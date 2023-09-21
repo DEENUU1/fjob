@@ -68,6 +68,9 @@ class OLX(Scraper):
             "category_id": "4",
         }
 
+    def convert_search_query(self, query: str) -> str:
+        return query.replace(" ", "%20")
+
     def set_param(self, key: str, value: str):
         """
         Set a query parameter for the URL.
@@ -76,6 +79,8 @@ class OLX(Scraper):
             key: The parameter key.
             value: The parameter value.
         """
+        if key == "query":
+            value = self.convert_search_query(value)
         self.params[key] = value
 
     def build_url(self) -> str:
