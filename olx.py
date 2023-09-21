@@ -61,6 +61,37 @@ class OLX(Scraper):
 
     def __init__(self, url: str):
         super().__init__(url)
+        self.params = {
+            "offset": "0",
+            "sort_by": "created_at:desc",
+            "limit": "40",
+            "category_id": "4",
+        }
+
+    def set_param(self, key: str, value: str):
+        """
+        Set a query parameter for the URL.
+
+        Args:
+            key: The parameter key.
+            value: The parameter value.
+        """
+        self.params[key] = value
+
+    def build_url(self) -> str:
+        """
+        Build the URL to be used for scraping.
+
+        Returns:
+            The URL to be used for scraping.
+        """
+        url = self.url
+        if self.params:
+            param_string = "&".join(
+                [f"{key}={value}" for key, value in self.params.items()]
+            )
+            url += f"?{param_string}"
+        return url
 
     def fetch_data(self) -> List[Dict[str, str]] | None:
         """
@@ -70,7 +101,7 @@ class OLX(Scraper):
             A list of dictionaries containing the job offer data, or None if an error occurred.
         """
         try:
-            r = requests.get(self.url)
+            r = requests.get(self.build_url())
             r.raise_for_status()
             return json.loads(r.content)
         except requests.exceptions.HTTPError as http_err:
@@ -79,7 +110,7 @@ class OLX(Scraper):
             logging.error(f"JSON decoding error occurred: {json_err}")
         return None
 
-    def parse_offer(self, json_data: List[Dict[str, str]]) -> List[ParsedOffer] | None:
+    def parse_offer(self, json_data: Dict[str, List]) -> List[ParsedOffer] | None:
         """
         Parse fetched data and return a list of ParsedOffer objects.
 
@@ -95,8 +126,8 @@ class OLX(Scraper):
             return None
 
         parsed_data = []
-        for data in json_data:
-            pass
+        for data in json_data["data"]:
+            print(data)
 
         return parsed_data
 
@@ -105,6 +136,13 @@ if __name__ == "__main__":
     l = OLXLocalization("Zdunska-wola")
     x = l.return_localization_data()
     print(x)
+
+    olx_scraper = OLX("https://www.olx.pl/api/v1/offers/")
+    olx_scraper.set_param("query", "python")
+    # olx_scraper.set_param("city_id", str(x.city_id))
+    # olx_scraper.set_param("region_id", str(x.region_id))
+    data = olx_scraper.fetch_data()
+    print(olx_scraper.parse_offer(data))
 
     # c = JustJoinIT(f"https://www.justjoin.it/api/offers")
     #
