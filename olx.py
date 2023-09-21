@@ -13,6 +13,22 @@ logging.basicConfig(
 
 
 @dataclass
+class ParamsData:
+    """
+    Dataclass for storing params data
+    """
+
+    type: Optional[str] = None
+    agreement: Optional[bool] = None
+    salary_from: Optional[int] = None
+    salary_to: Optional[int] = None
+    currency: Optional[str] = None
+    experience: Optional[bool] = None
+    availability: Optional[str] = None
+    workplace: Optional[str] = None
+
+
+@dataclass
 class LocalizationData:
     """
     Dataclass for storing localization data
@@ -68,7 +84,8 @@ class OLX(Scraper):
             "category_id": "4",
         }
 
-    def convert_search_query(self, query: str) -> str:
+    @staticmethod
+    def convert_search_query(query: str) -> str:
         return query.replace(" ", "%20")
 
     def set_param(self, key: str, value: str):
@@ -97,6 +114,18 @@ class OLX(Scraper):
             )
             url += f"?{param_string}"
         return url
+
+    def process_description(self, description: str) -> str:
+        """
+        Delete HTML tags from description
+        """
+        pass
+
+    def get_params(self, params: List[Dict[str, str]]) -> List[ParamsData]:
+        """
+        Extract params data from json file
+        """
+        pass
 
     def fetch_data(self) -> List[Dict[str, str]] | None:
         """
@@ -132,7 +161,14 @@ class OLX(Scraper):
 
         parsed_data = []
         for data in json_data["data"]:
-            print(data)
+            parsed_data.append(
+                ParsedOffer(
+                    title=data["title"],
+                    id=data["id"],
+                    url=data["url"],
+                    description=data["description"],
+                )
+            )
 
         return parsed_data
 
@@ -143,7 +179,7 @@ if __name__ == "__main__":
     print(x)
 
     olx_scraper = OLX("https://www.olx.pl/api/v1/offers/")
-    olx_scraper.set_param("query", "python")
+    olx_scraper.set_param("query", "python junior")
     # olx_scraper.set_param("city_id", str(x.city_id))
     # olx_scraper.set_param("region_id", str(x.region_id))
     data = olx_scraper.fetch_data()
