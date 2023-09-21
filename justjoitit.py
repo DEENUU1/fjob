@@ -61,6 +61,7 @@ class JustJoinIT(Scraper):
 
             location_data = data.get("multilocation", [{}])[0]
 
+            # Todo scrape region
             parsed_data.append(
                 ParsedOffer(
                     title=data.get("title", None),

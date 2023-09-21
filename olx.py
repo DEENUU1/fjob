@@ -49,6 +49,16 @@ class LocalizationData:
     city_name: Optional[str] = None
 
 
+@dataclass
+class Localization:
+    """
+    Dataclass for storing localization data
+    """
+
+    region: Optional[str] = None
+    city: Optional[str] = None
+
+
 class OLXLocalization:
     """
     Fetch localization data from OLX API
@@ -130,6 +140,25 @@ class OLX(Scraper):
         Delete HTML tags from description
         """
         pass
+
+    def get_localization_data(
+        self, localization: List[Dict[str, Union[str, List[ValueData]]]]
+    ) -> Localization:
+        """
+        Extract localization data from json file
+        """
+        region = None
+        city = None
+
+        if "region" in localization:
+            region = localization["region"]["name"]
+        elif "city" in localization:
+            city = localization["city"]["name"]
+
+        return Localization(
+            region=region,
+            city=city,
+        )
 
     def get_params(
         self, params: List[Dict[str, Union[str, List[ValueData]]]]
@@ -224,12 +253,33 @@ class OLX(Scraper):
         parsed_data = []
         for data in json_data["data"]:
             params_data = self.get_params(data["params"])
+            localization_data = self.get_localization_data(data["location"])
+
+            is_remote = (
+                "zdalna" in params_data.workplace if params_data.workplace else False
+            )
+            is_hybrid = (
+                "hybrid" in params_data.workplace if params_data.workplace else False
+            )
+
             parsed_data.append(
                 ParsedOffer(
                     title=data["title"],
                     id=data["id"],
+                    salary_from=params_data.salary_from,
+                    salary_to=params_data.salary_to,
+                    currency=params_data.currency,
                     url=data["url"],
+                    region=localization_data.region,
                     description=data["description"],
+                    remote=is_remote,
+                    hybrid=is_hybrid,
+                    country="PL",
+                    city=localization_data.city,
+                    date_created=data["created_time"],
+                    date_finished=data["valid_to_time"],
+                    company_name=data["user"]["name"],
+                    company_logo=data["user"]["banner_mobile"],
                 )
             )
 
@@ -246,7 +296,7 @@ if __name__ == "__main__":
     # olx_scraper.set_param("city_id", str(x.city_id))
     # olx_scraper.set_param("region_id", str(x.region_id))
     data = olx_scraper.fetch_data()
-    print(olx_scraper.parse_offer(data))
+    print(olx_scraper.parse_offer(data)[1])
 
     # c = JustJoinIT(f"https://www.justjoin.it/api/offers")
     #
