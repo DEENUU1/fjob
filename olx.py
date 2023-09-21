@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 import logging
 from scraper import Scraper, ParsedOffer
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, Union
 import requests
 import json
 
@@ -10,6 +10,16 @@ logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s - %(levelname)s - %(message)s",
 )
+
+
+@dataclass
+class ValueData(Dict[str, Optional[str]]):
+    """
+    Datatype for params data
+    """
+
+    key: str
+    value: Optional[str]
 
 
 @dataclass
@@ -121,11 +131,63 @@ class OLX(Scraper):
         """
         pass
 
-    def get_params(self, params: List[Dict[str, str]]) -> List[ParamsData]:
+    def get_params(
+        self, params: List[Dict[str, Union[str, List[ValueData]]]]
+    ) -> ParamsData:
         """
         Extract params data from json file
         """
-        pass
+        type = None
+        agreement = None
+        salary_from = None
+        salary_to = None
+        currency = None
+        experience = False
+        availability = None
+        workplace = None
+
+        for param in params:
+            key = param["key"]
+            value = param.get("value")
+
+            if value is not None:
+                if key == "type":
+                    type = value["key"]
+                elif key == "agreement":
+                    if isinstance(value, list):
+                        agreement = value[1] if len(value) > 1 else None
+                    else:
+                        agreement = value["key"]
+                elif key == "salary":
+                    if isinstance(value, list):
+                        salary_from = value[0] if len(value) > 0 else None
+                        salary_to = value[1] if len(value) > 1 else None
+                        currency = value[3] if len(value) > 3 else None
+                    else:
+                        salary_from = value.get("from")
+                        salary_to = value.get("to")
+                        currency = value.get("currency")
+                elif (
+                    key == "experience"
+                    and isinstance(value, list)
+                    and value[0] == "exp_yes"
+                ):
+                    experience = True
+                elif key == "availability":
+                    availability = value["key"]
+                elif key == "workplace":
+                    workplace = value["key"]
+
+        return ParamsData(
+            type=type,
+            agreement=agreement,
+            salary_from=salary_from,
+            salary_to=salary_to,
+            currency=currency,
+            experience=experience,
+            availability=availability,
+            workplace=workplace,
+        )
 
     def fetch_data(self) -> List[Dict[str, str]] | None:
         """
@@ -161,6 +223,7 @@ class OLX(Scraper):
 
         parsed_data = []
         for data in json_data["data"]:
+            params_data = self.get_params(data["params"])
             parsed_data.append(
                 ParsedOffer(
                     title=data["title"],
