@@ -139,7 +139,16 @@ class OLX(Scraper):
         """
         Delete HTML tags from description
         """
-        pass
+        return (
+            description.replace("<p>", " ")
+            .replace("</p>", " ")
+            .replace("<strong>", " ")
+            .replace("</strong>", " ")
+            .replace("<li>", " ")
+            .replace("</li>", " ")
+            .replace("<ul>", " ")
+            .replace("</ul>", " ")
+        )
 
     def get_localization_data(
         self, localization: List[Dict[str, Union[str, List[ValueData]]]]
@@ -271,7 +280,7 @@ class OLX(Scraper):
                     currency=params_data.currency,
                     url=data["url"],
                     region=localization_data.region,
-                    description=data["description"],
+                    description=self.process_description(data["description"]),
                     remote=is_remote,
                     hybrid=is_hybrid,
                     country="PL",
