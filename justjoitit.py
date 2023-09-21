@@ -6,7 +6,10 @@ import json
 
 class JustJoinIT(Scraper):
 
-    def fetch_data(self):
+    def fetch_data(self) -> List[Dict[str, str]] | None:
+        """
+        Fetch data from JustJoin.it API
+        """
         r = requests.get(self.url)
         try:
             r.raise_for_status()
@@ -17,7 +20,14 @@ class JustJoinIT(Scraper):
             print(f"JSON decoding error occurred: {json_err}")
         return None
 
-    def parse_data(self, json_data: Dict[str, str]):
+    def parse_data(self, json_data: List[Dict[str, str]]) -> List[ParsedOffer] | None:
+        """
+        Parse fetched data and return a list of ParsedOffer objects
+        """
+        if not json_data:
+            print("No data received")
+            return None
+
         parsed_data = []
         for data in json_data:
 
@@ -55,13 +65,6 @@ class JustJoinIT(Scraper):
 if __name__ == "__main__":
     c = JustJoinIT(f"https://www.justjoin.it/api/offers")
 
-    # print("FETCHED DATA")
-    # f = c.fetch_data()
-
-    with open("data.json", "r", encoding="utf-8") as json_file:
-        f = json.load(json_file)
-
-    print("PARSED DATA")
-
-    print(c.parse_data(f)[10])
+    f = c.fetch_data()
+    print(c.parse_data(f)[1])
 
