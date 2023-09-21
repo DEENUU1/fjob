@@ -4,7 +4,11 @@ from typing import Dict, List
 import requests
 import json
 
-logging.basicConfig(filename='justjoinit.log', level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+logging.basicConfig(
+    filename="justjoinit.log",
+    level=logging.INFO,
+    format="%(asctime)s - %(levelname)s - %(message)s",
+)
 
 
 class JustJoinIT(Scraper):
@@ -61,9 +65,15 @@ class JustJoinIT(Scraper):
                 ParsedOffer(
                     title=data.get("title", None),
                     id=data.get("id", None),
-                    salary_from=salary_info.get("from", None) if salary_info is not None else None,
-                    salary_to=salary_info.get("to", None) if salary_info is not None else None,
-                    currency=salary_info.get("currency", None) if salary_info is not None else None,
+                    salary_from=salary_info.get("from", None)
+                    if salary_info is not None
+                    else None,
+                    salary_to=salary_info.get("to", None)
+                    if salary_info is not None
+                    else None,
+                    currency=salary_info.get("currency", None)
+                    if salary_info is not None
+                    else None,
                     url=f"https://www.justjoin.it/offers/{data.get('id', None)}",
                     street=location_data.get("street", None),
                     remote=remote,
@@ -72,7 +82,9 @@ class JustJoinIT(Scraper):
                     city=data.get("city", None),
                     date_created=data.get("published_at", None),
                     experience_level=data.get("experience_level", None),
-                    skills=[skill["name"] for skill in data.get("skills", None)] if "skills" in data else None,
+                    skills=[skill["name"] for skill in data.get("skills", None)]
+                    if "skills" in data
+                    else None,
                     company_name=data.get("company_name", None),
                     company_logo=data.get("company_logo_url", None),
                 )
@@ -88,5 +100,6 @@ if __name__ == "__main__":
     parsed_data = c.parse_offer(f)
     if parsed_data is not None:
         logging.info(f"Successfully parsed {len(parsed_data)} job offers")
+        print(parsed_data)
     else:
         logging.error("Failed to parse job offers")
