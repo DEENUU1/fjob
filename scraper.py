@@ -6,6 +6,7 @@ from dataclasses import dataclass
 @dataclass
 class ParsedOffer:
     title: Optional[str] = None
+    id: Optional[str] = None
     salary_from: Optional[int] = None
     salary_to: Optional[int] = None
     currency: Optional[str] = None
@@ -21,6 +22,9 @@ class ParsedOffer:
     date_finished: Optional[str] = None
     experience_level: Optional[str] = None
     skills: Optional[List[str]] = None
+    company_name: Optional[str] = None
+    company_logo: Optional[str] = None
+
 
 class Scraper(ABC):
     def __init__(self, url: str, search: Dict[str, str] = None):
@@ -32,7 +36,7 @@ class Scraper(ABC):
         pass
 
     @abstractmethod
-    def parse_data(self, json_data: List[Dict[str, str]]):
+    def parse_offer(self, json_data: List[Dict[str, str]]):
         pass
 
     def save_data(self, data: List[ParsedOffer]):
