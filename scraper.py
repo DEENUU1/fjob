@@ -11,7 +11,8 @@ class ParsedOffer:
     salary_to: Optional[int] = None
     currency: Optional[str] = None
     url: Optional[str] = None
-    street:  Optional[str] = None
+    street: Optional[str] = None
+    region: Optional[str] = None
     additional_data: Optional[Dict[str, str]] = None
     description: Optional[str] = None
     remote: Optional[bool] = None
@@ -42,4 +43,3 @@ class Scraper(ABC):
     def save_data(self, data: List[ParsedOffer]):
         pass
         # Implement saving data to database here
-
