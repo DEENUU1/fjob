@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 import logging
 from scraper import Scraper, ParsedOffer
-from typing import Dict, List, Optional, Union
+from typing import Dict, List, Optional, Any
 import requests
 import json
 
@@ -10,16 +10,6 @@ logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s - %(levelname)s - %(message)s",
 )
-
-
-@dataclass
-class ValueData(Dict[str, Optional[str]]):
-    """
-    Datatype for params data
-    """
-
-    key: str
-    value: Optional[str]
 
 
 @dataclass
@@ -135,7 +125,8 @@ class OLX(Scraper):
             url += f"?{param_string}"
         return url
 
-    def process_description(self, description: str) -> str:
+    @staticmethod
+    def process_description(description: str) -> str:
         """
         Delete HTML tags from description
         """
@@ -150,9 +141,8 @@ class OLX(Scraper):
             .replace("</ul>", " ")
         )
 
-    def get_localization_data(
-        self, localization: List[Dict[str, Union[str, List[ValueData]]]]
-    ) -> Localization:
+    @staticmethod
+    def get_localization_data(localization: Dict[str, Dict[str, str]]) -> Localization:
         """
         Extract localization data from json file
         """
@@ -169,9 +159,8 @@ class OLX(Scraper):
             city=city,
         )
 
-    def get_params(
-        self, params: List[Dict[str, Union[str, List[ValueData]]]]
-    ) -> ParamsData:
+    @staticmethod
+    def get_params(params: List[Dict[str, Any]]) -> ParamsData:
         """
         Extract params data from json file
         """
