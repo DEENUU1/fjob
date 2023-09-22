@@ -55,16 +55,19 @@ class OLXLocalization:
     """
 
     def __init__(self, city_name: str):
-        self.city_name = city_name
+        self.city_name = city_name.replace(" ", "-").lower()
         self.base_url = (
             f"https://www.olx.pl/api/v1/friendly-links/query-params/{self.city_name}"
         )
 
     def get_localization_data(self) -> dict | None:
-        response = requests.get(self.base_url)
-        if response.status_code != 200:
+        try:
+            response = requests.get(self.base_url)
+            response.raise_for_status()
+            return json.loads(response.content)
+        except requests.exceptions.RequestException as e:
+            logging.error(f"Request error occurred: {e}")
             return None
-        return json.loads(response.content)
 
     def return_localization_data(self) -> LocalizationData | None:
         """
@@ -217,12 +220,6 @@ class OLX(Scraper):
         )
 
     def fetch_data(self) -> List[Dict[str, str]] | None:
-        """
-        Fetch data from OLX API.
-
-        Returns:
-            A list of dictionaries containing the job offer data, or None if an error occurred.
-        """
         try:
             r = requests.get(self.build_url())
             r.raise_for_status()
@@ -287,21 +284,21 @@ class OLX(Scraper):
 if __name__ == "__main__":
     l = OLXLocalization("Zdunska-wola")
     x = l.return_localization_data()
-    print(x)
+    if x is not None:
+        logging.info(f"Successfully scraped localization data: {x}")
+        print(x)
+    else:
+        logging.error("Failed to scrap localization data")
 
     olx_scraper = OLX("https://www.olx.pl/api/v1/offers/")
-    olx_scraper.set_param("query", "python junior")
-    # olx_scraper.set_param("city_id", str(x.city_id))
-    # olx_scraper.set_param("region_id", str(x.region_id))
+    # olx_scraper.set_param("query", "python junior")
+    olx_scraper.set_param("city_id", str(x.city_id))
+    olx_scraper.set_param("region_id", str(x.region_id))
     data = olx_scraper.fetch_data()
-    print(olx_scraper.parse_offer(data)[1])
+    result = olx_scraper.parse_offer(data)
 
-    # c = JustJoinIT(f"https://www.justjoin.it/api/offers")
-    #
-    # f = c.fetch_data()
-    # parsed_data = c.parse_offer(f)
-    # if parsed_data is not None:
-    #     logging.info(f"Successfully parsed {len(parsed_data)} job offers")
-    #     print(parsed_data)
-    # else:
-    #     logging.error("Failed to parse job offers")
+    if result is not None:
+        logging.info(f"Successfully parsed {len(result)} job offers")
+        print(result)
+    else:
+        logging.error("Failed to parse job offers")
