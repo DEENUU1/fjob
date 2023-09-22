@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 import logging
-from scraper import Scraper, ParsedOffer, Salary
+from .scraper import Scraper, ParsedOffer, Salary
 from typing import Dict, List, Optional, Any
 import requests
 import json
@@ -292,7 +292,6 @@ if __name__ == "__main__":
     x = l.return_localization_data()
     if x is not None:
         logging.info(f"Successfully scraped localization data: {x}")
-        print(x)
     else:
         logging.error("Failed to scrap localization data")
 
@@ -305,6 +304,5 @@ if __name__ == "__main__":
 
     if result is not None:
         logging.info(f"Successfully parsed {len(result)} job offers")
-        print(result)
     else:
         logging.error("Failed to parse job offers")
