@@ -12,23 +12,26 @@ logging.basicConfig(
 )
 
 
-class OLX(Scraper):
+class PracujPL(Scraper):
     """
-    A scraper for the OLX jobs board.
+    A scraper for the Pracuj.pl jobs board.
     """
 
     def __init__(self, url: str):
         super().__init__(url)
-        # self.params = {
-        #     "offset": "0",
-        #     "sort_by": "created_at:desc",
-        #     "limit": "40",
-        #     "category_id": "4",
-        # }
+        self.params = {}
 
-    # @staticmethod
-    # def convert_search_query(query: str) -> str:
-    #     return query.replace(" ", "%20")
+    @staticmethod
+    def convert_search_query(query: str) -> str:
+        return query.replace(" ", "+")
+
+    @staticmethod
+    def get_region_id(region: str) -> int:
+        pass
+
+    @staticmethod
+    def convert_city_name(city: str) -> str:
+        return city.replace(" ", "+")
 
     def set_param(self, key: str, value: str):
         """
@@ -40,6 +43,10 @@ class OLX(Scraper):
         """
         if key == "query":
             value = self.convert_search_query(value)
+        elif key == "r":  # Region
+            value = ...
+        elif key == "wp":  # City
+            value = ...
         self.params[key] = value
 
     def build_url(self) -> str:
@@ -91,23 +98,15 @@ class OLX(Scraper):
 
 
 if __name__ == "__main__":
-    l = OLXLocalization("Zdunska-wola")
-    x = l.return_localization_data()
-    if x is not None:
-        logging.info(f"Successfully scraped localization data: {x}")
-        print(x)
-    else:
-        logging.error("Failed to scrap localization data")
-
-    olx_scraper = OLX("https://www.olx.pl/api/v1/offers/")
-    # olx_scraper.set_param("query", "python junior")
-    olx_scraper.set_param("city_id", str(x.city_id))
-    olx_scraper.set_param("region_id", str(x.region_id))
-    data = olx_scraper.fetch_data()
-    result = olx_scraper.parse_offer(data)
-
-    if result is not None:
-        logging.info(f"Successfully parsed {len(result)} job offers")
-        print(result)
-    else:
-        logging.error("Failed to parse job offers")
+    scraper = PracujPL("https://massachusetts.pracuj.pl/jobOffers/listing/")
+    # # olx_scraper.set_param("query", "python junior")
+    # scraper.set_param("city_id", str(x.city_id))
+    # scraper.set_param("region_id", str(x.region_id))
+    # data = scraper.fetch_data()
+    # result = scraper.parse_offer(data)
+    #
+    # if result is not None:
+    #     logging.info(f"Successfully parsed {len(result)} job offers")
+    #     print(result)
+    # else:
+    #     logging.error("Failed to parse job offers")
