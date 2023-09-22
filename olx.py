@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 import logging
-from scraper import Scraper, ParsedOffer
+from scraper import Scraper, ParsedOffer, Salary
 from typing import Dict, List, Optional, Any
 import requests
 import json
@@ -257,13 +257,19 @@ class OLX(Scraper):
                 "hybrid" in params_data.workplace if params_data.workplace else False
             )
 
+            salary = Salary(
+                salary_from=params_data.salary_from,
+                salary_to=params_data.salary_to,
+                currency=params_data.currency,
+                contract_type=params_data.agreement,
+                work_schedule=params_data.type,
+            )
+
             parsed_data.append(
                 ParsedOffer(
                     title=data["title"],
                     id=data["id"],
-                    salary_from=params_data.salary_from,
-                    salary_to=params_data.salary_to,
-                    currency=params_data.currency,
+                    salary=[salary],
                     url=data["url"],
                     region=localization_data.region,
                     description=self.process_description(data["description"]),

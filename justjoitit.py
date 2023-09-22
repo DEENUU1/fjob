@@ -1,5 +1,5 @@
 import logging
-from scraper import Scraper, ParsedOffer
+from scraper import Scraper, ParsedOffer, Salary
 from typing import Dict, List
 import requests
 import json
@@ -56,25 +56,30 @@ class JustJoinIT(Scraper):
             remote = data.get("workplace_type", None) == "remote"
             hybrid = data.get("employment_types", None) == "partly_remote"
 
-            employment_types = data.get("employment_types", [{}])[0]
-            salary_info = employment_types.get("salary", {})
-
+            employment_types = data.get("employment_types", [{}])
             location_data = data.get("multilocation", [{}])[0]
 
-            # Todo scrape region
+            salary_data = []
+            for salary in employment_types:
+                salary_info = salary.get("salary", {})
+                salary_data.append(
+                    Salary(
+                        salary_from=salary_info.get("from", None)
+                        if salary_info
+                        else None,
+                        salary_to=salary_info.get("to", None) if salary_info else None,
+                        currency=salary_info.get("currency", None)
+                        if salary_info
+                        else None,
+                        contract_type=salary.get("type", None),
+                    )
+                )
+
             parsed_data.append(
                 ParsedOffer(
                     title=data.get("title", None),
                     id=data.get("id", None),
-                    salary_from=salary_info.get("from", None)
-                    if salary_info is not None
-                    else None,
-                    salary_to=salary_info.get("to", None)
-                    if salary_info is not None
-                    else None,
-                    currency=salary_info.get("currency", None)
-                    if salary_info is not None
-                    else None,
+                    salary=salary_data,
                     url=f"https://www.justjoin.it/offers/{data.get('id', None)}",
                     street=location_data.get("street", None),
                     remote=remote,
