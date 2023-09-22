@@ -1,0 +1,63 @@
+version: "3"
+
+services:
+    db:
+        hostname: db
+        image: postgres:15
+        container_name: fjob-db-dev
+        volumes:
+            - ./data/db:/var/lib/postgresql/data
+        environment:
+            - POSTGRES_DB=fjob
+            - POSTGRES_USER=fjob
+            - POSTGRES_PASSWORD=fjob123
+        ports:
+            - "5432:5432"
+
+    web:
+        hostname: web
+        build:
+            context: .
+            dockerfile: ./config/django/Dockerfile
+        container_name: fjob-web-dev
+        command: python manage.py runserver 0.0.0.0:8000
+        volumes:
+            - ./fjob:/app
+        ports:
+            - "8000:8000"
+        depends_on:
+            - db
+            - redis
+            - celery
+        env_file:
+            - .env
+
+#    redis:
+#        image: redis:latest
+#        container_name: fjob-redis-dev
+#        ports:
+#            - "6379:6379"
+
+#    celery:
+#        build:
+#            context: .
+#            dockerfile: ./config/django/Dockerfile
+#        container_name: myfridge-celery-dev
+#        command: celery -A myfridge.celery worker -l info
+#        volumes:
+#            - ./myfridge:/app/
+#        depends_on:
+#            - db
+#            - redis
+#
+#    celery_beat:
+#        build:
+#            context: .
+#            dockerfile: ./config/django/Dockerfile
+#        container_name: myfridge-celery-beat-dev
+#        command: celery -A myfridge.celery beat -l info
+#        volumes:
+#            - ./myfridge:/app/
+#        depends_on:
+#            - db
+#            - redis
