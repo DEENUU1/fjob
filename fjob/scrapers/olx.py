@@ -6,7 +6,7 @@ import requests
 import json
 
 logging.basicConfig(
-    filename="justjoinit.log",
+    filename="../logs.log",
     level=logging.INFO,
     format="%(asctime)s - %(levelname)s - %(message)s",
 )
