@@ -1,6 +1,7 @@
 from abc import ABC, abstractmethod
 from typing import Dict, List, Optional
 from dataclasses import dataclass
+from ..offers.models import Offers, Salaries
 
 
 @dataclass
@@ -47,6 +48,5 @@ class Scraper(ABC):
     def parse_offer(self, json_data: List[Dict[str, str]]):
         pass
 
-    def save_data(self, data: List[ParsedOffer]):
+    def save_data(self, data_list: List[ParsedOffer]) -> bool:
         pass
-        # Implement saving data to database here

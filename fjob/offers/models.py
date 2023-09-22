@@ -1,7 +1,7 @@
 from django.db import models
 
 
-class Salary(models.Model):
+class Salaries(models.Model):
     salary_from = models.IntegerField(null=True, blank=True)
     salary_to = models.IntegerField(null=True, blank=True)
     currency = models.CharField(max_length=10, null=True, blank=True)
@@ -12,7 +12,7 @@ class Salary(models.Model):
 class Offers(models.Model):
     title = models.CharField(max_length=255, null=True, blank=True)
     offer_id = models.CharField(max_length=255, null=True, blank=True)
-    salary = models.ManyToManyField(Salary)
+    salary = models.ManyToManyField(Salaries)
     url = models.CharField(max_length=255, null=True, blank=True)
     street = models.CharField(max_length=255, null=True, blank=True)
     region = models.CharField(max_length=255, null=True, blank=True)

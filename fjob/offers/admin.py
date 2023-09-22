@@ -1,8 +1,8 @@
 from django.contrib import admin
-from .models import Salary, Offers
+from .models import Salaries, Offers
 
 
-@admin.register(Salary)
+@admin.register(Salaries)
 class SalaryAdmin(admin.ModelAdmin):
     list_display = (
         "id",
