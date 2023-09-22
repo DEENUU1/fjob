@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from typing import Dict, List, Optional
 from dataclasses import dataclass
-from ..offers.models import Offers, Salaries
+from offers.models import Offers, Salaries
 from django.db import transaction
 
 
@@ -60,6 +60,8 @@ class Scraper(ABC):
 
         """
 
+        saved_offers = []
+
         for parsed_offer in data_list:
             try:
                 offer = Offers.objects.get(url=parsed_offer.url)
@@ -97,4 +99,6 @@ class Scraper(ABC):
                     salary.save()
                     offer.salary.add(salary)
 
-            return offer
+            saved_offers.append(offer)
+
+        return saved_offers

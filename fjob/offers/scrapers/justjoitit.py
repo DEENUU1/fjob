@@ -1,5 +1,5 @@
 import logging
-from scraper import Scraper, ParsedOffer, Salary
+from .scraper import Scraper, ParsedOffer, Salary
 from typing import Dict, List
 import requests
 import json
@@ -99,13 +99,13 @@ class JustJoinIT(Scraper):
         return parsed_data
 
 
-if __name__ == "__main__":
+def run():
     c = JustJoinIT(f"https://www.justjoin.it/api/offers")
 
     f = c.fetch_data()
     parsed_data = c.parse_offer(f)
     if parsed_data is not None:
         logging.info(f"Successfully parsed {len(parsed_data)} job offers")
-        print(parsed_data)
+        c.save_data(parsed_data)
     else:
         logging.error("Failed to parse job offers")
