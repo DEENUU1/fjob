@@ -23,14 +23,38 @@ class PracujPL(Scraper):
 
     @staticmethod
     def convert_search_query(query: str) -> str:
+        """Replace spaces with '+' in search query.
+
+        Args:
+            query: The search query.
+
+        Returns:
+            The search query with spaces replaced with '+'.
+        """
         return query.replace(" ", "+")
 
     @staticmethod
     def convert_city_name(city: str) -> str:
+        """Replace spaces with '+' in city name.
+
+        Args:
+            city: The city name.
+
+        Returns:
+            The city name with spaces replaced with '+'.
+        """
         return city.replace(" ", "+")
 
     @staticmethod
     def convert_region_name(region: str) -> str:
+        """Replace spaces with '-' in region name.
+
+        Args:
+            region: The region name.
+
+        Returns:
+            The region name with spaces replaced with '-'.
+        """
         return region.replace(" ", "-")
 
     def set_param(self, key: str, value: str):
@@ -43,10 +67,6 @@ class PracujPL(Scraper):
         """
         if key == "query":
             value = self.convert_search_query(value)
-        elif key == "r":  # Region
-            value = self.convert_region_name(value)
-        elif key == "c":  # City
-            value = self.convert_city_name(value)
         self.params[key] = value
 
     def build_url(self) -> str:
@@ -64,7 +84,7 @@ class PracujPL(Scraper):
             url += f"?{param_string}"
         return url
 
-    def fetch_data(self) -> List[Dict[str, str]] | None:
+    def fetch_data(self) -> Optional[Dict[str, List[Dict[str, str]]]]:
         try:
             r = requests.get(self.build_url())
             r.raise_for_status()
@@ -75,7 +95,22 @@ class PracujPL(Scraper):
             logging.error(f"JSON decoding error occurred: {json_err}")
         return None
 
-    def parse_offer(self, json_data: Dict[str, List]) -> List[ParsedOffer] | None:
+    @staticmethod
+    def check_work_mode(datas: List[str]):
+        is_hybrid = False
+        is_remote = False
+
+        for data in datas:
+            if "zdalna" in data:
+                is_remote = True
+            elif "hybrydowa" in data:
+                is_hybrid = True
+
+        return is_hybrid, is_remote
+
+    def parse_offer(
+        self, json_data: Optional[Dict[str, List[Dict[str, str]]]]
+    ) -> List[ParsedOffer] | None:
         """
         Parse fetched data and return a list of ParsedOffer objects.
 
@@ -91,22 +126,48 @@ class PracujPL(Scraper):
             return None
 
         parsed_data = []
-        for data in json_data["data"]:
-            pass
+        for data in json_data["groupedOffers"]:
+            is_hybrid, is_remote = self.check_work_mode(data["workModes"])
+
+            parsed_data.append(
+                ParsedOffer(
+                    title=data["jobTitle"],
+                    id=...,
+                    url=data["offers"][0]["offerAbsoluteUri"],
+                    remote=is_remote,
+                    hybrid=is_hybrid,
+                    country="PL",
+                    city=data["offers"][0]["displayWorkplace"],
+                    date_created=data["lastPublicated"],
+                    date_finished=data["expirationDate"],
+                    description=data["jobDescription"],
+                    company_name=data["companyName"],
+                    company_logo=data["companyLogoUri"],
+                )
+            )
 
         return parsed_data
 
 
 if __name__ == "__main__":
-    scraper = PracujPL("https://massachusetts.pracuj.pl/jobOffers/listing/")
+    scraper = PracujPL("https://massachusetts.pracuj.pl/jobOffers/listing/multiregion")
     scraper.set_param("query", "junior")
-    scraper.set_param("r", "łódzkie")
-    scraper.set_param("c", "Łódź")
+
+    region = "łódzkie"
+    city = "Zduńska Wola"
+
+    if region and city:
+        scraper.set_param("wp", region)
+    elif region:
+        scraper.set_param("wp", region)
+    elif city:
+        scraper.set_param("wp", city)
+
     data = scraper.fetch_data()
-    # result = scraper.parse_offer(data)
-    #
-    # if result is not None:
-    #     logging.info(f"Successfully parsed {len(result)} job offers")
-    #     print(result)
-    # else:
-    #     logging.error("Failed to parse job offers")
+    result = scraper.parse_offer(data)
+
+    if result is not None:
+        logging.info(f"Successfully parsed {len(result)} job offers")
+        print(result[38])
+    else:
+        logging.error("Failed to parse job offers")
