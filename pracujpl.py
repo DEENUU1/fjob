@@ -1,5 +1,5 @@
 import logging
-from scraper import Scraper, ParsedOffer
+from scraper import Scraper, ParsedOffer, Salary
 from typing import Dict, List, Optional
 import requests
 import json
@@ -129,10 +129,15 @@ class PracujPL(Scraper):
         for data in json_data["groupedOffers"]:
             is_hybrid, is_remote = self.check_work_mode(data["workModes"])
 
+            salary = Salary(
+                contract_type=data["typesOfContract"][0],
+                work_schedule=data["workSchedules"][0],
+            )
+
             parsed_data.append(
                 ParsedOffer(
                     title=data["jobTitle"],
-                    id=...,
+                    salary=[salary],
                     url=data["offers"][0]["offerAbsoluteUri"],
                     remote=is_remote,
                     hybrid=is_hybrid,
@@ -144,8 +149,6 @@ class PracujPL(Scraper):
                     company_name=data["companyName"],
                     company_logo=data["companyLogoUri"],
                     experience_level=data["positionLevels"][0],
-                    contract_type=data["typesOfContract"][0],
-                    work_schedules=data["workSchedules"][0],
                 )
             )
 

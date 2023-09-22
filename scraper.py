@@ -4,12 +4,19 @@ from dataclasses import dataclass
 
 
 @dataclass
-class ParsedOffer:
-    title: Optional[str] = None
-    id: Optional[str] = None
+class Salary:
     salary_from: Optional[int] = None
     salary_to: Optional[int] = None
     currency: Optional[str] = None
+    contract_type: Optional[str] = None
+    work_schedule: Optional[str] = None
+
+
+@dataclass
+class ParsedOffer:
+    title: Optional[str] = None
+    id: Optional[str] = None
+    salary: Optional[List[Salary]] = None
     url: Optional[str] = None
     street: Optional[str] = None
     region: Optional[str] = None
@@ -25,8 +32,6 @@ class ParsedOffer:
     skills: Optional[List[str]] = None
     company_name: Optional[str] = None
     company_logo: Optional[str] = None
-    contract_type: Optional[str] = None
-    work_schedules: Optional[str] = None
 
 
 class Scraper(ABC):
