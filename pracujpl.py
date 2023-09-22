@@ -1,7 +1,6 @@
-from dataclasses import dataclass
 import logging
 from scraper import Scraper, ParsedOffer
-from typing import Dict, List, Optional, Any
+from typing import Dict, List, Optional
 import requests
 import json
 
@@ -97,6 +96,7 @@ class PracujPL(Scraper):
 
     @staticmethod
     def check_work_mode(datas: List[str]):
+        """Check if hybrid or remote work mode are available."""
         is_hybrid = False
         is_remote = False
 
@@ -143,6 +143,9 @@ class PracujPL(Scraper):
                     description=data["jobDescription"],
                     company_name=data["companyName"],
                     company_logo=data["companyLogoUri"],
+                    experience_level=data["positionLevels"][0],
+                    contract_type=data["typesOfContract"][0],
+                    work_schedules=data["workSchedules"][0],
                 )
             )
 

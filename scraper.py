@@ -25,6 +25,8 @@ class ParsedOffer:
     skills: Optional[List[str]] = None
     company_name: Optional[str] = None
     company_logo: Optional[str] = None
+    contract_type: Optional[str] = None
+    work_schedules: Optional[str] = None
 
 
 class Scraper(ABC):
