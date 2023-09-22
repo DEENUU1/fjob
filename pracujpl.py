@@ -26,12 +26,12 @@ class PracujPL(Scraper):
         return query.replace(" ", "+")
 
     @staticmethod
-    def get_region_id(region: str) -> int:
-        pass
-
-    @staticmethod
     def convert_city_name(city: str) -> str:
         return city.replace(" ", "+")
+
+    @staticmethod
+    def convert_region_name(region: str) -> str:
+        return region.replace(" ", "-")
 
     def set_param(self, key: str, value: str):
         """
@@ -44,9 +44,9 @@ class PracujPL(Scraper):
         if key == "query":
             value = self.convert_search_query(value)
         elif key == "r":  # Region
-            value = ...
-        elif key == "wp":  # City
-            value = ...
+            value = self.convert_region_name(value)
+        elif key == "c":  # City
+            value = self.convert_city_name(value)
         self.params[key] = value
 
     def build_url(self) -> str:
@@ -99,10 +99,10 @@ class PracujPL(Scraper):
 
 if __name__ == "__main__":
     scraper = PracujPL("https://massachusetts.pracuj.pl/jobOffers/listing/")
-    # # olx_scraper.set_param("query", "python junior")
-    # scraper.set_param("city_id", str(x.city_id))
-    # scraper.set_param("region_id", str(x.region_id))
-    # data = scraper.fetch_data()
+    scraper.set_param("query", "junior")
+    scraper.set_param("r", "łódzkie")
+    scraper.set_param("c", "Łódź")
+    data = scraper.fetch_data()
     # result = scraper.parse_offer(data)
     #
     # if result is not None:
