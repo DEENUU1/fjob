@@ -1,32 +1,60 @@
 from requests_html import HTMLSession
+from dataclasses import dataclass
+from typing import Optional
 
-url = "https://nofluffjobs.com/pl/backend?page=1"
+
+@dataclass
+class Data:
+    url: Optional[str] = None
+    title: Optional[str] = None
+    salary: Optional[str] = None
+    location: Optional[str] = None
+
+
+page_number = 1
 
 session = HTMLSession()
-r = session.get(url)
-r.html.render()
 
-# Wybierz wszystkie oferty wewnątrz diva o klasie 'list-container ng-star-inserted'
-offers = r.html.find("div.list-container.ng-star-inserted a")
+offers_ls = []
 
-for offer in offers:
-    # Wydobądź URL
-    url = offer.attrs["href"]
+while True:
+    url = f"https://nofluffjobs.com/pl/backend?page={page_number}"
+    r = session.get(url)
+    r.html.render()
+    offers = r.html.find("div.list-container.ng-star-inserted a")
+    new_offers_found = False
 
-    title_selector = offer.find("h3.posting-title__position", first=True)
-    title_text = title_selector.text.strip() if title_selector else "None"
+    for offer in offers:
+        url = offer.attrs["href"]
 
-    # Wydobądź widełki (salary ranges)
-    salary_selector = offer.find("span.text-truncate.badgy.salary", first=True)
-    salary_text = salary_selector.text.strip() if salary_selector else "None"
+        title_selector = offer.find("h3.posting-title__position", first=True)
+        title_text = title_selector.text.strip() if title_selector else None
 
-    # Wydobądź lokalizację
-    location_selector = offer.find("span.tw-text-ellipsis", first=True)
-    location_text = location_selector.text.strip() if location_selector else "None"
+        salary_selector = offer.find("span.text-truncate.badgy.salary", first=True)
+        salary_text = salary_selector.text.strip() if salary_selector else None
 
-    # Wyświetl dane oferty
-    print("URL:", url)
-    print("Tytuł:", title_text)
-    print("Widełki:", salary_text)
-    print("Lokalizacja:", location_text)
-    print()
+        location_selector = offer.find("span.tw-text-ellipsis", first=True)
+        location_text = location_selector.text.strip() if location_selector else None
+
+        if (
+            title_text is not None
+            and salary_text is not None
+            and location_text is not None
+        ):
+            offers_ls.append(
+                Data(
+                    url=url,
+                    title=title_text,
+                    salary=salary_text,
+                    location=location_text,
+                )
+            )
+            new_offers_found = True
+    if not new_offers_found:
+        break
+
+    page_number += 1
+    print(page_number)
+
+print(offers_ls)
+print(f"Offers: {len(offers_ls)}")
