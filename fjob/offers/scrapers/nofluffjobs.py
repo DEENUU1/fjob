@@ -28,6 +28,7 @@ class Nofluffjobs(Scraper):
         match = re.search(pattern, salary_text)
 
         if not match:
+            # Todo (3 600 PLN) salary format
             pass
         else:
             first_num = match.group(1).replace("\xa0", "")
@@ -41,9 +42,27 @@ class Nofluffjobs(Scraper):
             )
 
     @staticmethod
-    def check_for_experience_status_in_title(title: str) -> str:
+    def check_for_experience_status_in_title(title: str) -> str | None:
         """
         Check if experience status (junior, mid, senior) is included in the title.
+        """
+        title.lower()
+        result = None
+        if "intern" in title:
+            result = "intern"
+        if "junior" in title:
+            result = "junior"
+        elif "mid" in title:
+            result = "mid"
+        elif "senior" in title:
+            result = "senior"
+        return result
+
+    @staticmethod
+    def parse_localization(localization: str) -> str:
+        """
+        Check if localization data has additional information (like +4
+        and delete this information
         """
         pass
 
@@ -130,6 +149,9 @@ class Nofluffjobs(Scraper):
                                 "title": title_text,
                                 "salary": salary_text,
                                 "location": location_text,
+                                "experience_level": self.check_for_experience_status_in_title(
+                                    title_text
+                                ),
                             }
                         )
                         new_offers_found = True
@@ -166,6 +188,7 @@ class Nofluffjobs(Scraper):
                 url=f"https://nofluffjobs.com/pl/{data['id']}",
                 salary=[salary],
                 city=data["location"],
+                experience_level=data["experience_level"],
             )
             parsed_data.append(parsed_obj)
 
