@@ -2,7 +2,7 @@ from requests_html import HTMLSession
 import logging
 from .scraper import Scraper, ParsedOffer, Salary
 from typing import Dict, List
-
+import re
 
 logging.basicConfig(
     filename="../logs.log",
@@ -19,6 +19,27 @@ class Nofluffjobs(Scraper):
     def __init__(self, url: str):
         super().__init__(url)
 
+    @staticmethod
+    def parse_salary(salary_text: str) -> Salary:
+        """
+        Parse a salary data to return Salary dataclass object
+        """
+        pattern = r"(\d+)\s*–\s*(\d+)\s*PLN$"
+        match = re.search(pattern, salary_text)
+
+        if not match:
+            pass
+        else:
+            first_num = match.group(1).replace("\xa0", "")
+            second_num = match.group(2).replace("\xa0", "")
+            currency = match.group(3)
+
+            return Salary(
+                salary_from=int(first_num),
+                salary_to=int(second_num),
+                currency=currency,
+            )
+
     def fetch_data(self) -> List[Dict[str, str]]:
         """
         Scrape data from Nofluffjobs.com
@@ -30,13 +51,13 @@ class Nofluffjobs(Scraper):
         offers_ls = []
 
         categories = [
-            "backend",
+            # "backend",
             # "frontend",
             # "fullstack",
             # "mobile",
             # "embedded",
             # "artificial-intelligence",
-            # "data",
+            "data",
             # "business-intelligence",
             # "business-analyst",
             # "product-management",
@@ -131,7 +152,14 @@ class Nofluffjobs(Scraper):
 
         parsed_data = []
         for data in json_data:
-            pass
+            salary = self.parse_salary(data["salary"])
+            parsed_obj = ParsedOffer(
+                title=data["title"],
+                url=data["url"],
+                salary=[salary],
+                city=data["location"],
+            )
+            parsed_data.append(parsed_obj)
 
         return parsed_data
 
@@ -143,10 +171,10 @@ def run():
     logging.info(f"Successfully fetched {len(f)} job offers")
     print(f)
 
-    # parsed_data = c.parse_offer(f)
-    # if parsed_data is not None:
-    #     logging.info(f"Successfully parsed {len(parsed_data)} job offers")
-    #     print(parsed_data)
-    #     c.save_data(parsed_data)
-    # else:
-    #     logging.error("Failed to parse job offers")
+    parsed_data = c.parse_offer(f)
+    if parsed_data is not None:
+        logging.info(f"Successfully parsed {len(parsed_data)} job offers")
+        print(parsed_data)
+        c.save_data(parsed_data)
+    else:
+        logging.error("Failed to parse job offers")
