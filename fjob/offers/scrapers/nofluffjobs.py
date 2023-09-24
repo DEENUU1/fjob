@@ -40,6 +40,13 @@ class Nofluffjobs(Scraper):
                 currency=currency,
             )
 
+    @staticmethod
+    def check_for_experience_status_in_title(title: str) -> str:
+        """
+        Check if experience status (junior, mid, senior) is included in the title.
+        """
+        pass
+
     def fetch_data(self) -> List[Dict[str, str]]:
         """
         Scrape data from Nofluffjobs.com
@@ -119,7 +126,7 @@ class Nofluffjobs(Scraper):
                     ):
                         offers_ls.append(
                             {
-                                "url": url,
+                                "id": url,
                                 "title": title_text,
                                 "salary": salary_text,
                                 "location": location_text,
@@ -155,7 +162,8 @@ class Nofluffjobs(Scraper):
             salary = self.parse_salary(data["salary"])
             parsed_obj = ParsedOffer(
                 title=data["title"],
-                url=data["url"],
+                id=data["id"],
+                url=f"https://nofluffjobs.com/pl/{data['id']}",
                 salary=[salary],
                 city=data["location"],
             )
