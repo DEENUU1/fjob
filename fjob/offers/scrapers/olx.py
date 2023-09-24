@@ -287,7 +287,8 @@ class OLX(Scraper):
         return parsed_data
 
 
-if __name__ == "__main__":
+# if __name__ == "__main__":
+def run():
     l = OLXLocalization("Zdunska-wola")
     x = l.return_localization_data()
     if x is not None:
@@ -304,5 +305,6 @@ if __name__ == "__main__":
 
     if result is not None:
         logging.info(f"Successfully parsed {len(result)} job offers")
+        print(result)
     else:
         logging.error("Failed to parse job offers")
