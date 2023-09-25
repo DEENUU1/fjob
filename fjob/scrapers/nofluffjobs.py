@@ -11,7 +11,7 @@ logging.basicConfig(
 )
 
 
-class Nofluffjobs(Scraper):
+class NFJ(Scraper):
     """
     A scraper for the nofluffjobs.com jobs board.
     """
@@ -87,34 +87,34 @@ class Nofluffjobs(Scraper):
 
         categories = [
             "backend",
-            # "frontend",
-            # "fullstack",
-            # "mobile",
-            # "embedded",
-            # "artificial-intelligence",
+            "frontend",
+            "fullstack",
+            "mobile",
+            "embedded",
+            "artificial-intelligence",
             "data",
-            # "business-intelligence",
-            # "business-analyst",
-            # "product-management",
-            # "testing",
-            # "devops",
-            # "sys-administrator",
-            # "security",
-            # "architecture",
-            # "game-dev",
-            # "project-manager",
-            # "agile",
-            # "design",
-            # "support",
-            # "erp",
-            # "other",
-            # "hr",
-            # "marketing",
-            # "sales",
-            # "finance",
-            # "office-administration",
-            # "consulting",
-            # "customer-service",
+            "business-intelligence",
+            "business-analyst",
+            "product-management",
+            "testing",
+            "devops",
+            "sys-administrator",
+            "security",
+            "architecture",
+            "game-dev",
+            "project-manager",
+            "agile",
+            "design",
+            "support",
+            "erp",
+            "other",
+            "hr",
+            "marketing",
+            "sales",
+            "finance",
+            "office-administration",
+            "consulting",
+            "customer-service",
         ]
 
         for category in categories:
@@ -207,7 +207,7 @@ class Nofluffjobs(Scraper):
 
 
 def run():
-    c = Nofluffjobs("https://nofluffjobs.com/pl/")
+    c = NFJ("https://nofluffjobs.com/pl/")
 
     f = c.fetch_data()
     logging.info(f"Successfully fetched {len(f)} job offers")
