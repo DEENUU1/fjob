@@ -3,5 +3,5 @@ from .views import OfferFilterView
 
 
 urlpatterns = [
-    path("offers/", OfferFilterView.as_view(), name="offers"),
+    path("", OfferFilterView.as_view(), name="offers"),
 ]
