@@ -1,5 +1,5 @@
 from django.core.management.base import BaseCommand
-from offers.scrapers.nofluffjobs import run
+from scrapers.nofluffjobs import run
 
 
 class Command(BaseCommand):

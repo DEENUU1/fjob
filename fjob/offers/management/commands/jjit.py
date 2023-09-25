@@ -1,5 +1,5 @@
 from django.core.management.base import BaseCommand
-from offers.scrapers.justjoitit import run
+from scrapers.justjoitit import run
 
 
 class Command(BaseCommand):
