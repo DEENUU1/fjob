@@ -1,4 +1,6 @@
 from django.db import models
+from django.utils import timezone
+from datetime import timedelta
 
 
 class Salaries(models.Model):
@@ -29,3 +31,8 @@ class Offers(models.Model):
     company_name = models.CharField(max_length=255, null=True, blank=True)
     company_logo = models.CharField(max_length=255, null=True, blank=True)
     date_scraped = models.DateTimeField(null=True, blank=True, auto_now=True)
+
+    @property
+    def is_new(self):
+        time_diff = timezone.now() - self.date_scraped
+        return time_diff < timedelta(days=1)
