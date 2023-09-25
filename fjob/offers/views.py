@@ -1,7 +1,9 @@
 from rest_framework.generics import ListAPIView
-from .models import Offers, Salaries
-from .serializers import OffersSerializer, SalariesSerializer
+from .models import Offers
+from .serializers import OffersSerializer
 from .forms import OfferFilterForm
+from rest_framework.exceptions import ValidationError
+from django.db.models import Q
 
 
 class OfferFilterView(ListAPIView):
@@ -18,8 +20,25 @@ class OfferFilterView(ListAPIView):
         max_salary = self.request.query_params.get("max_salary")
         experience_level = self.request.query_params.get("experience_level")
 
+        if city and not country:
+            raise ValidationError("City cannot be specified without a country.")
+        if country and not city:
+            raise ValidationError("Country cannot be specified without a city.")
+
+        if (min_salary or max_salary) and not (query or country):
+            raise ValidationError(
+                "Salary range cannot be specified without a query or country."
+            )
+
+        if experience_level and not (query or country):
+            raise ValidationError(
+                "Experience level cannot be specified without a query or country."
+            )
+
         if query:
-            queryset = queryset.filter(title__icontains=query)
+            queryset = queryset.filter(
+                Q(title__icontains=query) | Q(description__icontains=query)
+            )
         if country:
             queryset = queryset.filter(country__icontains=country)
         if city:
