@@ -1,9 +1,9 @@
 from django.core.management.base import BaseCommand
-from scrapers.justjoitit import run
+from scrapers.olx import run
 
 
 class Command(BaseCommand):
-    help = "Run scraper for JustJoin.it platform"
+    help = "Run scraper for OLX platform"
 
     def handle(self, *args, **kwargs):
         run()

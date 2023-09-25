@@ -89,15 +89,26 @@ class Scraper(ABC):
 
             if parsed_offer.salary:
                 for salary_data in parsed_offer.salary:
-                    salary = Salaries(
-                        salary_from=salary_data.salary_from,
-                        salary_to=salary_data.salary_to,
-                        currency=salary_data.currency,
-                        contract_type=salary_data.contract_type,
-                        work_schedule=salary_data.work_schedule,
-                    )
-                    salary.save()
-                    offer.salary.add(salary)
+                    if salary_data != None:
+                        salary = Salaries(
+                            salary_from=salary_data.salary_from
+                            if salary_data.salary_from
+                            else None,
+                            salary_to=salary_data.salary_to
+                            if salary_data.salary_to
+                            else None,
+                            currency=salary_data.currency
+                            if salary_data.currency
+                            else None,
+                            contract_type=salary_data.contract_type
+                            if salary_data.contract_type
+                            else None,
+                            work_schedule=salary_data.work_schedule
+                            if salary_data.work_schedule
+                            else None,
+                        )
+                        salary.save()
+                        offer.salary.add(salary)
 
             saved_offers.append(offer)
 
