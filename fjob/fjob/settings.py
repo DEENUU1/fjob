@@ -10,7 +10,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.getenv("DJANGO_SECRET_KEY")
 
 DEBUG = True
-
+DATA_UPLOAD_MAX_NUMBER_FIELDS = 9999999
 ALLOWED_HOSTS = []
 
 

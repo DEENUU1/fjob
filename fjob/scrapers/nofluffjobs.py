@@ -20,7 +20,7 @@ class Nofluffjobs(Scraper):
         super().__init__(url)
 
     @staticmethod
-    def parse_salary(salary_text: str) -> Salary:
+    def parse_salary(salary_text: str) -> Salary | None:
         """
         Parse a salary data to return Salary dataclass object
         """
@@ -29,19 +29,7 @@ class Nofluffjobs(Scraper):
         match = re.search(pattern_1, salary_text)
         match2 = re.search(pattern_2, salary_text)
 
-        if not match2:
-            pass
-        else:
-            num = match.group(1)
-            currency = match2.group(2)
-            return Salary(
-                salary_from=int(num),
-                currency=currency,
-            )
-
-        if not match:
-            pass
-        else:
+        if match:
             first_num = match.group(1).replace("\xa0", "")
             second_num = match.group(2).replace("\xa0", "")
             currency = match.group(3)
@@ -51,6 +39,17 @@ class Nofluffjobs(Scraper):
                 salary_to=int(second_num),
                 currency=currency,
             )
+
+        elif match2:
+            num = match2.group(1)
+            currency = match2.group(2)
+            return Salary(
+                salary_from=int(num),
+                currency=currency,
+            )
+        else:
+            logging.info(f"No salary found in {salary_text}")
+            return None
 
     @staticmethod
     def check_for_experience_status_in_title(title: str) -> str | None:
@@ -87,7 +86,7 @@ class Nofluffjobs(Scraper):
         offers_ls = []
 
         categories = [
-            # "backend",
+            "backend",
             # "frontend",
             # "fullstack",
             # "mobile",
@@ -212,12 +211,10 @@ def run():
 
     f = c.fetch_data()
     logging.info(f"Successfully fetched {len(f)} job offers")
-    print(f)
 
     parsed_data = c.parse_offer(f)
     if parsed_data is not None:
         logging.info(f"Successfully parsed {len(parsed_data)} job offers")
-        print(parsed_data)
         c.save_data(parsed_data)
     else:
         logging.error("Failed to parse job offers")
