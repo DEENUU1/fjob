@@ -56,15 +56,15 @@ class Nofluffjobs(Scraper):
         """
         Check if experience status (junior, mid, senior) is included in the title.
         """
-        title.lower()
+        tl = title.lower()
         result = None
-        if "intern" in title:
+        if "intern" in tl:
             result = "intern"
-        if "junior" in title:
+        if "junior" in tl:
             result = "junior"
-        elif "mid" in title:
+        elif "mid" in tl:
             result = "mid"
-        elif "senior" in title:
+        elif "senior" in tl:
             result = "senior"
         return result
 
@@ -215,6 +215,8 @@ def run():
     parsed_data = c.parse_offer(f)
     if parsed_data is not None:
         logging.info(f"Successfully parsed {len(parsed_data)} job offers")
+        logging.info(f"Saving parsed data to database")
         c.save_data(parsed_data)
+        logging.info(f"Data saved to database")
     else:
         logging.error("Failed to parse job offers")
