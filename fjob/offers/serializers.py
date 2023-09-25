@@ -10,6 +10,7 @@ class SalariesSerializer(serializers.ModelSerializer):
 
 class OffersSerializer(serializers.ModelSerializer):
     salary = SalariesSerializer(many=True, read_only=True)
+    is_new = serializers.ReadOnlyField(source="is_new")
 
     class Meta:
         model = Offers
