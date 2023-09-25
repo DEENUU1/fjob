@@ -1,0 +1,39 @@
+name: Run Tests
+
+on: [push, pull_request]
+
+jobs:
+  test:
+    name: Run pytest
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.11
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Set up SQLite database
+        working-directory: ./fjob/
+        env:
+          USE_SQLITE: "true"
+        run: |
+          python manage.py makemigrations
+          python manage.py migrate
+
+      - name: Change directory and run pytest
+        env:
+          DJANGO_SECRET_KEY: ${{secrets.SECRET_KEY}}
+          USE_SQLITE: "true"
+        working-directory: ./fjob/
+        run: |
+          pytest
+          
+      - name: Publish code coverage
+        uses: codecov/codecov-action@v2
