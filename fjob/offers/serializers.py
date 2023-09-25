@@ -1,10 +1,10 @@
 from rest_framework import serializers
-from .models import Offers, Salaries
+from .models import offers, salaries
 
 
 class SalariesSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Salaries
+        model = salaries.Salaries
         fields = "__all__"
 
 
@@ -13,5 +13,5 @@ class OffersSerializer(serializers.ModelSerializer):
     is_new_offer = serializers.ReadOnlyField(source="is_new")
 
     class Meta:
-        model = Offers
+        model = offers.Offers
         fields = "__all__"
