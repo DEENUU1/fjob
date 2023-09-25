@@ -5,12 +5,11 @@ from .forms import OfferFilterForm
 
 
 class OfferFilterView(ListAPIView):
-    queryset = Offers.objects.all()
     serializer_class = OffersSerializer
     filter_form_class = OfferFilterForm
 
     def get_queryset(self):
-        queryset = self.queryset
+        queryset = Offers.objects.all()
 
         query = self.request.query_params.get("query")
         country = self.request.query_params.get("country")
