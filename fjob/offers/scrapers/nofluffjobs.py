@@ -24,11 +24,22 @@ class Nofluffjobs(Scraper):
         """
         Parse a salary data to return Salary dataclass object
         """
-        pattern = r"(\d+)\s*–\s*(\d+)\s*PLN$"
-        match = re.search(pattern, salary_text)
+        pattern_1 = r"(\d+)\s*–\s*(\d+)\s*PLN$"
+        pattern_2 = r"(\d+)\s+([A-Z]+)"
+        match = re.search(pattern_1, salary_text)
+        match2 = re.search(pattern_2, salary_text)
+
+        if not match2:
+            pass
+        else:
+            num = match.group(1)
+            currency = match2.group(2)
+            return Salary(
+                salary_from=int(num),
+                currency=currency,
+            )
 
         if not match:
-            # Todo (3 600 PLN) salary format
             pass
         else:
             first_num = match.group(1).replace("\xa0", "")
