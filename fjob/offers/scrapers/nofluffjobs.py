@@ -1,7 +1,7 @@
 from requests_html import HTMLSession
 import logging
 from .scraper import Scraper, ParsedOffer, Salary
-from typing import Dict, List
+from typing import Dict, List, Any
 import re
 
 logging.basicConfig(
@@ -59,12 +59,11 @@ class Nofluffjobs(Scraper):
         return result
 
     @staticmethod
-    def parse_localization(localization: str) -> str:
+    def is_remote(localization: str) -> bool:
         """
-        Check if localization data has additional information (like +4
-        and delete this information
+        Check if 'Zdalnie' is in localization.
         """
-        pass
+        return "Zdalnie" in localization
 
     def fetch_data(self) -> List[Dict[str, str]]:
         """
@@ -152,6 +151,7 @@ class Nofluffjobs(Scraper):
                                 "experience_level": self.check_for_experience_status_in_title(
                                     title_text
                                 ),
+                                "is_remote": self.is_remote(location_text),
                             }
                         )
                         new_offers_found = True
@@ -164,7 +164,7 @@ class Nofluffjobs(Scraper):
 
         return offers_ls
 
-    def parse_offer(self, json_data: List[Dict[str, str]]) -> List[ParsedOffer] | None:
+    def parse_offer(self, json_data: List[Dict[str, Any]]) -> List[ParsedOffer] | None:
         """
         Parse fetched data and return a list of ParsedOffer objects.
 
@@ -189,6 +189,7 @@ class Nofluffjobs(Scraper):
                 salary=[salary],
                 city=data["location"],
                 experience_level=data["experience_level"],
+                remote=data["is_remote"],
             )
             parsed_data.append(parsed_obj)
 
