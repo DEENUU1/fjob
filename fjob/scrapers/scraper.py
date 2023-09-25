@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from typing import Dict, List, Optional
 from dataclasses import dataclass
-from offers.models import Offers, Salaries
+from offers.models import offers, salaries
 from django.db import transaction
 
 
@@ -64,9 +64,9 @@ class Scraper(ABC):
 
         for parsed_offer in data_list:
             try:
-                offer = Offers.objects.get(url=parsed_offer.url)
-            except Offers.DoesNotExist:
-                offer = Offers(url=parsed_offer.url)
+                offer = offers.Offers.objects.get(url=parsed_offer.url)
+            except offers.Offers.DoesNotExist:
+                offer = offers.Offers(url=parsed_offer.url)
 
             offer.title = parsed_offer.title
             offer.url = parsed_offer.url
@@ -90,7 +90,7 @@ class Scraper(ABC):
             if parsed_offer.salary:
                 for salary_data in parsed_offer.salary:
                     if salary_data != None:
-                        salary = Salaries(
+                        salary = salaries.Salaries(
                             salary_from=salary_data.salary_from
                             if salary_data.salary_from
                             else None,
