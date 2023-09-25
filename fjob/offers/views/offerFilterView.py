@@ -1,5 +1,5 @@
 from rest_framework.generics import ListAPIView
-from ..models import Offers
+from ..models import offers
 from ..serializers import OffersSerializer
 from ..forms import OfferFilterForm
 from rest_framework.exceptions import ValidationError
@@ -11,7 +11,7 @@ class OfferFilterView(ListAPIView):
     filter_form_class = OfferFilterForm
 
     def get_queryset(self):
-        queryset = Offers.objects.all()
+        queryset = offers.Offers.objects.all()
 
         query = self.request.query_params.get("query")
         country = self.request.query_params.get("country")
