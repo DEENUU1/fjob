@@ -3,7 +3,7 @@ import axios from "axios";
 import "../styles/OfferFilterForm.css";
 
 
-const OfferFilterForm = () => {
+const OfferFilterForm = ({onSubmit}) => {
   const [query, setQuery] = useState("");
   const [country, setCountry] = useState("");
   const [city, setCity] = useState("");
@@ -13,7 +13,6 @@ const OfferFilterForm = () => {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-
     const response = await axios.get("http://localhost:8000/offers/", {
       params: {
         query,
@@ -24,12 +23,8 @@ const OfferFilterForm = () => {
         experience_level: experienceLevel,
       },
     });
+    onSubmit(response.data);
 
-    const offers = response.data;
-
-    offers.forEach((offers) => {
-      console.log(offers);
-    });
   };
 
   return (
@@ -86,7 +81,8 @@ const OfferFilterForm = () => {
         Search
       </button>
     </form>
+
   );
-};
+};  
 
 export default OfferFilterForm;
