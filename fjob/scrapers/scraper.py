@@ -50,7 +50,11 @@ class Scraper(ABC):
     def parse_offer(self, json_data: List[Dict[str, str]]):
         pass
 
-    def save_parsed_data_to_json(self, data: List[ParsedOffer]):
+    def save_fetch_data_to_json(self, data) -> None:
+        with open("fetch_data.json", "w", encoding="utf-8") as file:
+            file.write(json.dumps(data, indent=4, ensure_ascii=False))
+
+    def save_parsed_data_to_json(self, data: List[ParsedOffer]) -> None:
         offer_dict = [asdict(offer) for offer in data]
         json_data = json.dumps(offer_dict, indent=4, ensure_ascii=False)
 
