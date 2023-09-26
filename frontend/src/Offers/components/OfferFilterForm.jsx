@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
+import axios from "axios";
 
 const OfferFilterForm = () => {
   const [query, setQuery] = useState("");
@@ -8,67 +9,67 @@ const OfferFilterForm = () => {
   const [maxSalary, setMaxSalary] = useState("");
   const [experienceLevel, setExperienceLevel] = useState("");
 
-  const [offers, setOffers] = useState([]);
-
-  useEffect(() => {
-    const fetchOffers = async () => {
-      const response = await axios.get(
-        `/api/offers/?query=${query}&country=${country}&city=${city}&min_salary=${minSalary}&max_salary=${maxSalary}&experience_level=${experienceLevel}`
-      );
-      setOffers(response.data);
-    };
-
-    fetchOffers();
-  }, [query, country, city, minSalary, maxSalary, experienceLevel]);
-
   const handleSubmit = async (event) => {
     event.preventDefault();
 
-    const response = await axios.get(
-      `/api/offers/?query=${query}&country=${country}&city=${city}&min_salary=${minSalary}&max_salary=${maxSalary}&experience_level=${experienceLevel}`
-    );
-    setOffers(response.data);
+    const response = await axios.get("http://localhost:8000/offers/", {
+      params: {
+        query,
+        country,
+        city,
+        min_salary: minSalary,
+        max_salary: maxSalary,
+        experience_level: experienceLevel,
+      },
+    });
+    
+    const offers = response.data;
+
+    offers.forEach((offers) => {
+        console.log(offers);
+    })
+
   };
 
   return (
     <form onSubmit={handleSubmit}>
       <input
         type="text"
-        placeholder="Query"
+        placeholder="Wyszukaj ofertę"
         value={query}
         onChange={(event) => setQuery(event.target.value)}
       />
+    <select value={country} onChange={(event) => setCountry(event.target.value)}>
+        <option value="">Country</option>
+        <option value="poland">Polska</option>
+        <option value="germany">Niemcy</option>
+        <option value="usa">USA</option>
+      </select>
       <input
         type="text"
-        placeholder="Country"
-        value={country}
-        onChange={(event) => setCountry(event.target.value)}
-      />
-      <input
-        type="text"
-        placeholder="City"
+        placeholder="Miasto"
         value={city}
         onChange={(event) => setCity(event.target.value)}
       />
       <input
         type="number"
-        placeholder="Min salary"
+        placeholder="Minimalna pensja"
         value={minSalary}
         onChange={(event) => setMinSalary(event.target.value)}
       />
       <input
         type="number"
-        placeholder="Max salary"
+        placeholder="Maksymalna pensja"
         value={maxSalary}
         onChange={(event) => setMaxSalary(event.target.value)}
       />
       <select value={experienceLevel} onChange={(event) => setExperienceLevel(event.target.value)}>
-        <option value="">Select experience level</option>
-        <option value="entry">Entry level</option>
-        <option value="mid">Mid level</option>
-        <option value="senior">Senior level</option>
+        <option value="">Experience level</option>
+        <option value="junior">Junior</option>
+        <option value="mid">Mid</option>
+        <option value="senior">Senior</option>
       </select>
-      <button type="submit">Submit</button>
+      <button type="submit">Wyszukaj</button>
     </form>
   );
 };
