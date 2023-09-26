@@ -287,9 +287,8 @@ class OLX(Scraper):
         return parsed_data
 
 
-# if __name__ == "__main__":
-def run():
-    l = OLXLocalization("Zdunska-wola")
+def run(city: str) -> None:
+    l = OLXLocalization(city)
     x = l.return_localization_data()
     if x is not None:
         logging.info(f"Successfully scraped localization data: {x}")

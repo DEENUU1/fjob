@@ -155,14 +155,12 @@ class PracujPL(Scraper):
         return parsed_data
 
 
-def run():
+def run(query: str, region: str, city: str) -> None:
     scraper = PracujPL("https://massachusetts.pracuj.pl/jobOffers/listing/multiregion")
-    scraper.set_param("query", "junior")
 
-    region = "łódzkie"
-    city = "Zduńska Wola"
-
-    if region and city:
+    if query:
+        scraper.set_param("query", query)
+    elif region and city:
         scraper.set_param("wp", region)
     elif region:
         scraper.set_param("wp", region)

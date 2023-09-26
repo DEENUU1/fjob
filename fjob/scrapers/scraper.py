@@ -54,7 +54,7 @@ class Scraper(ABC):
         offer_dict = [asdict(offer) for offer in data]
         json_data = json.dumps(offer_dict, indent=4, ensure_ascii=False)
 
-        with open(f"{self.url}.json", "w", encoding="utf-8") as file:
+        with open("parsed_data.json", "w", encoding="utf-8") as file:
             file.write(json_data)
 
     @transaction.atomic()

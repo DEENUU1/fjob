@@ -216,7 +216,6 @@ def run():
     if parsed_data is not None:
         logging.info(f"Successfully parsed {len(parsed_data)} job offers")
         logging.info(f"Saving parsed data to database")
-        c.save_parsed_data_to_json(parsed_data)
         c.save_data(parsed_data)
         logging.info(f"Data saved to database")
     else:
