@@ -27,8 +27,8 @@ services:
             - "8000:8000"
         depends_on:
             - db
-            - redis
-            - celery
+            # - redis
+            # - celery
         env_file:
             - .env
 
