@@ -1,5 +1,4 @@
 import React from "react";
-import OfferFilterForm from "../components/OfferFilterForm";
 import "../styles/Offers.css";
 import OffersList from "../components/OfferList";
 
