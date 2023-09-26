@@ -287,23 +287,43 @@ class OLX(Scraper):
         return parsed_data
 
 
-def run(city: str) -> None:
+def run(sfd: bool, spd: bool, city: str = None, query: str = None) -> None:
     l = OLXLocalization(city)
     x = l.return_localization_data()
-    if x is not None:
-        logging.info(f"Successfully scraped localization data: {x}")
-    else:
-        logging.error("Failed to scrap localization data")
-
     olx_scraper = OLX("https://www.olx.pl/api/v1/offers/")
-    # olx_scraper.set_param("query", "python junior")
-    olx_scraper.set_param("city_id", str(x.city_id))
-    olx_scraper.set_param("region_id", str(x.region_id))
-    data = olx_scraper.fetch_data()
-    result = olx_scraper.parse_offer(data)
 
-    if result is not None:
-        logging.info(f"Successfully parsed {len(result)} job offers")
-        print(result)
+    if x is None:
+        logging.error("Failed to scrap localization data")
     else:
-        logging.error("Failed to parse job offers")
+        logging.info(f"Successfully scraped localization data: {x}")
+        olx_scraper.set_param("city_id", str(x.city_id))
+        olx_scraper.set_param("region_id", str(x.region_id))
+
+    if query is not None:
+        olx_scraper.set_param("query", "python junior")
+
+    logging.info(f"Scraping job offers from {olx_scraper.url}")
+    data = olx_scraper.fetch_data()
+
+    if data is None:
+        logging.error("Failed to scrap job offers")
+    else:
+        logging.info(f"Scraped {len(data)} job offers")
+
+        if sfd:
+            logging.info(f"Saving fetch data to json")
+            olx_scraper.save_fetch_data_to_json(data)
+            logging.info(f"Fetch data saved to json")
+
+        result = olx_scraper.parse_offer(data)
+
+        if result is not None:
+            logging.info(f"Successfully parsed {len(result)} job offers")
+
+            if spd:
+                logging.info(f"Saving parsed data to json")
+                olx_scraper.save_parsed_data_to_json(result)
+                logging.info(f"Parsed data saved to json")
+
+        else:
+            logging.error("Failed to parse job offers")

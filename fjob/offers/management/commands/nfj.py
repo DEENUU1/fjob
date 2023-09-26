@@ -6,4 +6,7 @@ class Command(BaseCommand):
     help = "Run scraper for OLX platform"
 
     def handle(self, *args, **kwargs):
-        run()
+        run(
+            sfd=False,  # Do not save fetch data to json file
+            spd=False,  # Do not save parsed data to json file
+        )

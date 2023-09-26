@@ -155,7 +155,9 @@ class PracujPL(Scraper):
         return parsed_data
 
 
-def run(query: str, region: str, city: str) -> None:
+def run(
+    sfd: bool, spd: bool, query: str = None, region: str = None, city: str = None
+) -> None:
     scraper = PracujPL("https://massachusetts.pracuj.pl/jobOffers/listing/multiregion")
 
     if query:
@@ -167,10 +169,28 @@ def run(query: str, region: str, city: str) -> None:
     elif city:
         scraper.set_param("wp", city)
 
+    logging.info(f"Start fetching data for {scraper.url}")
     data = scraper.fetch_data()
-    result = scraper.parse_offer(data)
 
-    if result is not None:
-        logging.info(f"Successfully parsed {len(result)} job offers")
+    if data is None:
+        logging.error("Failed to fetch data")
     else:
-        logging.error("Failed to parse job offers")
+        logging.info(f"Scraped {len(data)} job offers")
+
+        if sfd:
+            logging.info(f"Saving fetch data to json")
+            scraper.save_fetch_data_to_json(data)
+            logging.info(f"Fetch data saved to json")
+
+        logging.info("Start parsing data")
+        result = scraper.parse_offer(data)
+
+        if result is None:
+            logging.error("Failed to parse job offers")
+        else:
+            logging.info(f"Successfully parsed {len(result)} job offers")
+
+            if spd:
+                logging.info(f"Saving parsed data to json")
+                scraper.save_parsed_data_to_json(result)
+                logging.info("Parsed data saved to json")

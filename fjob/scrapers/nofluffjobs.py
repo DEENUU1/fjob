@@ -206,17 +206,33 @@ class NFJ(Scraper):
         return parsed_data
 
 
-def run():
+def run(sfd: bool, spd: bool) -> None:
     c = NFJ("https://nofluffjobs.com/pl/")
 
+    logging.info(f"Fetching data from {c.url}")
     f = c.fetch_data()
-    logging.info(f"Successfully fetched {len(f)} job offers")
 
-    parsed_data = c.parse_offer(f)
-    if parsed_data is not None:
-        logging.info(f"Successfully parsed {len(parsed_data)} job offers")
-        logging.info(f"Saving parsed data to database")
-        c.save_data(parsed_data)
-        logging.info(f"Data saved to database")
+    if f is None:
+        logging.info(f"No data received from {c.url}")
     else:
-        logging.error("Failed to parse job offers")
+        logging.info(f"Successfully fetched {len(f)} job offers")
+
+        if sfd:
+            logging.info(f"Saving fetch data to json")
+            c.save_fetch_data_to_json(f)
+            logging.info(f"Fetch data saved to json")
+
+        logging.info(f"Parsing data for")
+        parsed_data = c.parse_offer(f)
+        if parsed_data is not None:
+            logging.info(f"Successfully parsed {len(parsed_data)} job offers")
+            logging.info(f"Saving parsed data to database")
+            c.save_data(parsed_data)
+            logging.info(f"Data saved to database")
+
+            if spd:
+                logging.info(f"Saving parsed data to json")
+                c.save_parsed_data_to_json(parsed_data)
+
+        else:
+            logging.error("Failed to parse job offers")
