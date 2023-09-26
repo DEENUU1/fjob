@@ -155,9 +155,7 @@ class PracujPL(Scraper):
         return parsed_data
 
 
-def run(
-    sfd: bool, spd: bool, query: str = None, region: str = None, city: str = None
-) -> None:
+def run(sfd: bool, spd: bool, city: str, query: str = None, region: str = None) -> None:
     scraper = PracujPL("https://massachusetts.pracuj.pl/jobOffers/listing/multiregion")
 
     if query:
