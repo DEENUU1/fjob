@@ -21,3 +21,4 @@ class OfferFilterForm(forms.Form):
             ("senior", "senior"),
         ]
     )
+    advanced = forms.BooleanField(required=False)
