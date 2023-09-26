@@ -107,6 +107,7 @@ def run():
     if parsed_data is not None:
         logging.info(f"Successfully parsed {len(parsed_data)} job offers")
         print(parsed_data)
+        c.save_parsed_data_to_json(parsed_data)
         c.save_data(parsed_data)
     else:
         logging.error("Failed to parse job offers")

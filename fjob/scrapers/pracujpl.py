@@ -155,7 +155,7 @@ class PracujPL(Scraper):
         return parsed_data
 
 
-if __name__ == "__main__":
+def run():
     scraper = PracujPL("https://massachusetts.pracuj.pl/jobOffers/listing/multiregion")
     scraper.set_param("query", "junior")
 
