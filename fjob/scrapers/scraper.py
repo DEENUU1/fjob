@@ -1,8 +1,9 @@
 from abc import ABC, abstractmethod
 from typing import Dict, List, Optional
-from dataclasses import dataclass
+from dataclasses import dataclass, asdict
 from offers.models import offers, salaries
 from django.db import transaction
+import json
 
 
 @dataclass
@@ -48,6 +49,13 @@ class Scraper(ABC):
     @abstractmethod
     def parse_offer(self, json_data: List[Dict[str, str]]):
         pass
+
+    def save_parsed_data_to_json(self, data: List[ParsedOffer]):
+        offer_dict = [asdict(offer) for offer in data]
+        json_data = json.dumps(offer_dict, indent=4, ensure_ascii=False)
+
+        with open(f"{self.url}.json", "w", encoding="utf-8") as file:
+            file.write(json_data)
 
     @transaction.atomic()
     def save_data(self, data_list: List[ParsedOffer]):
