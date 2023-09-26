@@ -1,5 +1,7 @@
 import React, { useState } from "react";
 import axios from "axios";
+import "../styles/OfferFilterForm.css";
+
 
 const OfferFilterForm = () => {
   const [query, setQuery] = useState("");
@@ -22,54 +24,67 @@ const OfferFilterForm = () => {
         experience_level: experienceLevel,
       },
     });
-    
+
     const offers = response.data;
 
     offers.forEach((offers) => {
-        console.log(offers);
-    })
-
+      console.log(offers);
+    });
   };
 
   return (
-    <form onSubmit={handleSubmit}>
+    <form onSubmit={handleSubmit} className="offer-filter-form">
       <input
         type="text"
-        placeholder="Wyszukaj ofertę"
+        placeholder="Search phrase"
         value={query}
         onChange={(event) => setQuery(event.target.value)}
+        className="input-field"
       />
-    <select value={country} onChange={(event) => setCountry(event.target.value)}>
+      <select
+        value={country}
+        onChange={(event) => setCountry(event.target.value)}
+        className="select-field"
+      >
         <option value="">Country</option>
-        <option value="poland">Polska</option>
-        <option value="germany">Niemcy</option>
-        <option value="usa">USA</option>
+        <option value="poland">Poland</option>
+        <option value="germany">Germany</option>
       </select>
       <input
         type="text"
-        placeholder="Miasto"
+        placeholder="City"
         value={city}
         onChange={(event) => setCity(event.target.value)}
+        className="input-field"
       />
       <input
         type="number"
-        placeholder="Minimalna pensja"
+        placeholder="Min Salary"
         value={minSalary}
         onChange={(event) => setMinSalary(event.target.value)}
+        className="input-field"
       />
       <input
         type="number"
-        placeholder="Maksymalna pensja"
+        placeholder="Max Salary"
         value={maxSalary}
         onChange={(event) => setMaxSalary(event.target.value)}
+        className="input-field"
       />
-      <select value={experienceLevel} onChange={(event) => setExperienceLevel(event.target.value)}>
+      <select
+        value={experienceLevel}
+        onChange={(event) => setExperienceLevel(event.target.value)}
+        className="select-field"
+      >
         <option value="">Experience level</option>
+        <option value="intern">Intern</option>
         <option value="junior">Junior</option>
         <option value="mid">Mid</option>
         <option value="senior">Senior</option>
       </select>
-      <button type="submit">Wyszukaj</button>
+      <button type="submit" className="submit-button">
+        Search
+      </button>
     </form>
   );
 };
