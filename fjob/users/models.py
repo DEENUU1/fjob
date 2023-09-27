@@ -1,36 +1,39 @@
 from django.db import models
-from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
-from django.contrib.auth.models import BaseUserManager
+from django.contrib.auth.models import (
+    BaseUserManager,
+    AbstractBaseUser,
+    Permission,
+    PermissionsMixin,
+    Group,
+)
 
 
 class CustomUserManager(BaseUserManager):
-    def create_user(self, email, password=None, first_name=None, last_name=None):
+    def create_user(self, email, password=None, username=None):
         if not email:
             raise ValueError("An email address is required")
         if not password:
             raise ValueError("A password is required")
-        if not first_name or not last_name:
-            raise ValueError("A first and last name are required")
+        if not username:
+            raise ValueError("A  username is required")
         user = self.model(
             email=self.normalize_email(email),
-            first_name=first_name,
-            last_name=last_name,
+            username=username,
         )
         user.set_password(password)
         user.save(using=self._db)
         return user
 
-    def create_superuser(self, email, password=None, first_name=None, last_name=None):
+    def create_superuser(self, email, password=None, username=None):
         if not email:
             raise ValueError("An email address is required")
         if not password:
             raise ValueError("A password is required")
-        if not first_name or not last_name:
-            raise ValueError("A first and last name are required")
+        if not username:
+            raise ValueError("A  username is required")
         user = self.model(
             email=self.normalize_email(email),
-            first_name=first_name,
-            last_name=last_name,
+            username=username,
         )
         user.set_password(password)
         user.is_superuser = True
@@ -39,14 +42,16 @@ class CustomUserManager(BaseUserManager):
 
 
 class CustomUser(AbstractBaseUser, PermissionsMixin):
-    first_name = models.CharField(max_length=30)
-    last_name = models.CharField(max_length=30)
     email = models.EmailField(max_length=254, unique=True)
     password = models.CharField(max_length=128)
+    groups = models.ManyToManyField(Group, blank=True, related_name="customuser_set")
+    user_permissions = models.ManyToManyField(
+        Permission, blank=True, related_name="customuser_set"
+    )
 
     class Meta:
         verbose_name = "Custom User"
         verbose_name_plural = "Custom Users"
 
     def __str__(self):
-        return f"{self.first_name} {self.last_name}"
+        return self.email
