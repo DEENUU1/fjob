@@ -1,9 +1,8 @@
-from django.contrib.auth import get_user_model, login, logout
-from rest_framework.authentication import SessionAuthentication
+from django.contrib.auth import get_user_model
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import permissions, status
-from .serializers import UserSerializer, UserRegisterSerializer, UserLoginSerializer
+from ..serializers import UserRegisterSerializer
 
 UserModel = get_user_model()
 
@@ -38,30 +37,3 @@ class UserRegisterView(APIView):
         return Response(
             {"detail": "Something went wrong"}, status=status.HTTP_400_BAD_REQUEST
         )
-
-
-class UserLoginView(APIView):
-    permission_classes = (permissions.AllowAny,)
-    authentication_classes = (SessionAuthentication,)
-
-    def post(self, request):
-        data = request.data
-        serializer = UserLoginSerializer(data=data)
-
-        if serializer.is_valid():
-            user = serializer.check_user(validated_data=data)
-            login(request, user)
-            return Response(serializer.data, status=status.HTTP_200_OK)
-
-        return Response(
-            {"detail": "Something went wrong"}, status=status.HTTP_400_BAD_REQUEST
-        )
-
-
-class UserLogoutView(APIView):
-    permission_classes = (permissions.AllowAny,)
-    authentication_classes = ()
-
-    def post(self, request):
-        logout(request)
-        return Response(status=status.HTTP_200_OK)
