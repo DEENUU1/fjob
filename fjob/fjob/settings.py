@@ -13,6 +13,11 @@ DEBUG = True
 DATA_UPLOAD_MAX_NUMBER_FIELDS = 9999999
 ALLOWED_HOSTS = []
 
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:3000",
+    "http://127.0.0.1:3000",
+]
+CORS_ALLOWED_CREDENTIALS = True
 
 INSTALLED_APPS = [
     "django.contrib.admin",
@@ -29,6 +34,7 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+    "corsheaders.middleware.CorsMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
