@@ -56,3 +56,12 @@ class UserLoginView(APIView):
         return Response(
             {"detail": "Something went wrong"}, status=status.HTTP_400_BAD_REQUEST
         )
+
+
+class UserLogoutView(APIView):
+    permission_classes = (permissions.AllowAny,)
+    authentication_classes = ()
+
+    def post(self, request):
+        logout(request)
+        return Response(status=status.HTTP_200_OK)
