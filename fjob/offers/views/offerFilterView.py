@@ -3,7 +3,6 @@ from ..models import offers
 from ..serializers import OffersSerializer
 from ..forms import OfferFilterForm
 from django.db.models import Q
-import json
 from scrapers import olx, pracujpl
 
 
