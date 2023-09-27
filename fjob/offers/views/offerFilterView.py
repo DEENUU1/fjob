@@ -4,7 +4,7 @@ from ..serializers import OffersSerializer
 from ..forms import OfferFilterForm
 from django.db.models import Q
 import json
-from scrapers import olx
+from scrapers import olx, pracujpl
 
 
 class OfferFilterView(ListAPIView):
@@ -38,15 +38,13 @@ class OfferFilterView(ListAPIView):
                 queryset = queryset.filter(salary__lte=max_salary)
             if experience_level:
                 queryset = queryset.filter(experience_level=experience_level)
-        # however, when using advanced search, it will receive offers from the database and scrapers will be launched
-        else:
-            if country == "Poland":
-                parsed_offers = olx.run(False, False, "Zduńska Wola")
-
-                parsed_offers_data = [offer.__dict__ for offer in parsed_offers]
-
-                queryset = list(queryset) + parsed_offers_data
 
             return queryset
+        # however, when using advanced search, it will receive offers from the database and scrapers will be launched
+        else:
+            # if country == "Poland":
+            olx_data = olx.run(False, False, "Zduńska Wola")
+            pracujpl_data = pracujpl.run(False, False, "Zduńska Wola")
+            queryset = list(queryset) + olx_data + pracujpl_data
 
-        return queryset
+            return queryset

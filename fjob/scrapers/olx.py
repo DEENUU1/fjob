@@ -287,7 +287,9 @@ class OLX(Scraper):
         return parsed_data
 
 
-def run(sfd: bool, spd: bool, city: str, query: str = None) -> List[ParsedOffer] | None:
+def run(
+    sfd: bool, spd: bool, city: str, query: str = None
+) -> List[Dict[str, Any]] | None:
     result = None
 
     l = OLXLocalization(city)
@@ -330,4 +332,4 @@ def run(sfd: bool, spd: bool, city: str, query: str = None) -> List[ParsedOffer]
         else:
             logging.error("Failed to parse job offers")
 
-    return result
+    return olx_scraper.return_parsed_data(result)
