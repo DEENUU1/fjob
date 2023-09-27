@@ -23,6 +23,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     # project applications
     "offers",
+    "users",
     # django
     "rest_framework",
 ]
