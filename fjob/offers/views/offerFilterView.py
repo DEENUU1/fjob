@@ -1,12 +1,19 @@
+from rest_framework import status
 from rest_framework.generics import ListAPIView
 from ..models import offers
 from ..serializers import OffersSerializer
 from ..forms import OfferFilterForm
 from django.db.models import Q
 from scrapers import olx, pracujpl
+from payment.models import Payment
+from rest_framework.authentication import SessionAuthentication
+from rest_framework.response import Response
 
 
 class OfferFilterView(ListAPIView):
+    authentication_classes = [
+        SessionAuthentication,
+    ]
     serializer_class = OffersSerializer
     filter_form_class = OfferFilterForm
 
@@ -42,9 +49,17 @@ class OfferFilterView(ListAPIView):
 
         # however, when using advanced search, it will receive offers from the database and scrapers will be launched
         else:
-            # if country == "Poland":
-            olx_data = olx.run(False, False, "Zduńska Wola")
-            pracujpl_data = pracujpl.run(False, False, "Zduńska Wola")
-            advanced_queryset = list(queryset) + olx_data + pracujpl_data
+            payment = Payment.objects.filter(
+                user=self.request.user, active=True
+            ).first()
+            if not payment:
+                return Response(
+                    {"error": "YOu need an active payment to use advanced search"},
+                    status=status.HTTP_403_FORBIDDEN,
+                )
+            else:
+                olx_data = olx.run(False, False, "Zduńska Wola")
+                pracujpl_data = pracujpl.run(False, False, "Zduńska Wola")
+                advanced_queryset = list(queryset) + olx_data + pracujpl_data
 
-            return advanced_queryset
+                return advanced_queryset
