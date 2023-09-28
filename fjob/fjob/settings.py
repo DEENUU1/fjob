@@ -21,6 +21,8 @@ CORS_ALLOWED_CREDENTIALS = True
 
 STRIPE_PUBLIC_KEY = os.getenv("STRIPE_PUBLIC_KEY")
 STRIPE_SECRET_KEY = os.getenv("STRIPE_SECRET_KEY")
+STRIPE_PRICE = 0  # Price have to be in a cents (1000 cents is a 10$)
+
 
 INSTALLED_APPS = [
     "django.contrib.admin",
