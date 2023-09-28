@@ -38,6 +38,7 @@ class UserPackage(models.Model):
     stripe_checkout_id = models.CharField(
         max_length=500, blank=True, null=True, default=None
     )
+    custom_id = models.CharField(max_length=500, blank=True, null=True, default=None)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
