@@ -38,6 +38,14 @@ class Payment(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
+    class Meta:
+        ordering = ["-created_at"]
+        verbose_name_plural = "Payments"
+        verbose_name = "Payment"
+
+    def __str__(self):
+        return f"{self.user} - {self.package}"
+
 
 class UserPackage(models.Model):
     user = models.ForeignKey(UserModel, on_delete=models.CASCADE)
@@ -45,3 +53,11 @@ class UserPackage(models.Model):
     active = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ["-created_at"]
+        verbose_name_plural = "User Packages"
+        verbose_name = "User Package"
+
+    def __str__(self):
+        return f"{self.user} - {self.package}"
