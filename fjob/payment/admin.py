@@ -1,7 +1,4 @@
 from django.contrib import admin
-from .models import Payment, UserPackage, Package
-
-from django.contrib import admin
 from .models import Package, Payment, UserPackage
 
 
