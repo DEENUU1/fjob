@@ -1,4 +1,3 @@
-from rest_framework import status
 from rest_framework.generics import ListAPIView
 from ..models import offers
 from ..serializers import OffersSerializer
@@ -7,7 +6,6 @@ from django.db.models import Q
 from scrapers import olx, pracujpl
 from payment.models import Payment
 from rest_framework.authentication import SessionAuthentication
-from rest_framework.response import Response
 
 
 class OfferFilterView(ListAPIView):
@@ -52,12 +50,7 @@ class OfferFilterView(ListAPIView):
             payment = Payment.objects.filter(
                 user=self.request.user, active=True
             ).first()
-            if not payment:
-                return Response(
-                    {"error": "YOu need an active payment to use advanced search"},
-                    status=status.HTTP_403_FORBIDDEN,
-                )
-            else:
+            if payment:
                 olx_data = olx.run(False, False, "Zduńska Wola")
                 pracujpl_data = pracujpl.run(False, False, "Zduńska Wola")
                 advanced_queryset = list(queryset) + olx_data + pracujpl_data
