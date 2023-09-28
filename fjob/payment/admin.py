@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Package, Payment, UserPackage
+from .models import Package, UserPackage
 
 
 class PackageAdmin(admin.ModelAdmin):
@@ -17,13 +17,6 @@ class PackageAdmin(admin.ModelAdmin):
     search_fields = ("name",)
 
 
-class PaymentAdmin(admin.ModelAdmin):
-    # list_display = ("user", "package", "stripe_checkout_id", "created_at", "updated_at")
-    # list_filter = ("user", "package")
-    # search_fields = ("user__username",)
-    pass
-
-
 class UserPackageAdmin(admin.ModelAdmin):
     list_display = ("user", "package", "active", "created_at", "updated_at")
     list_filter = ("user", "package", "active")
@@ -31,5 +24,4 @@ class UserPackageAdmin(admin.ModelAdmin):
 
 
 admin.site.register(Package, PackageAdmin)
-admin.site.register(Payment, PaymentAdmin)
 admin.site.register(UserPackage, UserPackageAdmin)

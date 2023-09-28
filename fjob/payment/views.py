@@ -1,22 +1,31 @@
 import stripe
 from rest_framework import status
 from rest_framework.views import APIView
+from rest_framework.generics import ListAPIView
 from django.conf import settings
 from django.urls import reverse
 from rest_framework.response import Response
 from django.contrib.auth import get_user_model
-from .models import Payment
-
+from .models import UserPackage, Package
+from .serializers import PackageSerializer
 
 UserModel = get_user_model()
 stripe.api_key = settings.STRIPE_SECRET_KEY
+
+
+class GetPackages(ListAPIView):
+    serializer_class = PackageSerializer
+
+    def get_queryset(self):
+        queryset = Package.objects.all()
+        return queryset
 
 
 class CreateCheckoutSession(APIView):
     def get(self, request):
         user = request.user
 
-        if Payment.objects.filter(user=user, active=True).exists():
+        if UserPackage.objects.filter(user=user, active=True).exists():
             return Response(
                 {"error": "You already have an active payment."},
                 status=status.HTTP_403_FORBIDDEN,

@@ -31,33 +31,20 @@ class Package(models.Model):
         return f"{self.name} - {self.price}$"
 
 
-class Payment(models.Model):
-    user = models.ForeignKey(UserModel, on_delete=models.CASCADE)
-    package = models.ForeignKey(Package, on_delete=models.CASCADE)
-    stripe_checkout_id = models.CharField(max_length=500)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-
-    class Meta:
-        ordering = ["-created_at"]
-        verbose_name_plural = "Payments"
-        verbose_name = "Payment"
-
-    # def __str__(self):
-    #     return f"{self.user} - {self.package}"
-
-
 class UserPackage(models.Model):
     user = models.ForeignKey(UserModel, on_delete=models.CASCADE)
     package = models.ForeignKey(Package, on_delete=models.CASCADE)
     active = models.BooleanField(default=False)
+    stripe_checkout_id = models.CharField(
+        max_length=500, blank=True, null=True, default=None
+    )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
         ordering = ["-created_at"]
-        # verbose_name_plural = "User Packages"
-        # verbose_name = "User Package"
+        verbose_name_plural = "User Packages"
+        verbose_name = "User Package"
 
-    # def __str__(self):
-    #     return f"{self.user} - {self.package}"
+    def __str__(self):
+        return f"{self.user} - {self.package}"
