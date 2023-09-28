@@ -29,6 +29,11 @@ class GetUserFreeUses(APIView):
                 {"free_uses": user_package.package.free_users},
                 status=status.HTTP_200_OK,
             )
+        else:
+            return Response(
+                {"free_uses": None},
+                status=status.HTTP_200_OK,
+            )
 
 
 class GetPackages(ListAPIView):
