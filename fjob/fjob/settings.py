@@ -19,6 +19,11 @@ CORS_ALLOWED_ORIGINS = [
 ]
 CORS_ALLOWED_CREDENTIALS = True
 
+STRIPE_PUBLIC_KEY = os.getenv("STRIPE_PUBLIC_KEY")
+STRIPE_SECRET_KEY = os.getenv("STRIPE_SECRET_KEY")
+STRIPE_PRICE = 0  # Price have to be in a cents (1000 cents is a 10$)
+
+
 INSTALLED_APPS = [
     "django.contrib.admin",
     "django.contrib.auth",
@@ -29,6 +34,7 @@ INSTALLED_APPS = [
     # project applications
     "offers",
     "users",
+    "payment",
     # api and libs
     "rest_framework",
     "drf_yasg",
