@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from django.contrib.auth import get_user_model, authenticate
 from rest_framework.exceptions import ValidationError
+from payment.models import UserPackage, Package
 
 UserModel = get_user_model()
 
@@ -16,6 +17,10 @@ class UserRegisterSerializer(serializers.ModelSerializer):
             password=validated_data["password"],
             username=validated_data["username"],
         )
+        package = Package.objects.get(id=1)
+        user_package = UserPackage(active=True, package=package, user=user_obj)
+        user_package.save()
+
         user_obj.save()
         return user_obj
 

@@ -43,8 +43,8 @@ class Payment(models.Model):
         verbose_name_plural = "Payments"
         verbose_name = "Payment"
 
-    def __str__(self):
-        return f"{self.user} - {self.package}"
+    # def __str__(self):
+    #     return f"{self.user} - {self.package}"
 
 
 class UserPackage(models.Model):
@@ -56,8 +56,8 @@ class UserPackage(models.Model):
 
     class Meta:
         ordering = ["-created_at"]
-        verbose_name_plural = "User Packages"
-        verbose_name = "User Package"
+        # verbose_name_plural = "User Packages"
+        # verbose_name = "User Package"
 
-    def __str__(self):
-        return f"{self.user} - {self.package}"
+    # def __str__(self):
+    #     return f"{self.user} - {self.package}"

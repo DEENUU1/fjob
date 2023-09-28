@@ -18,9 +18,10 @@ class PackageAdmin(admin.ModelAdmin):
 
 
 class PaymentAdmin(admin.ModelAdmin):
-    list_display = ("user", "package", "stripe_checkout_id", "created_at", "updated_at")
-    list_filter = ("user", "package")
-    search_fields = ("user__username",)
+    # list_display = ("user", "package", "stripe_checkout_id", "created_at", "updated_at")
+    # list_filter = ("user", "package")
+    # search_fields = ("user__username",)
+    pass
 
 
 class UserPackageAdmin(admin.ModelAdmin):
