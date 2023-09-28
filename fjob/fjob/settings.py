@@ -19,6 +19,9 @@ CORS_ALLOWED_ORIGINS = [
 ]
 CORS_ALLOWED_CREDENTIALS = True
 
+STRIPE_PUBLIC_KEY = os.getenv("STRIPE_PUBLIC_KEY")
+STRIPE_SECRET_KEY = os.getenv("STRIPE_SECRET_KEY")
+
 INSTALLED_APPS = [
     "django.contrib.admin",
     "django.contrib.auth",
