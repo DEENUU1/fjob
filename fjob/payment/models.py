@@ -33,7 +33,15 @@ class Package(models.Model):
 
 class Payment(models.Model):
     user = models.ForeignKey(UserModel, on_delete=models.CASCADE)
-    active = models.BooleanField(default=False)
+    package = models.ForeignKey(Package, on_delete=models.CASCADE)
     stripe_checkout_id = models.CharField(max_length=500)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+
+class UserPackage(models.Model):
+    user = models.ForeignKey(UserModel, on_delete=models.CASCADE)
+    package = models.ForeignKey(Package, on_delete=models.CASCADE)
+    active = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
