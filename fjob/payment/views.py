@@ -8,9 +8,27 @@ from rest_framework.response import Response
 from django.contrib.auth import get_user_model
 from .models import UserPackage, Package
 from .serializers import PackageSerializer
+from rest_framework.authentication import SessionAuthentication
+
 
 UserModel = get_user_model()
 stripe.api_key = settings.STRIPE_SECRET_KEY
+
+
+class GetUserFreeUses(APIView):
+    authentication_classes = [
+        SessionAuthentication,
+    ]
+
+    def get(self, request):
+        user = request.user
+        package = Package.objects.get(id=1)
+        user_package = UserPackage.objects.filter(user=user, active=True).first()
+        if user_package.package == package:
+            return Response(
+                {"free_uses": user_package.package.free_users},
+                status=status.HTTP_200_OK,
+            )
 
 
 class GetPackages(ListAPIView):
