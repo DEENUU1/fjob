@@ -48,7 +48,6 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     user_permissions = models.ManyToManyField(
         Permission, blank=True, related_name="customuser_set"
     )
-    trial = models.IntegerField(default=5)
 
     class Meta:
         verbose_name = "Custom User"
