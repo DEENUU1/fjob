@@ -1,48 +1,16 @@
 import stripe
 from rest_framework import status
 from rest_framework.views import APIView
-from rest_framework.generics import ListAPIView
 from django.conf import settings
 from django.urls import reverse
 from rest_framework.response import Response
 from django.contrib.auth import get_user_model
-from .models import UserPackage, Package
-from .serializers import PackageSerializer
-from rest_framework.authentication import SessionAuthentication
-from .utils import generate_random_id
+from ..models import UserPackage, Package
+from ..utils import generate_random_id
 
 
 UserModel = get_user_model()
 stripe.api_key = settings.STRIPE_SECRET_KEY
-
-
-class GetUserFreeUses(APIView):
-    authentication_classes = [
-        SessionAuthentication,
-    ]
-
-    def get(self, request):
-        user = request.user
-        package = Package.objects.get(id=1)
-        user_package = UserPackage.objects.filter(user=user, active=True).first()
-        if user_package.package == package:
-            return Response(
-                {"free_uses": user_package.package.free_users},
-                status=status.HTTP_200_OK,
-            )
-        else:
-            return Response(
-                {"free_uses": None},
-                status=status.HTTP_200_OK,
-            )
-
-
-class GetPackages(ListAPIView):
-    serializer_class = PackageSerializer
-
-    def get_queryset(self):
-        queryset = Package.objects.all()
-        return queryset
 
 
 class CreateCheckoutSession(APIView):
@@ -100,17 +68,3 @@ class CreateCheckoutSession(APIView):
         user_package.save()
 
         return Response({"url": session.url}, status=status.HTTP_200_OK)
-
-
-class SuccessView(APIView):
-    def get(self, request, custom_id):
-        user_package = UserPackage.objects.filter(custom_id=custom_id).first()
-        user_package.active = True
-        user_package.save()
-        UserPackage.objects.exclude(custom_id=custom_id).update(active=False)
-        return Response({"success": True})
-
-
-class CancelView(APIView):
-    def get(self, request):
-        return Response({"cancelled": True})
