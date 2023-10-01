@@ -1,16 +1,18 @@
 from django.urls import path
+
 from .views import (
     GetPackages,
     GetUserFreeUses,
     CreateCheckoutSession,
     SuccessView,
     CancelView,
+    GetUserPackage,
 )
 
 urlpatterns = [
     path("", GetPackages.GetPackages.as_view(), name="get_packages"),
     path(
-        "user_free_uses",
+        "user-free-uses",
         GetUserFreeUses.GetUserFreeUses.as_view(),
         name="user_free_uses",
     ),
@@ -21,4 +23,5 @@ urlpatterns = [
     ),
     path("success/<str:custom_id>/", SuccessView.SuccessView.as_view(), name="success"),
     path("cancel", CancelView.CancelView.as_view(), name="cancel"),
+    path("user-package", GetUserPackage.GetUserPackage.as_view(), name="user_package"),
 ]

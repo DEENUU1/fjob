@@ -1,8 +1,9 @@
 from django.contrib.auth import get_user_model, login
-from rest_framework.authentication import SessionAuthentication
-from rest_framework.views import APIView
-from rest_framework.response import Response
 from rest_framework import permissions, status
+from rest_framework.authentication import SessionAuthentication
+from rest_framework.response import Response
+from rest_framework.views import APIView
+
 from ..serializers import UserLoginSerializer
 
 UserModel = get_user_model()

@@ -1,9 +1,10 @@
-from abc import ABC, abstractmethod
-from typing import Dict, List, Optional, Any
-from dataclasses import dataclass, asdict
-from offers.models import offers, salaries
-from django.db import transaction
 import json
+from abc import ABC, abstractmethod
+from dataclasses import dataclass, asdict
+from typing import Dict, List, Optional, Any
+
+from django.db import transaction
+from offers.models import offers, salaries
 
 
 @dataclass

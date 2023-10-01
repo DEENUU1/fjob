@@ -1,10 +1,11 @@
+from django.db.models import Q
+from rest_framework.authentication import SessionAuthentication
 from rest_framework.generics import ListAPIView
+from scrapers import olx, pracujpl
+
+from ..forms import OfferFilterForm
 from ..models import offers
 from ..serializers import OffersSerializer
-from ..forms import OfferFilterForm
-from django.db.models import Q
-from scrapers import olx, pracujpl
-from rest_framework.authentication import SessionAuthentication
 
 
 class OfferFilterView(ListAPIView):
