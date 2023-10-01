@@ -1,11 +1,11 @@
 from django.contrib.auth import get_user_model
-from rest_framework.authentication import SessionAuthentication
-from rest_framework.response import Response
 from rest_framework import status
+from rest_framework.authentication import SessionAuthentication
 from rest_framework.generics import DestroyAPIView
 from rest_framework.permissions import IsAuthenticated
-from ..serializers import AccountDeleteSerializer
+from rest_framework.response import Response
 
+from ..serializers import AccountDeleteSerializer
 
 UserModel = get_user_model()
 

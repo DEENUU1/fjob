@@ -1,8 +1,10 @@
-import logging
-from .scraper import Scraper, ParsedOffer, Salary
-from typing import Dict, List
-import requests
 import json
+import logging
+from typing import Dict, List
+
+import requests
+
+from .scraper import Scraper, ParsedOffer, Salary
 
 logging.basicConfig(
     filename="../logs.log",

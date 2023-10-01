@@ -1,8 +1,10 @@
-from requests_html import HTMLSession
 import logging
-from .scraper import Scraper, ParsedOffer, Salary
-from typing import Dict, List, Any
 import re
+from typing import Dict, List, Any
+
+from requests_html import HTMLSession
+
+from .scraper import Scraper, ParsedOffer, Salary
 
 logging.basicConfig(
     filename="../logs.log",

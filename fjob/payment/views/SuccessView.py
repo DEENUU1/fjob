@@ -1,6 +1,7 @@
-from rest_framework.views import APIView
 from rest_framework.response import Response
-from ..models import UserPackage, Package
+from rest_framework.views import APIView
+
+from ..models import UserPackage
 
 
 class SuccessView(APIView):
