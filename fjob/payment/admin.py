@@ -10,7 +10,6 @@ class PackageAdmin(admin.ModelAdmin):
         "has_signals",
         "num_of_signals",
         "is_free",
-        "free_users",
         "created_at",
         "updated_at",
     )
@@ -19,7 +18,14 @@ class PackageAdmin(admin.ModelAdmin):
 
 
 class UserPackageAdmin(admin.ModelAdmin):
-    list_display = ("user", "package", "active", "created_at", "updated_at")
+    list_display = (
+        "user",
+        "package",
+        "active",
+        "free_uses",
+        "created_at",
+        "updated_at",
+    )
     list_filter = ("user", "package", "active")
     search_fields = ("user__username",)
 

@@ -6,7 +6,6 @@ from scrapers import olx, pracujpl
 from ..forms import OfferFilterForm
 from ..models import offers
 from ..serializers import OffersSerializer
-from django.conf import settings
 from django.utils.decorators import method_decorator
 from django.views.decorators.cache import cache_page
 
