@@ -18,7 +18,6 @@ class OfferFilterView(ListAPIView):
     serializer_class = OffersSerializer
     filter_form_class = OfferFilterForm
 
-    @method_decorator(cache_page(settings.CACHE_TTL, key_prefix="city-view"))
     def get_queryset(self):
         queryset = offers.Offers.objects.all()
 
@@ -45,18 +44,13 @@ class OfferFilterView(ListAPIView):
         if experience_level:
             queryset = queryset.filter(experience_level=experience_level)
 
-        # if the user does not use advanced search, he will only receive offers from the database
-        if not advanced:
-            return queryset
-
-        # however, when using advanced search, it will receive offers from the database and scrapers will be launched
-        else:
-            # payment = Payment.objects.filter(
-            #     user=self.request.user, active=True
-            # ).first()
-            # if payment:
+        if advanced:
             olx_data = olx.run(False, False, "Zduńska Wola")
             pracujpl_data = pracujpl.run(False, False, "Zduńska Wola")
-            advanced_queryset = list(queryset) + olx_data + pracujpl_data
+            queryset = list(queryset) + olx_data + pracujpl_data
 
-            return advanced_queryset
+        return queryset
+
+    @method_decorator(cache_page(60 * 1))
+    def list(self, request, *args, **kwargs):
+        return super().list(request, *args, **kwargs)
