@@ -4,6 +4,7 @@ from .views import (
     UserLoginView,
     UserRegistrationView,
     UserPasswordChangeView,
+    UserEmailChangeView,
 )
 
 
@@ -19,5 +20,10 @@ urlpatterns = [
         "change-password",
         UserPasswordChangeView.UserPasswordChangeView.as_view(),
         name="change_password",
+    ),
+    path(
+        "change-email",
+        UserEmailChangeView.UserEmailChangeView.as_view(),
+        name="change_email",
     ),
 ]
