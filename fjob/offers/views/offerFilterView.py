@@ -6,6 +6,8 @@ from scrapers import olx, pracujpl
 from ..forms import OfferFilterForm
 from ..models import offers
 from ..serializers import OffersSerializer
+from django.conf import settings
+from django.views.decorators.cache import cache_page
 
 
 class OfferFilterView(ListAPIView):
@@ -15,6 +17,7 @@ class OfferFilterView(ListAPIView):
     serializer_class = OffersSerializer
     filter_form_class = OfferFilterForm
 
+    @cache_page(settings.CACHE_TTL)
     def get_queryset(self):
         queryset = offers.Offers.objects.all()
 
