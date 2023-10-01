@@ -25,22 +25,6 @@ class UserRegisterSerializer(serializers.ModelSerializer):
         return user_obj
 
 
-class UserPasswordChangeSerializer(serializers.Serializer):
-    current_password = serializers.CharField()
-    new_password = serializers.CharField()
-
-    def update(self, instance, validated_data):
-        current_password = validated_data.get("current_password")
-        new_password = validated_data.get("new_password")
-
-        if not instance.check_password(current_password):
-            raise ValidationError("Current password is incorrect")
-
-        instance.set_password(new_password)
-        instance.save()
-        return instance
-
-
 class UserLoginSerializer(serializers.Serializer):
     username = serializers.CharField()
     password = serializers.CharField()
@@ -58,3 +42,8 @@ class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = UserModel
         fields = ("id", "email", "username")
+
+
+class ChangePasswordSerializer(serializers.Serializer):
+    old_password = serializers.CharField(required=True)
+    new_password = serializers.CharField(required=True)
