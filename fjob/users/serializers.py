@@ -53,3 +53,9 @@ class ChangeEmailSerializer(serializers.Serializer):
     old_email = serializers.EmailField(required=True)
     new_email = serializers.EmailField(required=True)
     password = serializers.CharField(required=True)
+
+
+class AccountDeleteSerializer(serializers.Serializer):
+    password = serializers.CharField(required=True)
+    email = serializers.EmailField(required=True)
+    username = serializers.CharField(required=True)
