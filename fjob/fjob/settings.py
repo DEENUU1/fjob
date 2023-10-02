@@ -35,6 +35,7 @@ INSTALLED_APPS = [
     "users",
     "payment",
     "contact",
+    "notification",
 
     # api and libs
     "rest_framework",
