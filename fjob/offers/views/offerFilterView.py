@@ -1,19 +1,25 @@
 from django.db.models import Q
-from rest_framework.generics import ListAPIView
-
+from rest_framework.views import APIView
 from ..forms import OfferFilterForm
 from ..models import offers
 from ..serializers import OffersSerializer
 from django.utils.decorators import method_decorator
 from django.views.decorators.cache import cache_page
 from scrapers.tasks import run_scrapers
+from rest_framework.response import Response
+from rest_framework.authentication import SessionAuthentication
+from payment.models import UserPackage, Package
 
 
-class OfferFilterView(ListAPIView):
+class OfferFilterView(APIView):
+    authentication_classes = [
+        SessionAuthentication,
+    ]
     serializer_class = OffersSerializer
     filter_form_class = OfferFilterForm
 
-    def get_queryset(self):
+    @method_decorator(cache_page(60 * 1))
+    def get(self, request):
         queryset = offers.Offers.objects.all()
 
         query = self.request.query_params.get("query")
@@ -23,6 +29,7 @@ class OfferFilterView(ListAPIView):
         max_salary = self.request.query_params.get("max_salary")
         experience_level = self.request.query_params.get("experience_level")
         advanced = self.request.query_params.get("advanced")
+        user = request.user
 
         if query:
             queryset = queryset.filter(
@@ -40,11 +47,17 @@ class OfferFilterView(ListAPIView):
             queryset = queryset.filter(experience_level=experience_level)
 
         if advanced:
-            advanced_data = run_scrapers.delay()
-            queryset = list(queryset) + list(advanced_data)
+            user_package = UserPackage.objects.filter(user=user, active=True).first()
+            if user_package.id in [2, 3]:
+                advanced_data = run_scrapers()  # Add delay
+                queryset = list(queryset) + list(advanced_data)
 
-        return queryset
-
-    @method_decorator(cache_page(60 * 1))
-    def list(self, request, *args, **kwargs):
-        return super().list(request, *args, **kwargs)
+            if user_package.id == 1:
+                if user_package.free_uses > 0:
+                    advanced_data = run_scrapers()  # Add delay
+                    queryset = list(queryset) + list(advanced_data)
+                    user_package.free_uses -= 1
+                    user_package.save()
+                else:
+                    return Response({"message": "You don't have any free uses"})
+        return Response(OffersSerializer(queryset, many=True).data)

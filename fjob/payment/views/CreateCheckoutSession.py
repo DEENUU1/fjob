@@ -18,7 +18,7 @@ class CreateCheckoutSession(APIView):
         user = request.user
 
         user_package = UserPackage.objects.filter(user=user, active=True).first()
-        if user_package.package.name == 3:
+        if user_package.package.id == 3:
             return Response(
                 {"error": "You already have the best packages"},
                 status=status.HTTP_400_BAD_REQUEST,
