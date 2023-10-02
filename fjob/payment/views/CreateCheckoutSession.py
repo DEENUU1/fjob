@@ -35,7 +35,7 @@ class CreateCheckoutSession(APIView):
             )
 
         package = Package.objects.get(id=package_id)
-        custom_id = generate_random_id()
+        custom_id = generate_random_id.generate_random_id()
 
         session = stripe.checkout.Session.create(
             payment_method_types=["card"],

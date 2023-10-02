@@ -1,6 +1,7 @@
 from django.contrib.auth import get_user_model
 from django.db import models
 
+
 UserModel = get_user_model()
 
 
@@ -10,7 +11,6 @@ class Package(models.Model):
     has_signals = models.BooleanField(default=False)
     num_of_signals = models.IntegerField(default=0)
     is_free = models.BooleanField(default=True)
-    free_users = models.IntegerField(default=5)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -40,6 +40,7 @@ class UserPackage(models.Model):
     custom_id = models.CharField(max_length=500, blank=True, null=True, default=None)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    free_uses = models.IntegerField(default=5)
 
     class Meta:
         ordering = ["-created_at"]
