@@ -1,8 +1,18 @@
 from django.urls import path
 
-from . import views
+from .views import (
+    NotificationCreateView,
+    NotificationDeleteView,
+    NotificationUpdateView,
+)
 
 
 urlpatterns = [
-    # path("", offerFilterView.OfferFilterView.as_view(), name="offers"),
+    path("create/", NotificationCreateView.as_view(), name="notification_create"),
+    path(
+        "<int:pk>/update/", NotificationUpdateView.as_view(), name="notification_update"
+    ),
+    path(
+        "<int:pk>/delete/", NotificationDeleteView.as_view(), name="notification_delete"
+    ),
 ]
