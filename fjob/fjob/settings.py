@@ -9,6 +9,14 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = os.getenv("DJANGO_SECRET_KEY")
 
+EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+EMAIL_HOST = "smtp.gmail.com"
+EMAIL_USE_TLS = True
+EMAIL_PORT = 587
+EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER")
+EMAIL_HOST_PASSWORD = os.getenv("EMAIL_PASSWORD_HOST_USER")
+
+
 DEBUG = True
 DATA_UPLOAD_MAX_NUMBER_FIELDS = 9999999
 ALLOWED_HOSTS = []
@@ -36,7 +44,6 @@ INSTALLED_APPS = [
     "payment",
     "contact",
     "notification",
-
     # api and libs
     "rest_framework",
     "drf_yasg",
