@@ -23,11 +23,6 @@ urlpatterns = [
         name="change_password",
     ),
     path(
-        "change-email",
-        UserEmailChangeView.UserEmailChangeView.as_view(),
-        name="change_email",
-    ),
-    path(
         "account-delete",
         UserAccountDeleteView.UserAccountDeleteView.as_view(),
         name="delete_account",

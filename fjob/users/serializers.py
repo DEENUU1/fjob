@@ -60,7 +60,7 @@ class ChangePasswordSerializer(serializers.Serializer):
     old_password = serializers.CharField(required=True)
     new_password = serializers.CharField(required=True)
 
-    def validate_olx_password(self, value):
+    def validate_old_password(self, value):
         user = self.context.get("request").user
         if not user.check_password(value):
             raise serializers.ValidationError("Incorrect old password.")
@@ -70,12 +70,6 @@ class ChangePasswordSerializer(serializers.Serializer):
         new_password = self.validated_data["new_password"]
         user.set_password(new_password)
         user.save()
-
-
-class ChangeEmailSerializer(serializers.Serializer):
-    old_email = serializers.EmailField(required=True)
-    new_email = serializers.EmailField(required=True)
-    password = serializers.CharField(required=True)
 
 
 class AccountDeleteSerializer(serializers.Serializer):
