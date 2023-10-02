@@ -12,9 +12,10 @@ UserModel = get_user_model()
 class UserLoginView(APIView):
     permission_classes = (permissions.AllowAny,)
     authentication_classes = (SessionAuthentication,)
+    serializer_class = UserLoginSerializer
 
     def post(self, request):
-        serializer = UserLoginSerializer(data=request.data)
+        serializer = self.serializer_class(data=request.data)
 
         if serializer.is_valid():
             user = serializer.validated_data["user"]

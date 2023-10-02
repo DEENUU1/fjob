@@ -16,22 +16,10 @@ class UserPasswordChangeView(UpdateAPIView):
     authentication_classes = (SessionAuthentication,)
 
     def update(self, request, *args, **kwargs):
-        serializer = ChangePasswordSerializer(data=request.data)
-        serializer.is_valid()
+        serializer = self.serializer_class(data=request.data)
 
-        user = self.request.user
-        old_password = serializer.validated_data["old_password"]
-        new_password = serializer.validated_data["new_password"]
+        if serializer.is_valid():
+            serializer.update_password(request.user)
+            return Response({"message": "ok"}, status=status.HTTP_200_OK)
 
-        if not user.check_password(old_password):
-            return Response(
-                {"detail": "Incorrect old password."},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
-
-        user.set_password(new_password)
-        user.save()
-
-        return Response(
-            {"detail": "Password changed successfully."}, status=status.HTTP_200_OK
-        )
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
