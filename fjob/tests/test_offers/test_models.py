@@ -6,6 +6,7 @@ from offers.models import salaries, offers
 from django.contrib.auth.models import Permission, Group
 from django.contrib.auth import get_user_model
 from payment.models import Package, UserPackage
+from contact.models import Contact
 
 
 UserModel = get_user_model()
@@ -155,3 +156,19 @@ def test_user_package_creation():
     assert user_package.free_uses == 5
 
     assert str(user_package) == f"{user} - {package}"
+
+
+@pytest.mark.django_db
+def test_contact_creation():
+    contact = Contact.objects.create(
+        name="Test user",
+        email="test@example.com",
+        content="Test body message",
+    )
+
+    assert contact.name == "Test user"
+    assert contact.email == "test@example.com"
+    assert contact.content == "Test body message"
+    assert contact.read == False
+
+    assert str(contact) == f"{contact.name} - {contact.email}"
