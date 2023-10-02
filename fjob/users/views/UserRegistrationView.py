@@ -10,31 +10,13 @@ UserModel = get_user_model()
 
 class UserRegisterView(APIView):
     permission_classes = (permissions.AllowAny,)
+    serializer_class = UserRegisterSerializer
 
     def post(self, request):
-        data = request.data
-        serializer = UserRegisterSerializer(data=data)
+        serializer = self.serializer_class(data=request.data)
 
         if serializer.is_valid():
-            email = data.get("email")
-            username = data.get("username")
+            serializer.save()
+            return Response({"message": "ok"}, status=status.HTTP_201_CREATED)
 
-            if UserModel.objects.filter(email=email).exists():
-                return Response(
-                    {"detail": "Email already exists"},
-                    status=status.HTTP_400_BAD_REQUEST,
-                )
-
-            elif UserModel.objects.filter(username=username).exists():
-                return Response(
-                    {"detail": "Username already exists"},
-                    status=status.HTTP_400_BAD_REQUEST,
-                )
-
-            user = serializer.create(data)
-            if user:
-                return Response(serializer.data, status=status.HTTP_201_CREATED)
-
-        return Response(
-            {"detail": "Something went wrong"}, status=status.HTTP_400_BAD_REQUEST
-        )
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
