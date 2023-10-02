@@ -1,7 +1,8 @@
-from .models import Contact
+import re
 
 from rest_framework import serializers
-import re
+
+from .models import Contact
 
 
 class ContactSerializer(serializers.ModelSerializer):
