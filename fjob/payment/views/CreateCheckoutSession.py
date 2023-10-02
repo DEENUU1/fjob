@@ -8,32 +8,19 @@ from rest_framework.views import APIView
 
 from ..models import UserPackage, Package
 from ..utils import generate_random_id
+from ..permissions import IsPackageAlreadyOwned
+from rest_framework.permissions import IsAuthenticated
+
 
 UserModel = get_user_model()
 stripe.api_key = settings.STRIPE_SECRET_KEY
 
 
 class CreateCheckoutSession(APIView):
+    permission_classes = [IsAuthenticated, IsPackageAlreadyOwned]
+
     def get(self, request, package_id):
         user = request.user
-
-        user_package = UserPackage.objects.filter(user=user, active=True).first()
-        if user_package.package.id == 3:
-            return Response(
-                {"error": "You already have the best packages"},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
-        elif user_package.package.id == 2 and package_id == 1:
-            return Response(
-                {"error": "You are not able to get worse packages"},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
-        elif user_package.package.id == package_id:
-            return Response(
-                {"error": "You already have this package"},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
-
         package = Package.objects.get(id=package_id)
         custom_id = generate_random_id.generate_random_id()
 
@@ -57,6 +44,19 @@ class CreateCheckoutSession(APIView):
             ),
             cancel_url=request.build_absolute_uri(reverse("cancel")),
         )
+
+        user_package = UserPackage.objects.filter(user=user, active=True).first()
+
+        if user_package.package.id == 3:
+            return Response(
+                {"error": "You already have the best packages"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        elif user_package.package.id == 2 and package_id == 1:
+            return Response(
+                {"error": "You are not able to get worse packages"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
 
         user_package = UserPackage.objects.create(
             user=user,
