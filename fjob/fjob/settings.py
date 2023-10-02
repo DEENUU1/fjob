@@ -34,6 +34,8 @@ INSTALLED_APPS = [
     "offers",
     "users",
     "payment",
+    "contact",
+
     # api and libs
     "rest_framework",
     "drf_yasg",
