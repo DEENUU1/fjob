@@ -18,7 +18,7 @@ class CreateCheckoutSession(APIView):
         user = request.user
 
         user_package = UserPackage.objects.filter(user=user, active=True).first()
-        if user_package.package.id == 3:
+        if user_package.package.name == 3:
             return Response(
                 {"error": "You already have the best packages"},
                 status=status.HTTP_400_BAD_REQUEST,
@@ -35,7 +35,7 @@ class CreateCheckoutSession(APIView):
             )
 
         package = Package.objects.get(id=package_id)
-        custom_id = generate_random_id()
+        custom_id = generate_random_id.generate_random_id()
 
         session = stripe.checkout.Session.create(
             payment_method_types=["card"],

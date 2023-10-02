@@ -1,19 +1,15 @@
 from django.db.models import Q
-from rest_framework.authentication import SessionAuthentication
 from rest_framework.generics import ListAPIView
-from scrapers import olx, pracujpl
 
 from ..forms import OfferFilterForm
 from ..models import offers
 from ..serializers import OffersSerializer
 from django.utils.decorators import method_decorator
 from django.views.decorators.cache import cache_page
+from scrapers.tasks import run_scrapers
 
 
 class OfferFilterView(ListAPIView):
-    authentication_classes = [
-        SessionAuthentication,
-    ]
     serializer_class = OffersSerializer
     filter_form_class = OfferFilterForm
 
@@ -44,9 +40,8 @@ class OfferFilterView(ListAPIView):
             queryset = queryset.filter(experience_level=experience_level)
 
         if advanced:
-            olx_data = olx.run(False, False, "Zduńska Wola")
-            pracujpl_data = pracujpl.run(False, False, "Zduńska Wola")
-            queryset = list(queryset) + olx_data + pracujpl_data
+            advanced_data = run_scrapers.delay()
+            queryset = list(queryset) + list(advanced_data)
 
         return queryset
 

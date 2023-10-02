@@ -17,7 +17,7 @@ class GetUserFreeUses(APIView):
         user_package = UserPackage.objects.filter(user=user, active=True).first()
         if user_package.package == package:
             return Response(
-                {"free_uses": user_package.package.free_users},
+                {"free_uses": user_package.free_users},
                 status=status.HTTP_200_OK,
             )
         else:

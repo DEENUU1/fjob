@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from .models import Package
+from .models import Package, UserPackage
 
 
 class PackageSerializer(serializers.ModelSerializer):
@@ -11,5 +11,15 @@ class PackageSerializer(serializers.ModelSerializer):
             "price",
             "has_signals",
             "num_of_signals",
-            "free_users",
+        )
+
+
+class UserPackageSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = UserPackage
+        fields = (
+            "user",
+            "package",
+            "active",
+            "free_uses",
         )
