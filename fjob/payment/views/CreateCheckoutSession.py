@@ -3,6 +3,7 @@ from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.urls import reverse
 from rest_framework import status
+from rest_framework.authentication import SessionAuthentication
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
@@ -18,6 +19,7 @@ stripe.api_key = settings.STRIPE_SECRET_KEY
 
 class CreateCheckoutSession(APIView):
     permission_classes = [IsAuthenticated, IsPackageAlreadyOwned]
+    authentication_classes = (SessionAuthentication,)
 
     def get(self, request, package_id):
         user = request.user
