@@ -9,6 +9,7 @@ from scrapers.tasks import run_scrapers
 from rest_framework.response import Response
 from rest_framework.authentication import SessionAuthentication
 from payment.models import UserPackage, Package
+from payment.utils import update_free_uses
 
 
 class OfferFilterView(APIView):
@@ -20,8 +21,6 @@ class OfferFilterView(APIView):
 
     @method_decorator(cache_page(60 * 1))
     def get(self, request):
-        queryset = offers.Offers.objects.all()
-
         query = self.request.query_params.get("query")
         country = self.request.query_params.get("country")
         city = self.request.query_params.get("city")
@@ -30,6 +29,8 @@ class OfferFilterView(APIView):
         experience_level = self.request.query_params.get("experience_level")
         advanced = self.request.query_params.get("advanced")
         user = request.user
+
+        queryset = offers.Offers.objects.all()
 
         if query:
             queryset = queryset.filter(
@@ -48,16 +49,16 @@ class OfferFilterView(APIView):
 
         if advanced:
             user_package = UserPackage.objects.filter(user=user, active=True).first()
-            if user_package.id in [2, 3]:
+            if user_package.package.id in [2, 3]:
                 advanced_data = run_scrapers()  # Add delay
-                queryset = list(queryset) + list(advanced_data)
+                queryset = list(queryset) + advanced_data
 
-            if user_package.id == 1:
+            if user_package.package.id == 1:
                 if user_package.free_uses > 0:
                     advanced_data = run_scrapers()  # Add delay
-                    queryset = list(queryset) + list(advanced_data)
-                    user_package.free_uses -= 1
-                    user_package.save()
+                    queryset = list(queryset) + advanced_data
+                    if advanced_data and len(advanced_data) != 0:
+                        update_free_uses.update_free_uses(user)
                 else:
                     return Response({"message": "You don't have any free uses"})
         return Response(OffersSerializer(queryset, many=True).data)
