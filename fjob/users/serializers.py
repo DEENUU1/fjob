@@ -44,13 +44,16 @@ class UserLoginSerializer(serializers.Serializer):
     username = serializers.CharField()
     password = serializers.CharField()
 
-    def check_user(self, validated_data):
-        user = authenticate(
-            username=validated_data["username"], password=validated_data["password"]
-        )
+    def validate(self, data):
+        username = data.get("username")
+        password = data.get("password")
+
+        user = authenticate(username=username, password=password)
         if not user:
-            raise ValidationError("Invalid credentials")
-        return user
+            raise serializers.ValidationError("Invalid Credentials")
+
+        data["user"] = user
+        return data
 
 
 class UserSerializer(serializers.ModelSerializer):
