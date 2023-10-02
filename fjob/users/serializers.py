@@ -1,9 +1,8 @@
 from django.contrib.auth import get_user_model, authenticate
+from django.db import transaction
 from payment.models import UserPackage, Package
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
-from django.db import transaction
-
 
 UserModel = get_user_model()
 

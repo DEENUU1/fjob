@@ -5,7 +5,6 @@ from .views import (
     UserLoginView,
     UserRegistrationView,
     UserPasswordChangeView,
-    UserEmailChangeView,
     UserAccountDeleteView,
 )
 
