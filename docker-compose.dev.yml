@@ -49,7 +49,19 @@ services:
         depends_on:
             - db
             - redis
-#
+
+    react:
+        build:
+            context: .
+            dockerfile: ./config/react/Dockerfile
+        container_name: fjob-react-dev
+        volumes:
+            - ./frontend:/app
+        ports:
+            - "3000:3000"
+        depends_on:
+            - web
+
 #    celery_beat:
 #        build:
 #            context: .
