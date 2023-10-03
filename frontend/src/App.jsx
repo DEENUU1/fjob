@@ -8,14 +8,13 @@ import LoginPage from "./Users/pages/LoginPage";
 
 function App() {
   return (
-    <Router>
-      <Routes>
-        <Route path="/" element={<OfferPage />} />
-        <Route path="/register" element={<RegisterPage />} />
-        <Route path="/login" element={<LoginPage />} />
-      </Routes>
-    </Router>
-      
+        <Router>
+          <Routes>
+            <Route path="/" element={<OfferPage />} />
+            <Route path="/register" element={<RegisterPage />} />
+            <Route path="/login" element={<LoginPage />} />
+          </Routes>
+        </Router>
   );
 }
 
