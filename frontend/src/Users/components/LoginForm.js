@@ -3,25 +3,23 @@ import { Navigate } from "react-router-dom";
 import axios from "axios";
 import "../styles/RegisterForm.css";
 
-const RegisterForm = () => {
+const LoginForm = () => {
   const [username, setUsername] = useState("");
-  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [isRegistered, setIsRegistered] = useState(false);
+  const [isLogin, setIsLogin] = useState(false);
   const [errors, setErrors] = useState([]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
 try {
-  const response = await axios.post("http://localhost:8000/users/register", {
+  const response = await axios.post("http://localhost:8000/users/login", {
     username,
-    email,
     password,
   });
 
-  if (response.status === 201) {
-    setIsRegistered(true);
+  if (response.status === 200) {
+    setIsLogin(true);
   } else if (response.status === 400) {
     if (response.data && response.data.errors) {
       setErrors(response.data.errors);
@@ -33,7 +31,7 @@ try {
   setErrors(["An unexpected error occurred."]);
 }}
 
-  if (isRegistered) {
+  if (isLogin) {
     return <Navigate to="/" />;
   }
 
@@ -44,12 +42,6 @@ try {
         value={username}
         onChange={(e) => setUsername(e.target.value)}
         placeholder="Username"
-      />
-      <input
-        type="email"
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
-        placeholder="E-mail"
       />
       <input
         type="password"
@@ -70,4 +62,4 @@ try {
   );
 };
 
-export default RegisterForm;
+export default LoginForm;
