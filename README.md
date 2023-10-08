@@ -69,89 +69,151 @@ This project is still in develop. The core of a project is already implemented, 
 - In progress...
 
 ## Endpoints
-### Users
-1. Register
-```bash
-localhost:8000/users/register
 
-{
-  "username": "user",
-  "email": "user@example.com",
-  "password": "user123"
-}
+### /users/register
+```bash
+curl --location 'http://127.0.0.1:8000/users/register' \
+--header 'Content-Type: application/json' \
+--data-raw '{
+    "username": "kacper2test1",
+    "email": "kacper2@example.com",
+    "password": "test123"
+}'
 ```
-2. Login
 ```bash
-localhost:8000/users/login
-
 {
-  "username": "user",
-  "password": "user123"
-} 
-```
-3. Logout
-```bash
-localhost:8000/users/logout
-
-Headers:
-{
-  X-CSRFToken: XXXX
-}
-
-```
-4. Change password
-```bash
-localhost:8000/users/change-password
-
-{
-  "new_password": "user1",
-  "old_password": "user123"
-}
-
-Headers:
-{
-  X-CSRFToken: XXXX
-}
-
-```
-5. Account delete
-```bash
-localhost:8000/users/account-delete
-
-{
-  "username": "user",
-  "email": "user@example.com",
-  "password": "user1"
+    "message": "ok"
 }
 ```
 
-### Payment
-1. Get available packages
+### /users/login
 ```bash
-localhost:8000/payment/
+curl --location 'http://localhost:8000/users/login' \
+--header 'Content-Type: application/json' \
+--header 'Cookie: csrftoken=ZN8CQTzGYp3jn68HzaAAXauNOKURbVrA; sessionid=2qqm4vlcbwrpbc4rhtusmkcbjm58cbln' \
+--data '{
+    "username": "kacper2test1",
+    "password": "test123"
+}'
 ```
-2. User's free uses
 ```bash
-localhost:8000/payment/user-free-uses
-```
-3. Create checkout session
-```bash
-localhost:8000/payment/chs/<int:package_id>/
-```
-4. Success & Cancelled checkout 
-```bash
-localhost:8000/payment/<str:custom_id>/
-localhost:8000/payment/cancel
-```
-5. User's package
-```bash
-localhost:8000/payment/user-package
+{
+    "message": "ok"
+}
 ```
 
-### Offers
-1. Return job offers
+### /users/authenticated
 ```bash
-localhost:8000/offers/
+curl --location 'http://localhost:8000/users/authenticated' \
+--header 'Cookie: csrftoken=ZN8CQTzGYp3jn68HzaAAXauNOKURbVrA; sessionid=2qqm4vlcbwrpbc4rhtusmkcbjm58cbln'
+```
+```bash
+{
+    "isAuthenticated": "success"
+}
+```
+
+
+### /users/logout
+```bash
+curl --location --request POST 'http://localhost:8000/users/logout' \
+--header 'X-CSRFToken: ZN8CQTzGYp3jn68HzaAAXauNOKURbVrA' \
+--header 'Cookie: csrftoken=ZN8CQTzGYp3jn68HzaAAXauNOKURbVrA'
+```
+```bash
+{
+    "message": "Ok"
+}
+```
+
+### /users/change-password
+```bash
+curl --location --request PUT 'http://localhost:8000/users/change-password' \
+--header 'X-CSRFToken: 0rbEW1c7hlbrsYfgGifRWvTUsB42R0NS' \
+--header 'Content-Type: application/json' \
+--header 'Cookie: csrftoken=0rbEW1c7hlbrsYfgGifRWvTUsB42R0NS; sessionid=2ipdxopgwmkc3kzgsblvbft1z3f1dvdv' \
+--data '{
+    "old_password": "test123",
+    "new_password": "test"
+}'
+```
+```bash
+{
+    "message": "ok"
+}
+```
+
+
+### /users/account-delete
+```bash
+curl --location --request DELETE 'http://localhost:8000/users/account-delete' \
+--header 'X-CSRFToken: FO4hUOSPhQqG62TZIDYsa44eMTBNoByA' \
+--header 'Content-Type: application/json' \
+--header 'Cookie: csrftoken=FO4hUOSPhQqG62TZIDYsa44eMTBNoByA; sessionid=8vbapt81k7z7x1ecviskugvg06qfclab' \
+--data-raw '{
+    "username": "kacper2test1",
+    "email": "kacper2@example.com",
+    "password": "test"
+}'
+```
+
+### /payment
+```bash
+curl --location 'http://localhost:8000/payment' \
+--header 'Cookie: csrftoken=vQgj54MXMmi98kcjwTkvq1KoWVMisxHf; sessionid=0w2coyh9hv7s30tigopxmied0mupjc2q'
+```
+```bash
+[
+    {
+        "name": "Advanced",
+        "price": 500,
+        "has_signals": true,
+        "num_of_signals": 0
+    },
+]
+```
+
+### /payment/user-free-uses
+```bash
+curl --location 'http://localhost:8000/payment/user-free-uses' \
+--header 'Cookie: csrftoken=vQgj54MXMmi98kcjwTkvq1KoWVMisxHf; sessionid=0w2coyh9hv7s30tigopxmied0mupjc2q'
+```
+```bash
+{
+    "free_uses": 5
+}
+```
+
+### /payment/chs/<int:package_id>/
+```bash
+curl --location 'http://localhost:8000/payment/chs/2' \
+--header 'Cookie: csrftoken=vQgj54MXMmi98kcjwTkvq1KoWVMisxHf; sessionid=0w2coyh9hv7s30tigopxmied0mupjc2q'
+```
+```bash
+{
+    "url": "https://checkout.stripe.com/c/pay/cs_test_YHgl"
+}
+```
+
+### /payment/< str:custom_id >
+### /payment/cancel
+
+### /payment/user-package
+```bash
+curl --location 'http://localhost:8000/payment/user-package' \
+--header 'Cookie: csrftoken=vQgj54MXMmi98kcjwTkvq1KoWVMisxHf; sessionid=0w2coyh9hv7s30tigopxmied0mupjc2q'
+```
+```bash
+{
+    "name": "Free",
+    "price": 0
+}
+```
+
+### /offers
+```bash
+curl --location 'http://localhost:8000/offers/?advanced=true&query=junior%20python&country=Poland' \
+--header 'Cookie: csrftoken=vQgj54MXMmi98kcjwTkvq1KoWVMisxHf; sessionid=0w2coyh9hv7s30tigopxmied0mupjc2q'
 
 params:
 - query [str]
@@ -163,7 +225,6 @@ params:
 - advanced [bool]
 ```
 
-#### Example result
 ```json
 [
      {
@@ -199,18 +260,23 @@ params:
 ]
 ```
 
-### Contact
-1. Send message
+### /contact/send
 ```bash
-localhost:8000/contact/send
-
+curl --location 'http://localhost:8000/contact/send' \
+--header 'X-CSRFToken: vQgj54MXMmi98kcjwTkvq1KoWVMisxHf' \
+--header 'Content-Type: application/json' \
+--header 'Cookie: csrftoken=vQgj54MXMmi98kcjwTkvq1KoWVMisxHf; sessionid=0w2coyh9hv7s30tigopxmied0mupjc2q' \
+--data-raw '{
+    "name": "Kacper",
+    "email": "kacper@example.com",
+    "content": "Test message"
+}'
+```
+```bash
 {
-  "name": "User1",
-  "email": "user@example.com",
-  "content": "Message content"
+    "message": "ok"
 }
 ```
-
 
 <!-- GETTING STARTED -->
 ## Getting Started
