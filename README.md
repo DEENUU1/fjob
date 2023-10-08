@@ -53,93 +53,167 @@ This project is still in develop. The core of a project is already implemented, 
   - Django Celery Beat
 - PostgreSQL
 - Docker and Docker-compose
-- JavaScript
-  - React
+
+## Graph of how user system and paid packages works
+<img src="assets/diagram2.png" />
+
+## Graph of how offer search works
+<img src="assets/diagram3.png" />
+
+## List of scrapers
+### Dynamic:
+- <a href="https://www.olx.pl/praca/"> OLX </a>
+- <a href="https://www.pracuj.pl/"> Pracuj.pl </a>
+
+### Static:
+- In progress...
 
 ## Endpoints
-### Users
-1. Register
-```bash
-localhost:8000/users/register
 
-{
-  "username": "user",
-  "email": "user@example.com",
-  "password": "user123"
-}
+### /users/register
+```bash
+curl --location 'http://127.0.0.1:8000/users/register' \
+--header 'Content-Type: application/json' \
+--data-raw '{
+    "username": "kacper2test1",
+    "email": "kacper2@example.com",
+    "password": "test123"
+}'
 ```
-2. Login
 ```bash
-localhost:8000/users/login
-
 {
-  "username": "user",
-  "password": "user123"
-} 
-```
-3. Logout
-```bash
-localhost:8000/users/logout
-
-Headers:
-{
-  X-CSRFToken: XXXX
-}
-
-```
-4. Change password
-```bash
-localhost:8000/users/change-password
-
-{
-  "new_password": "user1",
-  "old_password": "user123"
-}
-
-Headers:
-{
-  X-CSRFToken: XXXX
-}
-
-```
-5. Account delete
-```bash
-localhost:8000/users/account-delete
-
-{
-  "username": "user",
-  "email": "user@example.com",
-  "password": "user1"
+    "message": "ok"
 }
 ```
 
-### Payment
-1. Get available packages
+### /users/login
 ```bash
-localhost:8000/payment/
+curl --location 'http://localhost:8000/users/login' \
+--header 'Content-Type: application/json' \
+--header 'Cookie: csrftoken=ZN8CQTzGYp3jn68HzaAAXauNOKURbVrA; sessionid=2qqm4vlcbwrpbc4rhtusmkcbjm58cbln' \
+--data '{
+    "username": "kacper2test1",
+    "password": "test123"
+}'
 ```
-2. User's free uses
 ```bash
-localhost:8000/payment/user-free-uses
-```
-3. Create checkout session
-```bash
-localhost:8000/payment/chs/<int:package_id>/
-```
-4. Success & Cancelled checkout 
-```bash
-localhost:8000/payment/<str:custom_id>/
-localhost:8000/payment/cancel
-```
-5. User's package
-```bash
-localhost:8000/payment/user-package
+{
+    "message": "ok"
+}
 ```
 
-### Offers
-1. Return job offers
+### /users/authenticated
 ```bash
-localhost:8000/offers/
+curl --location 'http://localhost:8000/users/authenticated' \
+--header 'Cookie: csrftoken=ZN8CQTzGYp3jn68HzaAAXauNOKURbVrA; sessionid=2qqm4vlcbwrpbc4rhtusmkcbjm58cbln'
+```
+```bash
+{
+    "isAuthenticated": "success"
+}
+```
+
+
+### /users/logout
+```bash
+curl --location --request POST 'http://localhost:8000/users/logout' \
+--header 'X-CSRFToken: ZN8CQTzGYp3jn68HzaAAXauNOKURbVrA' \
+--header 'Cookie: csrftoken=ZN8CQTzGYp3jn68HzaAAXauNOKURbVrA'
+```
+```bash
+{
+    "message": "Ok"
+}
+```
+
+### /users/change-password
+```bash
+curl --location --request PUT 'http://localhost:8000/users/change-password' \
+--header 'X-CSRFToken: 0rbEW1c7hlbrsYfgGifRWvTUsB42R0NS' \
+--header 'Content-Type: application/json' \
+--header 'Cookie: csrftoken=0rbEW1c7hlbrsYfgGifRWvTUsB42R0NS; sessionid=2ipdxopgwmkc3kzgsblvbft1z3f1dvdv' \
+--data '{
+    "old_password": "test123",
+    "new_password": "test"
+}'
+```
+```bash
+{
+    "message": "ok"
+}
+```
+
+
+### /users/account-delete
+```bash
+curl --location --request DELETE 'http://localhost:8000/users/account-delete' \
+--header 'X-CSRFToken: FO4hUOSPhQqG62TZIDYsa44eMTBNoByA' \
+--header 'Content-Type: application/json' \
+--header 'Cookie: csrftoken=FO4hUOSPhQqG62TZIDYsa44eMTBNoByA; sessionid=8vbapt81k7z7x1ecviskugvg06qfclab' \
+--data-raw '{
+    "username": "kacper2test1",
+    "email": "kacper2@example.com",
+    "password": "test"
+}'
+```
+
+### /payment
+```bash
+curl --location 'http://localhost:8000/payment' \
+--header 'Cookie: csrftoken=vQgj54MXMmi98kcjwTkvq1KoWVMisxHf; sessionid=0w2coyh9hv7s30tigopxmied0mupjc2q'
+```
+```bash
+[
+    {
+        "name": "Advanced",
+        "price": 500,
+        "has_signals": true,
+        "num_of_signals": 0
+    },
+]
+```
+
+### /payment/user-free-uses
+```bash
+curl --location 'http://localhost:8000/payment/user-free-uses' \
+--header 'Cookie: csrftoken=vQgj54MXMmi98kcjwTkvq1KoWVMisxHf; sessionid=0w2coyh9hv7s30tigopxmied0mupjc2q'
+```
+```bash
+{
+    "free_uses": 5
+}
+```
+
+### /payment/chs/<int:package_id>/
+```bash
+curl --location 'http://localhost:8000/payment/chs/2' \
+--header 'Cookie: csrftoken=vQgj54MXMmi98kcjwTkvq1KoWVMisxHf; sessionid=0w2coyh9hv7s30tigopxmied0mupjc2q'
+```
+```bash
+{
+    "url": "https://checkout.stripe.com/c/pay/cs_test_YHgl"
+}
+```
+
+### /payment/< str:custom_id >
+### /payment/cancel
+
+### /payment/user-package
+```bash
+curl --location 'http://localhost:8000/payment/user-package' \
+--header 'Cookie: csrftoken=vQgj54MXMmi98kcjwTkvq1KoWVMisxHf; sessionid=0w2coyh9hv7s30tigopxmied0mupjc2q'
+```
+```bash
+{
+    "name": "Free",
+    "price": 0
+}
+```
+
+### /offers
+```bash
+curl --location 'http://localhost:8000/offers/?advanced=true&query=junior%20python&country=Poland' \
+--header 'Cookie: csrftoken=vQgj54MXMmi98kcjwTkvq1KoWVMisxHf; sessionid=0w2coyh9hv7s30tigopxmied0mupjc2q'
 
 params:
 - query [str]
@@ -151,18 +225,58 @@ params:
 - advanced [bool]
 ```
 
-### Contact
-1. Send message
-```bash
-localhost:8000/contact/send
-
-{
-  "name": "User1",
-  "email": "user@example.com",
-  "content": "Message content"
-}
+```json
+[
+     {
+        "id": 848873599,
+        "salary": [
+            {
+                "salary_from": 20,
+                "salary_to": 22,
+                "currency": "PLN",
+                "contract_type": "['selfemployment', 'other', 'contract', 'zlecenie']",
+                "work_schedule": "parttime"
+            }
+        ],
+        "title": "Zatrudnię - opiekun/pomoc do osoby leżącej",
+        "offer_id": null,
+        "url": "https://www.olx.pl/oferta/praca/zatrudnie-opiekun-pomoc-do-osoby-lezacej-CID4-IDWrMNF.html",
+        "street": null,
+        "region": "Dolnośląskie",
+        "additional_data": null,
+        "description": " Zatrudnię osobę do dorywczej pomocy przy osobie chorej, leżącej, bez kontaktu.  Pomoc w zakresie:    codzienna toaleta,    podawanie żywienia i leków (PEG)    przetransportowanie z łóżka na wózek za pomocą podnośnika elektrycznego    wyjścia na podwórko    pomoc w zakresie rehabilitacji ( proste ćwiczenia ruchowe)    Rodzina wszystkiego nauczy, zazwyczaj w domu będzie również ktoś z rodziny.  Potrzebujemy osoby, która:    będzie dostępna 2 - 3 razy w tygodniu, w godzinach do ustalenia (również popołudniowo - wieczornych),    jest kontaktowa, empatyczna, cierpliwa, uśmiechnięta i pozytywnie nastawiona,    jest zdolna do pracy fizycznej    wykazuje inicjatywę,    jest dobrze zorganizowana.    Miejsce pracy Boguszyce, około 5 km od Oleśnicy, dobre połączenie komunikacyjne.  Stawka: 20-22 zł/h (do negocjacji).  Dodatkowych informacji udzielę telefonicznie: 6 0 7 1 2 5 2 0 8 ",
+        "remote": false,
+        "hybrid": false,
+        "country": "PL",
+        "city": null,
+        "date_created": "2023-07-16T13:04:30+02:00",
+        "date_finished": "2023-11-07T20:50:57+01:00",
+        "experience_level": null,
+        "skills": null,
+        "company_name": "Kasia",
+        "company_logo": "",
+        "date_scraped": null
+    }
+]
 ```
 
+### /contact/send
+```bash
+curl --location 'http://localhost:8000/contact/send' \
+--header 'X-CSRFToken: vQgj54MXMmi98kcjwTkvq1KoWVMisxHf' \
+--header 'Content-Type: application/json' \
+--header 'Cookie: csrftoken=vQgj54MXMmi98kcjwTkvq1KoWVMisxHf; sessionid=0w2coyh9hv7s30tigopxmied0mupjc2q' \
+--data-raw '{
+    "name": "Kacper",
+    "email": "kacper@example.com",
+    "content": "Test message"
+}'
+```
+```bash
+{
+    "message": "ok"
+}
+```
 
 <!-- GETTING STARTED -->
 ## Getting Started
@@ -193,6 +307,11 @@ docker-compose -f docker-compose.dev.yml up
 5. Create Packages
 ```bash
 python manage.py default_package 
+```
+
+6. Create super user
+```bash
+python manage.py createsuperuser  
 ```
 
 ### Tests

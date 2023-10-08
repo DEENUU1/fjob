@@ -1,10 +1,18 @@
 import json
 from abc import ABC, abstractmethod
-from dataclasses import dataclass, asdict
+from dataclasses import dataclass
 from typing import Dict, List, Optional, Any
 
 from django.db import transaction
 from offers.models import offers, salaries
+import logging
+
+
+logging.basicConfig(
+    filename="../logs.log",
+    level=logging.INFO,
+    format="%(asctime)s - %(levelname)s - %(message)s",
+)
 
 
 @dataclass
@@ -56,18 +64,6 @@ class Scraper(ABC):
     ) -> List[Dict[str, Any]]:
         return [offer.__dict__ for offer in parsed_data]
 
-    def save_fetch_data_to_json(self, data) -> None:
-        with open("fetch_data.json", "w", encoding="utf-8") as file:
-            file.write(json.dumps(data, indent=4, ensure_ascii=False))
-
-    def save_parsed_data_to_json(self, data: List[ParsedOffer]) -> None:
-        offer_dict = [asdict(offer) for offer in data]
-        json_data = json.dumps(offer_dict, indent=4, ensure_ascii=False)
-
-        with open("parsed_data.json", "w", encoding="utf-8") as file:
-            file.write(json_data)
-
-    @transaction.atomic()
     def save_data(self, data_list: List[ParsedOffer]):
         """
         Save parsed data to database.
@@ -81,52 +77,39 @@ class Scraper(ABC):
         saved_offers = []
 
         for parsed_offer in data_list:
-            try:
-                offer = offers.Offers.objects.get(url=parsed_offer.url)
-            except offers.Offers.DoesNotExist:
-                offer = offers.Offers(url=parsed_offer.url)
-
-            offer.title = parsed_offer.title
-            offer.url = parsed_offer.url
-            offer.street = parsed_offer.street
-            offer.region = parsed_offer.region
-            offer.additional_data = parsed_offer.additional_data
-            offer.description = parsed_offer.description
-            offer.remote = parsed_offer.remote
-            offer.hybrid = parsed_offer.hybrid
-            offer.country = parsed_offer.country
-            offer.city = parsed_offer.city
-            offer.date_created = parsed_offer.date_created
-            offer.date_finished = parsed_offer.date_finished
-            offer.experience_level = parsed_offer.experience_level
-            offer.skills = parsed_offer.skills
-            offer.company_name = parsed_offer.company_name
-            offer.company_logo = parsed_offer.company_logo
-
+            # Create an Offers object
+            offer = offers.Offers(
+                title=parsed_offer.title,
+                offer_id=parsed_offer.id,
+                url=parsed_offer.url,
+                street=parsed_offer.street,
+                region=parsed_offer.region,
+                additional_data=parsed_offer.additional_data,
+                description=parsed_offer.description,
+                remote=parsed_offer.remote,
+                hybrid=parsed_offer.hybrid,
+                country=parsed_offer.country,
+                city=parsed_offer.city,
+                date_created=parsed_offer.date_created,
+                date_finished=parsed_offer.date_finished,
+                experience_level=parsed_offer.experience_level,
+                skills=parsed_offer.skills,
+                company_name=parsed_offer.company_name,
+                company_logo=parsed_offer.company_logo,
+            )
             offer.save()
 
-            if parsed_offer.salary:
-                for salary_data in parsed_offer.salary:
-                    if salary_data != None:
-                        salary = salaries.Salaries(
-                            salary_from=salary_data.salary_from
-                            if salary_data.salary_from
-                            else None,
-                            salary_to=salary_data.salary_to
-                            if salary_data.salary_to
-                            else None,
-                            currency=salary_data.currency
-                            if salary_data.currency
-                            else None,
-                            contract_type=salary_data.contract_type
-                            if salary_data.contract_type
-                            else None,
-                            work_schedule=salary_data.work_schedule
-                            if salary_data.work_schedule
-                            else None,
-                        )
-                        salary.save()
-                        offer.salary.add(salary)
+            # Create Salary objects and associate them with the offer
+            for salary_data in parsed_offer.salary:
+                salary = salaries.Salaries(
+                    salary_from=salary_data.salary_from,
+                    salary_to=salary_data.salary_to,
+                    currency=salary_data.currency,
+                    contract_type=salary_data.contract_type,
+                    work_schedule=salary_data.work_schedule,
+                )
+                salary.save()
+                offer.salary.add(salary)
 
             saved_offers.append(offer)
 
