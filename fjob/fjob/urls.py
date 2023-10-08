@@ -41,7 +41,7 @@ urlpatterns = [
     path("users/", include("users.urls")),
     path("payment/", include("payment.urls")),
     path("contact/", include("contact.urls")),
-    path("notification/", include("notification.urls")),
+    path("notification_todo/", include("notification_todo.urls")),
     re_path(
         r"^swagger(?P<format>\.json|\.yaml)$",
         schema_view.without_ui(cache_timeout=0),

@@ -1,5 +1,6 @@
 from django.contrib.auth import get_user_model, logout
-from rest_framework import permissions, status
+from rest_framework import status
+from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
@@ -8,7 +9,7 @@ UserModel = get_user_model()
 
 
 class UserLogoutView(APIView):
-    # permission_classes = (permissions.AllowAny,)
+    permission_classes = [AllowAny]
 
     def post(self, request):
         try:

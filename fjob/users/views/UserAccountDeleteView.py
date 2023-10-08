@@ -5,7 +5,8 @@ from rest_framework.generics import DestroyAPIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
-from ..serializers import AccountDeleteSerializer
+from users.serializers import AccountDeleteSerializer
+
 
 UserModel = get_user_model()
 
@@ -16,7 +17,7 @@ class UserAccountDeleteView(DestroyAPIView):
     authentication_classes = (SessionAuthentication,)
 
     def delete(self, request, *args, **kwargs):
-        serializer = AccountDeleteSerializer(data=request.data)
+        serializer = AccountDeleteSerializer.AccountDeleteSerializer(data=request.data)
         serializer.is_valid()
 
         user = self.request.user

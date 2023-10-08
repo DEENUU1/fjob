@@ -1,4 +1,4 @@
-from django.contrib.auth import get_user_model, authenticate
+from django.contrib.auth import get_user_model
 from django.db import transaction
 from payment.models import UserPackage, Package
 from rest_framework import serializers
@@ -37,41 +37,3 @@ class UserRegisterSerializer(serializers.ModelSerializer):
             user_package.save()
 
         return user_obj
-
-
-class UserLoginSerializer(serializers.Serializer):
-    username = serializers.CharField()
-    password = serializers.CharField()
-
-    def validate(self, data):
-        username = data.get("username")
-        password = data.get("password")
-
-        user = authenticate(username=username, password=password)
-        if not user:
-            raise serializers.ValidationError("Invalid Credentials")
-
-        data["user"] = user
-        return data
-
-
-class ChangePasswordSerializer(serializers.Serializer):
-    old_password = serializers.CharField(required=True)
-    new_password = serializers.CharField(required=True)
-
-    def validate_old_password(self, value):
-        user = self.context.get("request").user
-        if not user.check_password(value):
-            raise serializers.ValidationError("Incorrect old password.")
-        return value
-
-    def update_password(self, user):
-        new_password = self.validated_data["new_password"]
-        user.set_password(new_password)
-        user.save()
-
-
-class AccountDeleteSerializer(serializers.Serializer):
-    password = serializers.CharField(required=True)
-    email = serializers.EmailField(required=True)
-    username = serializers.CharField(required=True)

@@ -1,7 +1,7 @@
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from ..models import UserPackage
+from payment.models import UserPackage
 
 
 class SuccessView(APIView):

@@ -5,13 +5,13 @@ from rest_framework.generics import UpdateAPIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
-from ..serializers import ChangePasswordSerializer
+from users.serializers import ChangePasswordSerializer
 
 UserModel = get_user_model()
 
 
 class UserPasswordChangeView(UpdateAPIView):
-    serializer_class = ChangePasswordSerializer
+    serializer_class = ChangePasswordSerializer.ChangePasswordSerializer
     permission_classes = (IsAuthenticated,)
     authentication_classes = (SessionAuthentication,)
 

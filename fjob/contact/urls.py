@@ -1,12 +1,12 @@
 from django.urls import path
 
-from . import views
+from .views import SendMessage
+
 
 urlpatterns = [
     path(
         "send",
-        views.SendMessage.as_view(),
+        SendMessage.SendMessage.as_view(),
         name="send_message",
     ),
-
 ]
