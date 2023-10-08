@@ -11,5 +11,8 @@ class UserLogoutView(APIView):
     permission_classes = (permissions.AllowAny,)
 
     def post(self, request):
-        logout(request)
-        return Response(status=status.HTTP_200_OK)
+        try:
+            logout(request)
+            return Response({"message": "Ok"}, status=status.HTTP_200_OK)
+        except:
+            return Response({"message": "Error"}, status=status.HTTP_400_BAD_REQUEST)
