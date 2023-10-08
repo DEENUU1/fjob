@@ -80,6 +80,12 @@ localhost:8000/users/login
 3. Logout
 ```bash
 localhost:8000/users/logout
+
+Headers:
+{
+  X-CSRFToken: XXXX
+}
+
 ```
 4. Change password
 ```bash
@@ -89,6 +95,12 @@ localhost:8000/users/change-password
   "new_password": "user1",
   "old_password": "user123"
 }
+
+Headers:
+{
+  X-CSRFToken: XXXX
+}
+
 ```
 5. Account delete
 ```bash
