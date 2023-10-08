@@ -6,6 +6,8 @@ from .views import (
     UserRegistrationView,
     UserPasswordChangeView,
     UserAccountDeleteView,
+    CheckAuthenticatedView,
+    GetCSRToken,
 )
 
 urlpatterns = [
@@ -26,4 +28,10 @@ urlpatterns = [
         UserAccountDeleteView.UserAccountDeleteView.as_view(),
         name="delete_account",
     ),
+    path(
+        "authenticated",
+        CheckAuthenticatedView.CheckAuthenticatedView.as_view(),
+        name="authenticated",
+    ),
+    path("csrf_cookie", GetCSRToken.GetCSRFToken.as_view(), name="csrf_cookie"),
 ]
