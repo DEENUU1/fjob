@@ -22,12 +22,14 @@ class Notification(models.Model):
     city = models.CharField(max_length=50, blank=True, null=True)
     min_salary = models.IntegerField(blank=True, null=True)
     max_salary = models.IntegerField(blank=True, null=True)
-    experience_level = models.CharField(max_length=50, choices=EXPERIENCE, blank=True, null=True)
+    experience_level = models.CharField(
+        max_length=50, choices=EXPERIENCE, blank=True, null=True
+    )
 
     class Meta:
-        ordering = ['-id']
-        verbose_name = 'Notification'
-        verbose_name_plural = 'Notifications'
+        ordering = ["-id"]
+        verbose_name = "Notification"
+        verbose_name_plural = "Notifications"
 
     def __str__(self):
         return f"{self.user} - {self.query}"

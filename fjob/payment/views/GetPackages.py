@@ -2,12 +2,12 @@ from rest_framework.authentication import SessionAuthentication
 from rest_framework.generics import ListAPIView
 from rest_framework.permissions import IsAuthenticated
 
-from ..models import Package
-from ..serializers import PackageSerializer
+from payment.models import Package
+from payment.serializers import PackageSerializer
 
 
 class GetPackages(ListAPIView):
-    serializer_class = PackageSerializer
+    serializer_class = PackageSerializer.PackageSerializer
     authentication_classes = (SessionAuthentication,)
     permission_classes = [
         IsAuthenticated,

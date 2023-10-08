@@ -1,7 +1,7 @@
 from django.urls import path
 
-from .views import offerFilterView
+from .views import OfferFilterView
 
 urlpatterns = [
-    path("", offerFilterView.OfferFilterView.as_view(), name="offers"),
+    path("", OfferFilterView.OfferFilterView.as_view(), name="offers"),
 ]

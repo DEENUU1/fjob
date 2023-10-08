@@ -1,13 +1,14 @@
-from rest_framework import status, permissions
+from rest_framework import status
+from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from .serializers import ContactSerializer
+from contact.serializers import ContactSerializer
 
 
 class SendMessage(APIView):
-    serializer_class = ContactSerializer
-    permission_classes = (permissions.AllowAny,)
+    permission_classes = [AllowAny]
+    serializer_class = ContactSerializer.ContactSerializer
 
     def post(self, request):
         serializer = self.serializer_class(data=request.data)

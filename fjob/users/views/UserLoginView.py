@@ -5,7 +5,8 @@ from rest_framework.exceptions import AuthenticationFailed
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from ..serializers import UserLoginSerializer
+from users.serializers import UserLoginSerializer
+
 
 UserModel = get_user_model()
 
@@ -13,7 +14,7 @@ UserModel = get_user_model()
 class UserLoginView(APIView):
     permission_classes = (permissions.AllowAny,)
     authentication_classes = (SessionAuthentication,)
-    serializer_class = UserLoginSerializer
+    serializer_class = UserLoginSerializer.UserLoginSerializer
 
     def post(self, request):
         serializer = self.serializer_class(data=request.data)

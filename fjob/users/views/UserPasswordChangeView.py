@@ -5,18 +5,20 @@ from rest_framework.generics import UpdateAPIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
-from ..serializers import ChangePasswordSerializer
+from users.serializers import ChangePasswordSerializer
 
 UserModel = get_user_model()
 
 
 class UserPasswordChangeView(UpdateAPIView):
-    serializer_class = ChangePasswordSerializer
-    permission_classes = (IsAuthenticated,)
-    authentication_classes = (SessionAuthentication,)
+    serializer_class = ChangePasswordSerializer.ChangePasswordSerializer
+    permission_classes = [IsAuthenticated]
+    authentication_classes = [SessionAuthentication]
 
     def update(self, request, *args, **kwargs):
-        serializer = self.serializer_class(data=request.data)
+        serializer = self.serializer_class(
+            data=request.data, context={"request": request}
+        )
 
         if serializer.is_valid():
             serializer.update_password(request.user)

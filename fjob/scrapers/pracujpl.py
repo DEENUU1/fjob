@@ -133,7 +133,9 @@ class PracujPL(Scraper):
 
             salary = Salary(
                 contract_type=data["typesOfContract"][0],
-                work_schedule=data["workSchedules"][0],
+                work_schedule=data["workSchedules"][0]
+                if data["workSchedules"]
+                else None,
             )
 
             parsed_data.append(

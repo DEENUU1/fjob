@@ -1,8 +1,8 @@
 from django.db.models import Q
 from rest_framework.views import APIView
-from ..forms import OfferFilterForm
-from ..models import offers
-from ..serializers import OffersSerializer
+from offers.forms import OfferFilterForm
+from offers.models import offers
+from offers.serializers.OfferSerializer import OffersSerializer
 from django.utils.decorators import method_decorator
 from django.views.decorators.cache import cache_page
 from scrapers.tasks import run_scrapers
@@ -10,12 +10,14 @@ from rest_framework.response import Response
 from rest_framework.authentication import SessionAuthentication
 from payment.models import UserPackage, Package
 from payment.utils import update_free_uses
+from rest_framework.permissions import IsAuthenticated
 
 
 class OfferFilterView(APIView):
     authentication_classes = [
         SessionAuthentication,
     ]
+    permission_classes = [IsAuthenticated]
     serializer_class = OffersSerializer
     filter_form_class = OfferFilterForm
 

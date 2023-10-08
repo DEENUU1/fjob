@@ -21,15 +21,15 @@
 # def send_daily_notification():
 #     notifications = Notification.objects.all()
 #     queryset = Offer.objects.all()
-#     for notification in notifications:
-#         user_email = notification.user.email
-#         user_name = notification.user.username
-#         query = notification.query
-#         country = notification.country
-#         city = notification.city
-#         min_salary = notification.min_salary
-#         max_salary = notification.max_salary
-#         experience_level = notification.experience_level
+#     for notification_todo in notifications:
+#         user_email = notification_todo.user.email
+#         user_name = notification_todo.user.username
+#         query = notification_todo.query
+#         country = notification_todo.country
+#         city = notification_todo.city
+#         min_salary = notification_todo.min_salary
+#         max_salary = notification_todo.max_salary
+#         experience_level = notification_todo.experience_level
 #
 #         if query:
 #             queryset = queryset.filter(
