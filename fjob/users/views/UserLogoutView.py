@@ -8,7 +8,7 @@ UserModel = get_user_model()
 
 
 class UserLogoutView(APIView):
-    permission_classes = (permissions.AllowAny,)
+    # permission_classes = (permissions.AllowAny,)
 
     def post(self, request):
         try:

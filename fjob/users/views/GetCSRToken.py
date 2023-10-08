@@ -9,5 +9,5 @@ from django.utils.decorators import method_decorator
 class GetCSRFToken(APIView):
     permission_classes = (permissions.AllowAny,)
 
-    def get(self):
+    def get(self, request):
         return Response({"message": "CSRF cookie set"})

@@ -10,12 +10,14 @@ from rest_framework.response import Response
 from rest_framework.authentication import SessionAuthentication
 from payment.models import UserPackage, Package
 from payment.utils import update_free_uses
+from rest_framework.permissions import IsAuthenticated
 
 
 class OfferFilterView(APIView):
     authentication_classes = [
         SessionAuthentication,
     ]
+    permission_classes = [IsAuthenticated]
     serializer_class = OffersSerializer
     filter_form_class = OfferFilterForm
 

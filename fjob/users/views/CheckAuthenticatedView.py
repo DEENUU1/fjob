@@ -4,7 +4,7 @@ from rest_framework import status
 
 
 class CheckAuthenticatedView(APIView):
-    def get(self):
+    def get(self, request):
         user = self.request.user
 
         try:
