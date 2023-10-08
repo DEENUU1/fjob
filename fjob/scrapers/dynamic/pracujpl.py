@@ -4,7 +4,7 @@ from typing import Dict, List, Optional, Any
 
 import requests
 
-from .scraper import Scraper, ParsedOffer, Salary
+from scrapers.scraper import Scraper, ParsedOffer, Salary
 
 logging.basicConfig(
     filename="../logs.log",
@@ -160,7 +160,7 @@ class PracujPL(Scraper):
 
 
 def run(
-    sfd: bool, spd: bool, city: str, query: str = None, region: str = None
+    city: str, query: str = None, region: str = None
 ) -> List[Dict[str, Any]] | None:
     result = None
     scraper = PracujPL("https://massachusetts.pracuj.pl/jobOffers/listing/multiregion")
@@ -182,11 +182,6 @@ def run(
     else:
         logging.info(f"Scraped {len(data)} job offers")
 
-        if sfd:
-            logging.info(f"Saving fetch data to json")
-            scraper.save_fetch_data_to_json(data)
-            logging.info(f"Fetch data saved to json")
-
         logging.info("Start parsing data")
         result = scraper.parse_offer(data)
 
@@ -194,10 +189,5 @@ def run(
             logging.error("Failed to parse job offers")
         else:
             logging.info(f"Successfully parsed {len(result)} job offers")
-
-            if spd:
-                logging.info(f"Saving parsed data to json")
-                scraper.save_parsed_data_to_json(result)
-                logging.info("Parsed data saved to json")
 
     return scraper.return_parsed_data(result)

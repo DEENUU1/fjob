@@ -6,7 +6,6 @@ class Command(BaseCommand):
     help = "Create default Package objects"
 
     def handle(self, *args, **kwargs):
-        print("działa")
         package_1 = Package.objects.create(
             name="Free",
         )

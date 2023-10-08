@@ -5,7 +5,7 @@ from typing import Dict, List, Optional, Any
 
 import requests
 
-from .scraper import Scraper, ParsedOffer, Salary
+from scrapers.scraper import Scraper, ParsedOffer, Salary
 
 logging.basicConfig(
     filename="../logs.log",
@@ -289,9 +289,7 @@ class OLX(Scraper):
         return parsed_data
 
 
-def run(
-    sfd: bool, spd: bool, city: str, query: str = None
-) -> List[Dict[str, Any]] | None:
+def run(city: str, query: str = None) -> List[Dict[str, Any]] | None:
     result = None
 
     l = OLXLocalization(city)
@@ -316,20 +314,10 @@ def run(
     else:
         logging.info(f"Scraped {len(data)} job offers")
 
-        if sfd:
-            logging.info(f"Saving fetch data to json")
-            olx_scraper.save_fetch_data_to_json(data)
-            logging.info(f"Fetch data saved to json")
-
         result = olx_scraper.parse_offer(data)
 
         if result is not None:
             logging.info(f"Successfully parsed {len(result)} job offers")
-
-            if spd:
-                logging.info(f"Saving parsed data to json")
-                olx_scraper.save_parsed_data_to_json(result)
-                logging.info(f"Parsed data saved to json")
 
         else:
             logging.error("Failed to parse job offers")
