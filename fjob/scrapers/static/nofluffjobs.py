@@ -32,7 +32,6 @@ def chrome_driver_configuration() -> Options:
 
 categories = [
     "backend",
-    "backend",
     "frontend",
     "fullstack",
     "mobile",
@@ -66,24 +65,50 @@ categories = [
 
 driver = webdriver.Chrome(options=chrome_driver_configuration())
 BASE_URL = "https://nofluffjobs.com/pl/"
-page = 1
 
 for category in categories:
+    page = 1
     while True:
-        driver.get(f"{BASE_URL}{category}?page={page}")
+        url = f"{BASE_URL}{category}?page={page}"
+        print(url)
+        driver.get(url)
         html = driver.page_source
         soup = BeautifulSoup(html, "html.parser")
         jobs = soup.find("div", class_="list-container ng-star-inserted")
-        if len(jobs) == 0:
-            break
-        for job in jobs:
-            title = jobs.find_all(
-                "h3",
-                class_="posting-title__position text-truncate color-main ng-star-inserted",
-            )
-            for t in title:
-                print(t.text)
 
+        a_tag = soup.find("a")
+        if not a_tag:
+            break
+
+        if jobs:
+            job_list = jobs.find_all("a")
+            for job in job_list:
+                data = {}
+
+                title = job.find(
+                    "h3",
+                    class_="posting-title__position text-truncate color-main ng-star-inserted",
+                )
+                company = job.find(
+                    "span",
+                    class_="d-block posting-title__company text-truncate",
+                )
+                salary = job.find(
+                    "span",
+                    class_="text-truncate badgy salary tw-btn tw-btn-secondary-outline tw-btn-xs ng-star-inserted",
+                )
+                localization = job.find(
+                    "span",
+                    class_="tw-text-ellipsis tw-inline-block tw-overflow-hidden tw-whitespace-nowrap lg:tw-max-w-[100px] tw-text-right",
+                )
+                if title and company and salary and localization:
+                    data["title"] = title.text
+                    data["company"] = company.text
+                    data["salary"] = salary.text
+                    data["localization"] = localization.text
+                    print(data)
+        else:
+            break
         page += 1
 
 driver.quit()
