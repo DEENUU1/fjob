@@ -1,10 +1,9 @@
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 import time
-from typing import List, Dict, Any, Tuple, Optional
+from typing import List, Optional
 from bs4 import BeautifulSoup
 from ..scraper import ParsedOffer, Salary, Scraper
-import re
 
 
 BASE_URL = "https://justjoin.it/all-locations/ux"
@@ -45,6 +44,8 @@ class JJIT(Scraper):
                 salary_element = soup.find("div", class_="css-1qaewdq")
                 skill_elements = soup.find_all("div", class_="css-1am4i4o")
                 skills = [skill.text for skill in skill_elements]
+                localization_element = soup.find("div", class_="css-h3r3z8")
+
                 if title_element:
                     offer["title"] = title_element.text
                 if url_element:
@@ -53,25 +54,33 @@ class JJIT(Scraper):
                     offer["salary"] = salary_element.text
                 if skills:
                     offer["skills"] = skills
+                if localization_element:
+                    offer["localization"] = localization_element.text
 
                 self.data.append(offer)
         except Exception as e:
             print(e)
 
     @staticmethod
-    def process_salary(salary: str) -> Tuple[int, int] | Tuple[None, None]:
+    def process_salary(salary: str):
         if "Undisclosed" in salary:
             return None, None
 
-        salary = salary.replace(" PLN", "")
-        match = re.search(r"(\d+)\s*-\s*(\d+)", salary)
-        if match:
-            num1 = int(match.group(1))
-            num2 = int(match.group(2))
-            return num1, num2
-
+        if "-" in salary:
+            text = salary.split(" - ")
+            num1, num2 = text
+            return int(num1.replace(" ", "")), int(
+                num2.replace(" ", "").replace("PLN", "")
+            )
         else:
-            return None, None
+            return int(salary.replace("PLN", "").replace(" ", "")), None
+
+    @staticmethod
+    def get_currency(salary: str) -> Optional[str]:
+        if "PLN" in salary:
+            return "PLN"
+        else:
+            return None
 
     def process_skills(self, idx: int) -> None:
         skills = self.data[idx]["skills"]
@@ -82,34 +91,55 @@ class JJIT(Scraper):
         if "remote" in skills:
             self.data[idx]["skills"].remove("Fully remote")
             return True
-
         else:
             return False
+
+    @staticmethod
+    def get_experience_level(skills: List[str]) -> Optional[str]:
+        if "Senior" in skills:
+            return "senior"
+        elif "Mid" in skills:
+            return "mid"
+        elif "Junior" in skills:
+            return "junior"
+        elif "Trainee" in skills:
+            return "trainee"
+        else:
+            return None
+
+    @staticmethod
+    def process_localization(localization: str) -> str:
+        if ", " in localization:
+            return localization.split(", ")[0]
+        else:
+            return localization
 
     def parse_offer(self, json_data=None) -> List[ParsedOffer]:
         parsed_offer = []
         for idx, offer in enumerate(self.data):
             salary_from, salary_to = self.process_salary(offer["salary"])
+            currency = self.get_currency(offer["salary"])
             is_remote = self.is_remote(offer["skills"], idx)
             skills = self.process_skills(idx)
+            experience_level = self.get_experience_level(offer["skills"])
+            localization = self.process_localization(offer["localization"])
 
             salary = Salary(
                 salary_from=salary_from,
                 salary_to=salary_to,
+                currency=currency,
             )
 
             parsed_offer.append(
                 ParsedOffer(
                     title=offer["title"],
-                    id=offer["id"],
-                    url=offer["url"],
+                    id=offer["url"],
+                    url=f"https://justjoin.it{offer['url']}",
                     salary=[salary],
-                    # city=...,
+                    city=localization,
                     remote=is_remote,
-                    # experience_level=...,
+                    experience_level=experience_level if experience_level else None,
                     skills=skills,
-                    # company_name=...,
-                    # company_logo=...,
                 )
             )
 
