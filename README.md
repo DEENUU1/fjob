@@ -66,7 +66,8 @@ This project is still in develop. The core of a project is already implemented, 
 - <a href="https://www.pracuj.pl/"> Pracuj.pl </a>
 
 ### Static:
-- In progress...
+- <a href="https://justjoin.it"> Justjoin IT </a>
+
 
 ## Endpoints
 
