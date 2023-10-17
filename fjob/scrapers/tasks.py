@@ -4,6 +4,7 @@ from typing import List, Dict, Any
 from celery import shared_task
 from .static import jjit
 from .static.pracapl import PracaPL, get_max_page
+from .static.theprotocol import TheProtocol
 
 
 @shared_task()
@@ -24,3 +25,8 @@ def run_pracapl() -> None:
     max_page = get_max_page()
     pracapl_scraper = PracaPL(max_page=max_page)
     pracapl_scraper.pipeline()
+
+
+def run_theprotocol() -> None:
+    theprotocol_scraper = TheProtocol()
+    theprotocol_scraper.pipeline()
