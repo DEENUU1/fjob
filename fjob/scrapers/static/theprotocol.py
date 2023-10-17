@@ -1,6 +1,7 @@
 import httpx
 from bs4 import BeautifulSoup
 from ..scraper import Scraper, ParsedOffer
+from typing import List, Dict, Any, Optional
 
 
 BASE_URL = "https://theprotocol.it/?pageNumber="
@@ -25,6 +26,7 @@ class TheProtocol(Scraper):
             offer_data = {}
 
             title = card.find("h2", class_="titleText_t1280ha4")
+            url = card.get("href")
             company_logo = card.find("img")
             details = card.find_all("div", class_="rootClass_rpqnjlt")
             skill_divs = card.find_all("div", {"data-test": "chip-expectedTechnology"})
@@ -54,14 +56,32 @@ class TheProtocol(Scraper):
                 offer_data["skills"] = skills
             if localization:
                 offer_data["localization"] = localization.text
-
+            if url:
+                offer_data["url"] = url
             self.data.append(offer_data)
 
-    def parse_offer(self, data):
-        pass
+    def parse_offer(self, data: List[Dict[str, Any]]) -> List[Optional[ParsedOffer]]:
+        parsed_offers = []
+
+        for offer in data:
+            parsed_offers.append(
+                ParsedOffer(
+                    title=offer.get("title", None),
+                    company_name=offer.get("company_name", None),
+                    company_logo=offer.get("company_logo", None),
+                    skills=offer.get("skills", None),
+                    city=offer.get("localization", None),
+                    url=f"{'https://theprotocol.it/'}{offer.get('url', None)}",
+                )
+            )
+
+        return parsed_offers
 
     def pipeline(self):
         for i in range(1, MAX_PAGE_NUM):
             response = self.fetch_data()
             self.parse_data(response)
             self.page_num += 1
+
+        x = self.parse_offer(self.data)
+        print(x)

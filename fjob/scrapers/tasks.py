@@ -30,4 +30,3 @@ def run_pracapl() -> None:
 def run_theprotocol() -> None:
     theprotocol_scraper = TheProtocol()
     theprotocol_scraper.pipeline()
-    print(theprotocol_scraper.data)
