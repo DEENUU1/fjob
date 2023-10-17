@@ -4,7 +4,7 @@ from ..scraper import Scraper, ParsedOffer
 
 
 BASE_URL = "https://theprotocol.it/?pageNumber="
-MAX_PAGE_NUM = 58
+MAX_PAGE_NUM = 2
 
 
 class TheProtocol(Scraper):
