@@ -1,7 +1,7 @@
 from selenium import webdriver
 from bs4 import BeautifulSoup
 import time
-from chrome_driver import chrome_driver_configuration
+from ..chrome_driver import chrome_driver_configuration
 
 
 BASE_URL = "https://nofluffjobs.com/pl"
