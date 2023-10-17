@@ -1,9 +1,10 @@
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 import time
-from typing import List, Dict, Any
+from typing import List, Dict, Any, Tuple, Optional
 from bs4 import BeautifulSoup
 from ..scraper import ParsedOffer, Salary, Scraper
+import re
 
 
 BASE_URL = "https://justjoin.it/all-locations/ux"
@@ -57,21 +58,58 @@ class JJIT(Scraper):
         except Exception as e:
             print(e)
 
+    @staticmethod
+    def process_salary(salary: str) -> Tuple[int, int] | Tuple[None, None]:
+        if "Undisclosed" in salary:
+            return None, None
+
+        salary = salary.replace(" PLN", "")
+        match = re.search(r"(\d+)\s*-\s*(\d+)", salary)
+        if match:
+            num1 = int(match.group(1))
+            num2 = int(match.group(2))
+            return num1, num2
+
+        else:
+            return None, None
+
+    def process_skills(self, idx: int) -> None:
+        skills = self.data[idx]["skills"]
+        if "New" in skills:
+            skills.remove("New")
+
+    def is_remote(self, skills: List[str], idx: int) -> bool:
+        if "remote" in skills:
+            self.data[idx]["skills"].remove("Fully remote")
+            return True
+
+        else:
+            return False
+
     def parse_offer(self, json_data=None) -> List[ParsedOffer]:
         parsed_offer = []
-        for offer in self.data:
+        for idx, offer in enumerate(self.data):
+            salary_from, salary_to = self.process_salary(offer["salary"])
+            is_remote = self.is_remote(offer["skills"], idx)
+            skills = self.process_skills(idx)
+
+            salary = Salary(
+                salary_from=salary_from,
+                salary_to=salary_to,
+            )
+
             parsed_offer.append(
                 ParsedOffer(
                     title=offer["title"],
+                    id=offer["id"],
                     url=offer["url"],
-                    salary=...,
-                    city=...,
-                    remote=...,
-                    hybrid=...,
-                    experience_level=...,
-                    skills=...,
-                    company_name=...,
-                    company_logo=...,
+                    salary=[salary],
+                    # city=...,
+                    remote=is_remote,
+                    # experience_level=...,
+                    skills=skills,
+                    # company_name=...,
+                    # company_logo=...,
                 )
             )
 

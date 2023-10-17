@@ -16,4 +16,4 @@ def run_jjit() -> None:
     jjit_scraper = jjit.JJIT()
     jjit_scraper.fetch_data()
     x = jjit_scraper.parse_offer()
-    print(x)
+    print(x[0])
