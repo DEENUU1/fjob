@@ -58,9 +58,7 @@ class Scraper(ABC):
         pass
 
     @staticmethod
-    def return_parsed_data(
-        self, parsed_data: List[ParsedOffer]
-    ) -> List[Dict[str, Any]]:
+    def return_parsed_data(parsed_data: List[ParsedOffer]) -> List[Dict[str, Any]]:
         return [offer.__dict__ for offer in parsed_data]
 
     def save_data(self, data_list: List[ParsedOffer]):
