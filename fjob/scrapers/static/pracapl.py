@@ -1,10 +1,9 @@
 from bs4 import BeautifulSoup
 import httpx
-from typing import List, Dict, Any, Optional
+from typing import List, Dict, Any, Optional, Tuple
 from ..scraper import Scraper, ParsedOffer
 
 BASE_URL = f"https://www.praca.pl/oferty-pracy_"
-extract_data_list = []
 
 
 def get_max_page() -> int:
@@ -18,16 +17,16 @@ def get_max_page() -> int:
 
 
 class PracaPL(Scraper):
-    def __init__(self, url: str, max_page: int = 2):
+    def __init__(self, url: str = BASE_URL, max_page: int = 2):
         super().__init__(url)
         self.max_page = max_page
+        self.extract_data_list = []
 
     def fetch_data(self) -> str:
         response = httpx.get(f"{BASE_URL}{self.max_page}")
         return response.text
 
-    @staticmethod
-    def extract_data(data: str) -> None:
+    def extract_data(self, data: str) -> None:
         if not data:
             return
 
@@ -55,10 +54,57 @@ class PracaPL(Scraper):
             if employer_name_element:
                 offer_data["employer_name"] = employer_name_element.text
 
-            extract_data_list.append(offer_data)
+            self.extract_data_list.append(offer_data)
+
+    @staticmethod
+    def is_remote_hybrid(data: str) -> Tuple[bool, bool]:
+        if not data:
+            return False, False
+
+        hybrid = False
+        remote = False
+        if "hybrydowa" in data:
+            hybrid = True
+
+        if "zdalna" in data:
+            remote = True
+
+        return hybrid, remote
+
+    @staticmethod
+    def parse_localization(data: str) -> Optional[str]:
+        if not data:
+            return None
+
+        city = data.split()[0]
+        return city
+
+    def parse_offer(
+        self, data_list: List[Dict[str, Any]]
+    ) -> List[Optional[ParsedOffer]]:
+        parsed_offers = []
+        if not data_list:
+            return []
+        for data in data_list:
+            hybrid, remote = self.is_remote_hybrid(data.get("localization", ""))
+            localization = self.parse_localization(data.get("localization", ""))
+
+            parsed_offers.append(
+                ParsedOffer(
+                    title=data.get("title", ""),
+                    url=data.get("url", ""),
+                    city=localization if localization else None,
+                    company_name=data.get("employer_name", ""),
+                    company_logo=data.get("employer_img", ""),
+                    remote=remote,
+                    hybrid=hybrid,
+                )
+            )
+        return parsed_offers
 
     def pipeline(self) -> None:
-        # for i in range(1, max_page + 1):
-        for i in range(1, self.max_page):
+        for i in range(1, self.max_page + 1):
             fetched_data = self.fetch_data()
             self.extract_data(fetched_data)
+
+        parsed_data = self.parse_offer(self.extract_data_list)

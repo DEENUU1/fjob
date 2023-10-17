@@ -22,5 +22,5 @@ def run_jjit() -> None:
 
 def run_pracapl() -> None:
     max_page = get_max_page()
-    pracapl_scraper = PracaPL(max_page)
+    pracapl_scraper = PracaPL(max_page=max_page)
     pracapl_scraper.pipeline()

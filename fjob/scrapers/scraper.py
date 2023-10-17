@@ -54,7 +54,7 @@ class Scraper(ABC):
         pass
 
     @abstractmethod
-    def parse_offer(self, json_data: List[Dict[str, str]]):
+    def parse_offer(self, data):
         pass
 
     @staticmethod

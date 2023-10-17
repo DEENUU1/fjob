@@ -8,24 +8,24 @@ from ..scraper import ParsedOffer, Salary, Scraper
 
 BASE_URL = "https://justjoin.it/all-locations/ux"
 PIXELS_TO_SCROLL = "500"
-driver = webdriver.Chrome()
-driver.get(BASE_URL)
 
 
 class JJIT(Scraper):
     def __init__(self, url: str = BASE_URL):
         super().__init__(url)
         self.data = []
+        self.driver = webdriver.Chrome()
+        self.driver.get(BASE_URL)
 
     def fetch_data(self):
         try:
             last_height = 0
             while True:
                 self.extract_job_offers()
-                driver.execute_script(f"window.scrollBy(0, {PIXELS_TO_SCROLL});")
+                self.driver.execute_script(f"window.scrollBy(0, {PIXELS_TO_SCROLL});")
                 time.sleep(1)
 
-                new_height = driver.execute_script("return window.scrollY")
+                new_height = self.driver.execute_script("return window.scrollY")
                 if new_height == last_height:
                     break
                 last_height = new_height
@@ -34,7 +34,7 @@ class JJIT(Scraper):
 
     def extract_job_offers(self) -> None:
         try:
-            elements = driver.find_elements(By.CLASS_NAME, "css-gfqoze")
+            elements = self.driver.find_elements(By.CLASS_NAME, "css-gfqoze")
             for element in elements:
                 offer = {}
 
