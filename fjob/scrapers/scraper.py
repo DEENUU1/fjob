@@ -1,9 +1,7 @@
-import json
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from typing import Dict, List, Optional, Any
 
-from django.db import transaction
 from offers.models import offers, salaries
 import logging
 
@@ -59,6 +57,7 @@ class Scraper(ABC):
     def parse_offer(self, json_data: List[Dict[str, str]]):
         pass
 
+    @staticmethod
     def return_parsed_data(
         self, parsed_data: List[ParsedOffer]
     ) -> List[Dict[str, Any]]:

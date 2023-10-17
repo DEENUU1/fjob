@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     "payment",
     "contact",
     "notification_todo",
+    "scrapers",
     # api and libs
     "rest_framework",
     "drf_yasg",
