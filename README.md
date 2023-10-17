@@ -67,7 +67,9 @@ This project is still in develop. The core of a project is already implemented, 
 
 ### Static:
 - <a href="https://justjoin.it"> Justjoin IT </a>
-
+- <a href="https://nofluffjobs.com"> NoFluffJobs </a>
+- <a href="https://praca.pl"> Praca PL </a>
+- <a href="https://theprotocol.it"> TheProtocol </a>
 
 ## Endpoints
 
