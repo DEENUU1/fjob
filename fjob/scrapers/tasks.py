@@ -100,16 +100,36 @@ def jjit_task() -> None:
         jjit_scraper.fetch_data()
         parsed_offer = jjit_scraper.parse_offer()
         jjit_scraper.save_data(parsed_offer)
+
+        observer = ReportObserver("JustJoinIT")
+        observer.create_report(len(jj))
+
     except Exception as e:
         logging.error(f"Error occurred during scraping: {e}")
 
 
 def pracapl_task() -> None:
-    max_page = get_max_page()
-    pracapl_scraper = PracaPL(max_page=max_page)
-    pracapl_scraper.pipeline()
+    try:
+        max_page = get_max_page()
+        pracapl_scraper = PracaPL(max_page=max_page)
+        data = pracapl_scraper.pipeline()
+        pracapl_scraper.save_data(data)
+
+        observer = ReportObserver("PracaPL")
+        observer.create_report(len(data))
+
+    except Exception as e:
+        logging.error(f"Error occurred during scraping: {e}")
 
 
 def theprotocol_task() -> None:
-    theprotocol_scraper = TheProtocol()
-    theprotocol_scraper.pipeline()
+    try:
+        theprotocol_scraper = TheProtocol()
+        data = theprotocol_scraper.pipeline()
+        theprotocol_scraper.save_data(data)
+
+        observer = ReportObserver("TheProtocol")
+        observer.create_report(len(data))
+
+    except Exception as e:
+        logging.error(f"Error occurred during scraping: {e}")

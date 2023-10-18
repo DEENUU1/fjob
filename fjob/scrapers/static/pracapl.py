@@ -31,14 +31,15 @@ def get_max_page() -> int:
 
 
 class PracaPL(Scraper):
-    def __init__(self, url: str = BASE_URL, max_page: int = 2):
+    def __init__(self, max_page: int, url: str = BASE_URL):
         super().__init__(url)
         self.max_page = max_page
+        self.page = 1
         self.extract_data_list = []
 
     def fetch_data(self) -> Optional[str]:
         try:
-            response = httpx.get(f"{BASE_URL}{self.max_page}")
+            response = httpx.get(f"{BASE_URL}{self.page}")
             return response.text
         except Exception as e:
             logging.error(f"Error occurred during fetching data: {e}")
@@ -134,13 +135,14 @@ class PracaPL(Scraper):
             return []
         return parsed_offers
 
-    def pipeline(self) -> None:
+    def pipeline(self) -> List[Optional[ParsedOffer]]:
         try:
             for i in range(1, self.max_page + 1):
                 fetched_data = self.fetch_data()
                 self.extract_data(fetched_data)
-
-            parsed_data = self.parse_offer(self.extract_data_list)
-            self.save_data(parsed_data)
+                self.page += 1
+            logging.info(f"Parsed {len(self.extract_data_list)} offers from pracapl")
+            return self.parse_offer(self.extract_data_list)
         except Exception as e:
             logging.error(f"An error occurred while scraping data from pracapl {e}")
+            return []

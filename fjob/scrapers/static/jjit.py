@@ -158,4 +158,5 @@ class JJIT(Scraper):
         except Exception as e:
             logging.error(f"Error occurred during parsing: {e}")
 
+        logging.info(f"Parsed {len(parsed_offer)} offers from justjoin.it")
         return parsed_offer

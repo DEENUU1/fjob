@@ -13,7 +13,7 @@ logging.basicConfig(
 
 
 BASE_URL = "https://theprotocol.it/?pageNumber="
-MAX_PAGE_NUM = 2
+MAX_PAGE_NUM = 58
 
 
 class TheProtocol(Scraper):
@@ -102,15 +102,15 @@ class TheProtocol(Scraper):
 
         return parsed_offers
 
-    def pipeline(self):
+    def pipeline(self) -> List[Optional[ParsedOffer]]:
         try:
             for i in range(1, MAX_PAGE_NUM):
                 response = self.fetch_data()
                 self.parse_data(response)
                 self.page_num += 1
 
-            x = self.parse_offer(self.data)
-            self.save_data(x)
+            logging.info(f"Parsed {len(self.data)} offers from theprotocol.it")
+            return self.parse_offer(self.data)
         except Exception as e:
             logging.error(f"Error occurred during pipeline: {e}")
             return []
