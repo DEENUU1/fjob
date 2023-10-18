@@ -135,16 +135,18 @@ class OLX(Scraper):
         """
         Delete HTML tags from description
         """
-        return (
-            description.replace("<p>", " ")
-            .replace("</p>", " ")
-            .replace("<strong>", " ")
-            .replace("</strong>", " ")
-            .replace("<li>", " ")
-            .replace("</li>", " ")
-            .replace("<ul>", " ")
-            .replace("</ul>", " ")
-        )
+        if description:
+            return (
+                description.replace("<p>", " ")
+                .replace("</p>", " ")
+                .replace("<strong>", " ")
+                .replace("</strong>", " ")
+                .replace("<li>", " ")
+                .replace("</li>", " ")
+                .replace("<ul>", " ")
+                .replace("</ul>", " ")
+            )
+        return ""
 
     @staticmethod
     def get_localization_data(localization: Dict[str, Dict[str, str]]) -> Localization:
@@ -287,39 +289,3 @@ class OLX(Scraper):
             )
 
         return parsed_data
-
-
-def run(city: str, query: str = None) -> List[Dict[str, Any]] | None:
-    result = None
-
-    l = OLXLocalization(city)
-    x = l.return_localization_data()
-    olx_scraper = OLX("https://www.olx.pl/api/v1/offers/")
-
-    if x is None:
-        logging.error("Failed to scrap localization data")
-    else:
-        logging.info(f"Successfully scraped localization data: {x}")
-        olx_scraper.set_param("city_id", str(x.city_id))
-        olx_scraper.set_param("region_id", str(x.region_id))
-
-    if query is not None:
-        olx_scraper.set_param("query", "python junior")
-
-    logging.info(f"Scraping job offers from {olx_scraper.url}")
-    data = olx_scraper.fetch_data()
-
-    if data is None:
-        logging.error("Failed to scrap job offers")
-    else:
-        logging.info(f"Scraped {len(data)} job offers")
-
-        result = olx_scraper.parse_offer(data)
-
-        if result is not None:
-            logging.info(f"Successfully parsed {len(result)} job offers")
-
-        else:
-            logging.error("Failed to parse job offers")
-
-    return olx_scraper.return_parsed_data(result)

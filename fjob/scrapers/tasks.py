@@ -1,32 +1,135 @@
-from .dynamic.olx import run as run_olx
-from .dynamic.pracujpl import run as run_pracujpl
-from typing import List, Dict, Any
+from .dynamic.olx import OLXLocalization, OLX
+from .dynamic.pracujpl import PracujPL
+from typing import List, Dict, Any, Optional
 from celery import shared_task
 from .static import jjit
 from .static.pracapl import PracaPL, get_max_page
 from .static.theprotocol import TheProtocol
+import logging
+from dashboard.ReportObserver import ReportObserver
+
+
+logging.basicConfig(
+    filename="../logs.log",
+    level=logging.INFO,
+    format="%(asctime)s - %(levelname)s - %(message)s",
+)
 
 
 @shared_task()
-def run_scrapers() -> List[Dict[str, Any]]:
-    olx_data = run_olx("Zduńska Wola")
-    pracujpl_data = run_pracujpl("Zduńska Wola")
-    return olx_data + pracujpl_data
+def pracujpl_task(
+    city: str, query: str = None, user=None
+) -> List[Optional[Dict[str, Any]]]:
+    try:
+        result = None
+        scraper = PracujPL(
+            "https://massachusetts.pracuj.pl/jobOffers/listing/multiregion"
+        )
+
+        if query:
+            scraper.set_param("query", query)
+        if city:
+            scraper.set_param("wp", city)
+
+        logging.info(f"Start fetching data for {scraper.url}")
+        data = scraper.fetch_data()
+
+        if data is None:
+            logging.error("Failed to fetch data")
+        else:
+            logging.info(f"Scraped {len(data)} job offers")
+
+            logging.info("Start parsing data")
+            result = scraper.parse_offer(data)
+
+        logging.info(f"Parsed {len(result)} job offers")
+
+        if user:
+            observer = ReportObserver("PracujPL", user)
+            observer.create_report(len(result))
+            observer.update_user_stats()
+
+        return scraper.return_parsed_data(result)
+
+    except Exception as e:
+        logging.error(f"Error occurred during scraping: {e}")
+        return []
 
 
-def run_jjit() -> None:
-    jjit_scraper = jjit.JJIT()
-    jjit_scraper.fetch_data()
-    x = jjit_scraper.parse_offer()
-    print(x[3])
+@shared_task()
+def olx_task(city: str, query: str = None, user=None) -> List[Optional[Dict[str, Any]]]:
+    try:
+        l = OLXLocalization(city)
+        x = l.return_localization_data()
+        olx_scraper = OLX("https://www.olx.pl/api/v1/offers/")
+
+        if x is None:
+            logging.error("Failed to scrap localization data")
+        else:
+            logging.info(f"Successfully scraped localization data: {x}")
+            olx_scraper.set_param("city_id", str(x.city_id))
+            olx_scraper.set_param("region_id", str(x.region_id))
+
+        if query is not None:
+            olx_scraper.set_param("query", query)
+
+        logging.info(f"Scraping job offers from {olx_scraper.url}")
+        data = olx_scraper.fetch_data()
+
+        logging.info(f"Scraped {len(data)} job offers")
+
+        result = olx_scraper.parse_offer(data)
+
+        logging.info(f"Parsed {len(result)} job offers")
+
+        if user:
+            observer = ReportObserver("OLX", user)
+            observer.create_report(len(result))
+            observer.update_user_stats()
+
+        return olx_scraper.return_parsed_data(result)
+
+    except Exception as e:
+        logging.error(f"Error occurred during scraping: {e}")
+        return []
 
 
-def run_pracapl() -> None:
-    max_page = get_max_page()
-    pracapl_scraper = PracaPL(max_page=max_page)
-    pracapl_scraper.pipeline()
+def jjit_task() -> None:
+    try:
+        jjit_scraper = jjit.JJIT()
+        jjit_scraper.fetch_data()
+        parsed_offer = jjit_scraper.parse_offer()
+        jjit_scraper.save_data(parsed_offer)
+
+        observer = ReportObserver("JustJoinIT")
+        observer.create_report(len(jj))
+
+    except Exception as e:
+        logging.error(f"Error occurred during scraping: {e}")
 
 
-def run_theprotocol() -> None:
-    theprotocol_scraper = TheProtocol()
-    theprotocol_scraper.pipeline()
+def pracapl_task() -> None:
+    try:
+        max_page = get_max_page()
+        pracapl_scraper = PracaPL(max_page=max_page)
+        data = pracapl_scraper.pipeline()
+        pracapl_scraper.save_data(data)
+
+        observer = ReportObserver("PracaPL")
+        observer.create_report(len(data))
+
+    except Exception as e:
+        logging.error(f"Error occurred during scraping: {e}")
+
+
+def theprotocol_task() -> None:
+    try:
+        theprotocol_scraper = TheProtocol()
+        data = theprotocol_scraper.pipeline()
+        theprotocol_scraper.save_data(data)
+
+        observer = ReportObserver("TheProtocol")
+        observer.create_report(len(data))
+
+    except Exception as e:
+        logging.error(f"Error occurred during scraping: {e}")

@@ -58,7 +58,7 @@ This project is still in develop. The core of a project is already implemented, 
 <img src="assets/diagram2.png" />
 
 ## Graph of how offer search works
-<img src="assets/diagram3.png" />
+<img src="assets/diagram4.png" />
 
 ## List of scrapers
 ### Dynamic:
@@ -333,6 +333,16 @@ To run pytests use this command
 pytest
 ```
 
+
+### Scraper commands
+1. Run OLX scraper
+```bash
+python manage.py olx <city_name> --query <query>  
+```
+2. Run PracujPL scraper
+```bash
+python manage.py pracujpl <city_name> --query <query> 
+```
 
 <!-- LICENSE -->
 ## License

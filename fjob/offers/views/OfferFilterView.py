@@ -5,7 +5,8 @@ from offers.models import offers
 from offers.serializers.OfferSerializer import OffersSerializer
 from django.utils.decorators import method_decorator
 from django.views.decorators.cache import cache_page
-from scrapers.tasks import run_scrapers
+
+from offers.strategy.strategy import strategy
 from rest_framework.response import Response
 from rest_framework.authentication import SessionAuthentication
 from payment.models import UserPackage, Package
@@ -21,11 +22,15 @@ class OfferFilterView(APIView):
     serializer_class = OffersSerializer
     filter_form_class = OfferFilterForm
 
-    @method_decorator(cache_page(60 * 1))
+    # @method_decorator(cache_page(60 * 1))
     def get(self, request):
         query = self.request.query_params.get("query")
         country = self.request.query_params.get("country")
+        if country is None:
+            return Response({"message": "Country is required"})
         city = self.request.query_params.get("city")
+        if city is None:
+            return Response({"message": "City is required"})
         min_salary = self.request.query_params.get("min_salary")
         max_salary = self.request.query_params.get("max_salary")
         experience_level = self.request.query_params.get("experience_level")
@@ -52,15 +57,25 @@ class OfferFilterView(APIView):
         if advanced:
             user_package = UserPackage.objects.filter(user=user, active=True).first()
             if user_package.package.id in [2, 3]:
-                advanced_data = run_scrapers()  # Add delay
-                queryset = list(queryset) + advanced_data
+                advanced_data = strategy(
+                    country=country, city=city, query=query, user=user
+                )
+                if advanced_data:
+                    queryset = list(queryset) + advanced_data
+                else:
+                    pass
 
             if user_package.package.id == 1:
                 if user_package.free_uses > 0:
-                    advanced_data = run_scrapers()  # Add delay
-                    queryset = list(queryset) + advanced_data
+                    advanced_data = strategy(
+                        country=country, city=city, query=query, user=user
+                    )
+                    if advanced_data:
+                        queryset = list(queryset) + advanced_data
                     if advanced_data and len(advanced_data) != 0:
                         update_free_uses.update_free_uses(user)
+                    else:
+                        pass
                 else:
                     return Response({"message": "You don't have any free uses"})
         return Response(OffersSerializer(queryset, many=True).data)
