@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Report
+from .models import Report, UserStats
 
 
 class ReportAdmin(admin.ModelAdmin):
@@ -9,4 +9,10 @@ class ReportAdmin(admin.ModelAdmin):
     ordering = ("-date",)
 
 
+class UserStatsAdmin(admin.ModelAdmin):
+    list_display = ("id", "user", "number_of_usage")
+    ordering = ("-number_of_usage",)
+
+
 admin.site.register(Report, ReportAdmin)
+admin.site.register(UserStats, UserStatsAdmin)
