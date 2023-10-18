@@ -58,7 +58,7 @@ This project is still in develop. The core of a project is already implemented, 
 <img src="assets/diagram2.png" />
 
 ## Graph of how offer search works
-<img src="assets/diagram3.png" />
+<img src="assets/diagram4.png" />
 
 ## List of scrapers
 ### Dynamic:
