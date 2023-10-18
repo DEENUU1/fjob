@@ -282,12 +282,10 @@ curl --location 'http://localhost:8000/dashboard/' \
 --header 'Cookie: csrftoken=ZxODZ1nekBhOqq9AfVUBoVjRTd93p9CN; sessionid=kvum1lf4z6w3jek8vfkfq6rafcrca6ew'
 ```
 
-
-
+### /dashboard/user_stats
 ```bash
-{
-    "message": "ok"
-}
+curl --location 'http://localhost:8000/dashboard/user_stats/' \
+--header 'Cookie: csrftoken=k5G7seN4FtrPPXT6Tqrg4MrRoI6alw8T; sessionid=tc0duhu1jd1c9ayi1alrs6pe9bsw0bur'
 ```
 
 <!-- GETTING STARTED -->
