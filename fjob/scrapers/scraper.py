@@ -4,8 +4,7 @@ from typing import Dict, List, Optional, Any
 
 from offers.models import offers, salaries
 import logging
-from dashboard.models import Report
-from scrapers.ReportObserver import ReportObserver
+from dashboard.ReportObserver import ReportObserver
 
 
 logging.basicConfig(
@@ -46,7 +45,7 @@ class ParsedOffer:
     company_logo: Optional[str] = None
 
 
-class Scraper(ReportObserver, ABC):
+class Scraper(ABC):
     def __init__(self, url: str, search: Dict[str, str] = None):
         self.url = url
         self.search = search
@@ -62,20 +61,6 @@ class Scraper(ReportObserver, ABC):
     @staticmethod
     def return_parsed_data(parsed_data: List[ParsedOffer]) -> List[Dict[str, Any]]:
         return [offer.__dict__ for offer in parsed_data]
-
-    @staticmethod
-    def create_report(scraper_name: str, data_list: List[ParsedOffer]) -> bool:
-        try:
-            data_len = len(data_list)
-            report = Report(
-                scraper_name=scraper_name,
-                number_of_scraped_data=data_len,
-            )
-            report.save()
-            return True
-        except Exception as e:
-            logging.error(f"Error creating report: {e}")
-            return False
 
     def save_data(self, data_list: List[ParsedOffer], scraper_name: str):
         """
@@ -126,5 +111,4 @@ class Scraper(ReportObserver, ABC):
 
             saved_offers.append(offer)
 
-        self.create_report(scraper_name, data_list)
         return saved_offers

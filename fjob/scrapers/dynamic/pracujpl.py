@@ -18,7 +18,7 @@ class PracujPL(Scraper):
     A scraper for the Pracuj.pl jobs board.
     """
 
-    def __init__(self, url: str):
+    def __init__(self, url: str) -> None:
         super().__init__(url)
         self.params = {}
 
@@ -145,33 +145,3 @@ class PracujPL(Scraper):
             )
 
         return parsed_data
-
-
-def run(city: str, query: str = None) -> List[Dict[str, Any]] | None:
-    result = None
-    scraper = PracujPL("https://massachusetts.pracuj.pl/jobOffers/listing/multiregion")
-
-    if query:
-        scraper.set_param("query", query)
-    if city:
-        scraper.set_param("wp", city)
-
-    logging.info(f"Start fetching data for {scraper.url}")
-    data = scraper.fetch_data()
-
-    if data is None:
-        logging.error("Failed to fetch data")
-    else:
-        logging.info(f"Scraped {len(data)} job offers")
-
-        logging.info("Start parsing data")
-        result = scraper.parse_offer(data)
-
-    if not result:
-        logging.error("Failed to parse job offers")
-        scraper.create_report("PracujPL", 0)
-
-    logging.info(f"Successfully parsed {len(result)} job offers")
-    scraper.create_report("PracujPL", len(result))
-
-    return scraper.return_parsed_data(result)

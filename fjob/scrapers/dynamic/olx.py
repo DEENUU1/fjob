@@ -287,37 +287,3 @@ class OLX(Scraper):
             )
 
         return parsed_data
-
-
-def run(city: str, query: str = None) -> List[Dict[str, Any]] | None:
-    result = None
-
-    l = OLXLocalization(city)
-    x = l.return_localization_data()
-    olx_scraper = OLX("https://www.olx.pl/api/v1/offers/")
-
-    if x is None:
-        logging.error("Failed to scrap localization data")
-    else:
-        logging.info(f"Successfully scraped localization data: {x}")
-        olx_scraper.set_param("city_id", str(x.city_id))
-        olx_scraper.set_param("region_id", str(x.region_id))
-
-    if query is not None:
-        olx_scraper.set_param("query", query)
-
-    logging.info(f"Scraping job offers from {olx_scraper.url}")
-    data = olx_scraper.fetch_data()
-
-    logging.info(f"Scraped {len(data)} job offers")
-
-    result = olx_scraper.parse_offer(data)
-
-    if not result:
-        logging.error("Failed to parse job offers ")
-        olx_scraper.create_report("OLX", 0)
-
-    logging.info(f"Successfully parsed {len(result)} job offers")
-    olx_scraper.create_report("OLX", len(result))
-
-    return olx_scraper.return_parsed_data(result)

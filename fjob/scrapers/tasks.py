@@ -1,11 +1,12 @@
-from .dynamic.olx import run as run_olx
-from .dynamic.pracujpl import run as run_pracujpl
+from .dynamic.olx import OLXLocalization, OLX
+from .dynamic.pracujpl import PracujPL
 from typing import List, Dict, Any, Optional
 from celery import shared_task
 from .static import jjit
 from .static.pracapl import PracaPL, get_max_page
 from .static.theprotocol import TheProtocol
 import logging
+from dashboard.ReportObserver import ReportObserver
 
 
 logging.basicConfig(
@@ -16,21 +17,76 @@ logging.basicConfig(
 
 
 @shared_task()
-def pracujpl_task(city: str, query: str = None) -> List[Optional[Dict[str, Any]]]:
+def pracujpl_task(
+    city: str, query: str = None, user=None
+) -> List[Optional[Dict[str, Any]]]:
     try:
-        pracujpl_data = run_pracujpl(city=city, query=query)
-        print(pracujpl_data)
-        return pracujpl_data
+        result = None
+        scraper = PracujPL(
+            "https://massachusetts.pracuj.pl/jobOffers/listing/multiregion"
+        )
+
+        if query:
+            scraper.set_param("query", query)
+        if city:
+            scraper.set_param("wp", city)
+
+        logging.info(f"Start fetching data for {scraper.url}")
+        data = scraper.fetch_data()
+
+        if data is None:
+            logging.error("Failed to fetch data")
+        else:
+            logging.info(f"Scraped {len(data)} job offers")
+
+            logging.info("Start parsing data")
+            result = scraper.parse_offer(data)
+
+        logging.info(f"Parsed {len(result)} job offers")
+
+        if user:
+            observer = ReportObserver("PracujPL", user)
+            observer.create_report(len(result))
+
+        return scraper.return_parsed_data(result)
+
     except Exception as e:
         logging.error(f"Error occurred during scraping: {e}")
         return []
 
 
 @shared_task()
-def olx_task(city: str, query: str = None) -> List[Optional[Dict[str, Any]]]:
+def olx_task(city: str, query: str = None, user=None) -> List[Optional[Dict[str, Any]]]:
     try:
-        olx_data = run_olx(city=city, query=query)
-        return olx_data
+        l = OLXLocalization(city)
+        x = l.return_localization_data()
+        olx_scraper = OLX("https://www.olx.pl/api/v1/offers/")
+
+        if x is None:
+            logging.error("Failed to scrap localization data")
+        else:
+            logging.info(f"Successfully scraped localization data: {x}")
+            olx_scraper.set_param("city_id", str(x.city_id))
+            olx_scraper.set_param("region_id", str(x.region_id))
+
+        if query is not None:
+            olx_scraper.set_param("query", query)
+
+        logging.info(f"Scraping job offers from {olx_scraper.url}")
+        data = olx_scraper.fetch_data()
+
+        logging.info(f"Scraped {len(data)} job offers")
+
+        result = olx_scraper.parse_offer(data)
+
+        logging.info(f"Parsed {len(result)} job offers")
+
+        if user:
+            observer = ReportObserver("OLX", user)
+            observer.create_report(len(result))
+
+        return olx_scraper.return_parsed_data(result)
+
     except Exception as e:
         logging.error(f"Error occurred during scraping: {e}")
         return []

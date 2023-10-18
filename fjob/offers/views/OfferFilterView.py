@@ -57,7 +57,9 @@ class OfferFilterView(APIView):
         if advanced:
             user_package = UserPackage.objects.filter(user=user, active=True).first()
             if user_package.package.id in [2, 3]:
-                advanced_data = strategy(country, city, query)
+                advanced_data = strategy(
+                    country=country, city=city, query=query, user=user
+                )
                 if advanced_data:
                     queryset = list(queryset) + advanced_data
                 else:
@@ -65,7 +67,9 @@ class OfferFilterView(APIView):
 
             if user_package.package.id == 1:
                 if user_package.free_uses > 0:
-                    advanced_data = strategy(country, city, query)
+                    advanced_data = strategy(
+                        country=country, city=city, query=query, user=user
+                    )
                     if advanced_data:
                         queryset = list(queryset) + advanced_data
                     if advanced_data and len(advanced_data) != 0:

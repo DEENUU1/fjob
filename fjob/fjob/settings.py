@@ -1,7 +1,7 @@
 import os
 from pathlib import Path
-
 from dotenv import load_dotenv
+import sentry_sdk
 
 load_dotenv()
 
@@ -95,6 +95,11 @@ CELERY_RESULT_SERIALIZER = "json"
 SESSION_ENGINE = "django.contrib.sessions.backends.cache"
 SESSION_CACHE_ALIAS = "default"
 
+sentry_sdk.init(
+    dsn="https://6094696b781381797ceb568f7f4bc58b@o4505387948113920.ingest.sentry.io/4506072856395776",
+    traces_sample_rate=1.0,
+    profiles_sample_rate=1.0,
+)
 
 ROOT_URLCONF = "fjob.urls"
 
