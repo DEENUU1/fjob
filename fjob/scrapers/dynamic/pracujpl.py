@@ -46,18 +46,6 @@ class PracujPL(Scraper):
         """
         return city.replace(" ", "+")
 
-    @staticmethod
-    def convert_region_name(region: str) -> str:
-        """Replace spaces with '-' in region name.
-
-        Args:
-            region: The region name.
-
-        Returns:
-            The region name with spaces replaced with '-'.
-        """
-        return region.replace(" ", "-")
-
     def set_param(self, key: str, value: str):
         """
         Set a query parameter for the URL.
@@ -159,19 +147,13 @@ class PracujPL(Scraper):
         return parsed_data
 
 
-def run(
-    city: str, query: str = None, region: str = None
-) -> List[Dict[str, Any]] | None:
+def run(city: str, query: str = None) -> List[Dict[str, Any]] | None:
     result = None
     scraper = PracujPL("https://massachusetts.pracuj.pl/jobOffers/listing/multiregion")
 
     if query:
         scraper.set_param("query", query)
-    elif region and city:
-        scraper.set_param("wp", region)
-    elif region:
-        scraper.set_param("wp", region)
-    elif city:
+    if city:
         scraper.set_param("wp", city)
 
     logging.info(f"Start fetching data for {scraper.url}")

@@ -334,6 +334,16 @@ pytest
 ```
 
 
+### Scraper commands
+1. Run OLX scraper
+```bash
+python manage.py olx <city_name> --query <query>  
+```
+2. Run PracujPL scraper
+```bash
+python manage.py pracujpl <city_name> --query <query> 
+```
+
 <!-- LICENSE -->
 ## License
 

@@ -304,7 +304,7 @@ def run(city: str, query: str = None) -> List[Dict[str, Any]] | None:
         olx_scraper.set_param("region_id", str(x.region_id))
 
     if query is not None:
-        olx_scraper.set_param("query", "python junior")
+        olx_scraper.set_param("query", query)
 
     logging.info(f"Scraping job offers from {olx_scraper.url}")
     data = olx_scraper.fetch_data()
