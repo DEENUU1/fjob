@@ -343,6 +343,18 @@ python manage.py olx <city_name> --query <query>
 ```bash
 python manage.py pracujpl <city_name> --query <query> 
 ```
+3. Run JustJoinIT scraper
+```bash
+python manage.py jjit
+```
+4. Run PracaPL scraper
+```bash
+python manage.py pracapl 
+```
+5. Run TheProtocol scraper
+```bash
+python manage.py theprotocol
+```
 
 <!-- LICENSE -->
 ## License
