@@ -135,16 +135,18 @@ class OLX(Scraper):
         """
         Delete HTML tags from description
         """
-        return (
-            description.replace("<p>", " ")
-            .replace("</p>", " ")
-            .replace("<strong>", " ")
-            .replace("</strong>", " ")
-            .replace("<li>", " ")
-            .replace("</li>", " ")
-            .replace("<ul>", " ")
-            .replace("</ul>", " ")
-        )
+        if description:
+            return (
+                description.replace("<p>", " ")
+                .replace("</p>", " ")
+                .replace("<strong>", " ")
+                .replace("</strong>", " ")
+                .replace("<li>", " ")
+                .replace("</li>", " ")
+                .replace("<ul>", " ")
+                .replace("</ul>", " ")
+            )
+        return ""
 
     @staticmethod
     def get_localization_data(localization: Dict[str, Dict[str, str]]) -> Localization:

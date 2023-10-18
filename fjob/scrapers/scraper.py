@@ -4,7 +4,7 @@ from typing import Dict, List, Optional, Any
 
 from offers.models import offers, salaries
 import logging
-from dashboard.ReportObserver import ReportObserver
+from django.db import transaction
 
 
 logging.basicConfig(
@@ -62,53 +62,47 @@ class Scraper(ABC):
     def return_parsed_data(parsed_data: List[ParsedOffer]) -> List[Dict[str, Any]]:
         return [offer.__dict__ for offer in parsed_data]
 
-    def save_data(self, data_list: List[ParsedOffer], scraper_name: str):
-        """
-        Save parsed data to database.
+    @staticmethod
+    def save_data(data_list: List[ParsedOffer]) -> None:
+        try:
+            with transaction.atomic():
+                for parsed_offer in data_list:
+                    existing_offer = offers.Offers.objects.filter(
+                        url=parsed_offer.url
+                    ).first()
+                    if existing_offer:
+                        continue
 
-        :param data_list: List of parsed data.
-        :return: List of saved data.
-        :rtype: List[Offers]
+                    offer = offers.Offers(
+                        title=parsed_offer.title,
+                        url=parsed_offer.url,
+                        street=parsed_offer.street,
+                        region=parsed_offer.region,
+                        additional_data=parsed_offer.additional_data,
+                        description=parsed_offer.description,
+                        remote=parsed_offer.remote,
+                        hybrid=parsed_offer.hybrid,
+                        country=parsed_offer.country,
+                        city=parsed_offer.city,
+                        date_created=parsed_offer.date_created,
+                        date_finished=parsed_offer.date_finished,
+                        experience_level=parsed_offer.experience_level,
+                        company_name=parsed_offer.company_name,
+                        company_logo=parsed_offer.company_logo,
+                    )
+                    offer.save()
 
-        """
-
-        saved_offers = []
-
-        for parsed_offer in data_list:
-            # Create an Offers object
-            offer = offers.Offers(
-                title=parsed_offer.title,
-                offer_id=parsed_offer.id,
-                url=parsed_offer.url,
-                street=parsed_offer.street,
-                region=parsed_offer.region,
-                additional_data=parsed_offer.additional_data,
-                description=parsed_offer.description,
-                remote=parsed_offer.remote,
-                hybrid=parsed_offer.hybrid,
-                country=parsed_offer.country,
-                city=parsed_offer.city,
-                date_created=parsed_offer.date_created,
-                date_finished=parsed_offer.date_finished,
-                experience_level=parsed_offer.experience_level,
-                skills=parsed_offer.skills,
-                company_name=parsed_offer.company_name,
-                company_logo=parsed_offer.company_logo,
-            )
-            offer.save()
-
-            # Create Salary objects and associate them with the offer
-            for salary_data in parsed_offer.salary:
-                salary = salaries.Salaries(
-                    salary_from=salary_data.salary_from,
-                    salary_to=salary_data.salary_to,
-                    currency=salary_data.currency,
-                    contract_type=salary_data.contract_type,
-                    work_schedule=salary_data.work_schedule,
-                )
-                salary.save()
-                offer.salary.add(salary)
-
-            saved_offers.append(offer)
-
-        return saved_offers
+                    if parsed_offer.salary:
+                        for parsed_salary in parsed_offer.salary:
+                            salary = salaries.Salaries(
+                                salary_from=parsed_salary.salary_from,
+                                salary_to=parsed_salary.salary_to,
+                                currency=parsed_salary.currency,
+                                contract_type=parsed_salary.contract_type,
+                                work_schedule=parsed_salary.work_schedule,
+                            )
+                            salary.offer = offer
+                            salary.save()
+            logging.info(f"Saved scraped data to database")
+        except Exception as e:
+            logging.error(f"Error occurred while saving data to database: {e}")

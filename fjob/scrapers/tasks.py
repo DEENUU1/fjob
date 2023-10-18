@@ -95,10 +95,13 @@ def olx_task(city: str, query: str = None, user=None) -> List[Optional[Dict[str,
 
 
 def jjit_task() -> None:
-    jjit_scraper = jjit.JJIT()
-    jjit_scraper.fetch_data()
-    x = jjit_scraper.parse_offer()
-    print(x[3])
+    try:
+        jjit_scraper = jjit.JJIT()
+        jjit_scraper.fetch_data()
+        parsed_offer = jjit_scraper.parse_offer()
+        jjit_scraper.save_data(parsed_offer)
+    except Exception as e:
+        logging.error(f"Error occurred during scraping: {e}")
 
 
 def pracapl_task() -> None:

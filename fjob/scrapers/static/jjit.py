@@ -4,6 +4,13 @@ import time
 from typing import List, Optional
 from bs4 import BeautifulSoup
 from ..scraper import ParsedOffer, Salary, Scraper
+import logging
+
+logging.basicConfig(
+    filename="../logs.log",
+    level=logging.INFO,
+    format="%(asctime)s - %(levelname)s - %(message)s",
+)
 
 
 BASE_URL = "https://justjoin.it/all-locations/ux"
@@ -30,7 +37,7 @@ class JJIT(Scraper):
                     break
                 last_height = new_height
         except Exception as e:
-            print(e)
+            logging.error(f"Error occurred during scraping: {e}")
 
     def extract_job_offers(self) -> None:
         try:
@@ -59,7 +66,7 @@ class JJIT(Scraper):
 
                 self.data.append(offer)
         except Exception as e:
-            print(e)
+            logging.error(f"Error occurred during extracting job offers: {e}")
 
     @staticmethod
     def process_salary(salary: str):
@@ -114,33 +121,41 @@ class JJIT(Scraper):
         else:
             return localization
 
-    def parse_offer(self, json_data=None) -> List[ParsedOffer]:
+    def parse_offer(self, json_data=None) -> List[Optional[ParsedOffer]]:
         parsed_offer = []
-        for idx, offer in enumerate(self.data):
-            salary_from, salary_to = self.process_salary(offer["salary"])
-            currency = self.get_currency(offer["salary"])
-            is_remote = self.is_remote(offer["skills"], idx)
-            skills = self.process_skills(idx)
-            experience_level = self.get_experience_level(offer["skills"])
-            localization = self.process_localization(offer["localization"])
 
-            salary = Salary(
-                salary_from=salary_from,
-                salary_to=salary_to,
-                currency=currency,
-            )
+        if not self.data:
+            return parsed_offer
 
-            parsed_offer.append(
-                ParsedOffer(
-                    title=offer["title"],
-                    id=offer["url"],
-                    url=f"https://justjoin.it{offer['url']}",
-                    salary=[salary],
-                    city=localization,
-                    remote=is_remote,
-                    experience_level=experience_level if experience_level else None,
-                    skills=skills,
+        try:
+            for idx, offer in enumerate(self.data):
+                salary_from, salary_to = self.process_salary(offer["salary"])
+                currency = self.get_currency(offer["salary"])
+                is_remote = self.is_remote(offer["skills"], idx)
+                skills = self.process_skills(idx)
+                experience_level = self.get_experience_level(offer["skills"])
+                localization = self.process_localization(offer["localization"])
+
+                salary = Salary(
+                    salary_from=salary_from,
+                    salary_to=salary_to,
+                    currency=currency,
                 )
-            )
+
+                parsed_offer.append(
+                    ParsedOffer(
+                        title=offer["title"],
+                        id=offer["url"],
+                        url=f"https://justjoin.it{offer['url']}",
+                        salary=[salary],
+                        city=localization,
+                        remote=is_remote,
+                        experience_level=experience_level if experience_level else None,
+                        skills=skills,
+                    )
+                )
+
+        except Exception as e:
+            logging.error(f"Error occurred during parsing: {e}")
 
         return parsed_offer
