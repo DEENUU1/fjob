@@ -47,6 +47,7 @@ def pracujpl_task(
         if user:
             observer = ReportObserver("PracujPL", user)
             observer.create_report(len(result))
+            observer.update_user_stats()
 
         return scraper.return_parsed_data(result)
 
@@ -84,6 +85,7 @@ def olx_task(city: str, query: str = None, user=None) -> List[Optional[Dict[str,
         if user:
             observer = ReportObserver("OLX", user)
             observer.create_report(len(result))
+            observer.update_user_stats()
 
         return olx_scraper.return_parsed_data(result)
 
