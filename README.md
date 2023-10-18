@@ -275,6 +275,15 @@ curl --location 'http://localhost:8000/contact/send' \
     "content": "Test message"
 }'
 ```
+
+### /dashboard
+```bash
+curl --location 'http://localhost:8000/dashboard/' \
+--header 'Cookie: csrftoken=ZxODZ1nekBhOqq9AfVUBoVjRTd93p9CN; sessionid=kvum1lf4z6w3jek8vfkfq6rafcrca6ew'
+```
+
+
+
 ```bash
 {
     "message": "ok"
