@@ -4,6 +4,7 @@ from typing import Dict, List, Optional, Any
 
 from offers.models import offers, salaries
 import logging
+from dashboard.models import Report
 
 
 logging.basicConfig(
@@ -61,7 +62,21 @@ class Scraper(ABC):
     def return_parsed_data(parsed_data: List[ParsedOffer]) -> List[Dict[str, Any]]:
         return [offer.__dict__ for offer in parsed_data]
 
-    def save_data(self, data_list: List[ParsedOffer]):
+    @staticmethod
+    def create_report(scraper_name: str, data_list: List[ParsedOffer]) -> bool:
+        try:
+            data_len = len(data_list)
+            report = Report(
+                scraper_name=scraper_name,
+                number_of_scraped_data=data_len,
+            )
+            report.save()
+            return True
+        except Exception as e:
+            logging.error(f"Error creating report: {e}")
+            return False
+
+    def save_data(self, data_list: List[ParsedOffer], scraper_name: str):
         """
         Save parsed data to database.
 
@@ -110,4 +125,5 @@ class Scraper(ABC):
 
             saved_offers.append(offer)
 
+        self.create_report(scraper_name, data_list)
         return saved_offers
