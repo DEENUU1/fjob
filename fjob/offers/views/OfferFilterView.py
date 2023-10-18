@@ -26,7 +26,11 @@ class OfferFilterView(APIView):
     def get(self, request):
         query = self.request.query_params.get("query")
         country = self.request.query_params.get("country")
+        if country is None:
+            return Response({"message": "Country is required"})
         city = self.request.query_params.get("city")
+        if city is None:
+            return Response({"message": "City is required"})
         min_salary = self.request.query_params.get("min_salary")
         max_salary = self.request.query_params.get("max_salary")
         experience_level = self.request.query_params.get("experience_level")

@@ -167,9 +167,11 @@ def run(city: str, query: str = None) -> List[Dict[str, Any]] | None:
         logging.info("Start parsing data")
         result = scraper.parse_offer(data)
 
-        if result is None:
-            logging.error("Failed to parse job offers")
-        else:
-            logging.info(f"Successfully parsed {len(result)} job offers")
+    if not result:
+        logging.error("Failed to parse job offers")
+        scraper.create_report("PracujPL", 0)
+
+    logging.info(f"Successfully parsed {len(result)} job offers")
+    scraper.create_report("PracujPL", len(result))
 
     return scraper.return_parsed_data(result)

@@ -15,3 +15,5 @@ def strategy(
             result += olx_data
     else:
         return []
+
+    return result

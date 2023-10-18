@@ -309,17 +309,15 @@ def run(city: str, query: str = None) -> List[Dict[str, Any]] | None:
     logging.info(f"Scraping job offers from {olx_scraper.url}")
     data = olx_scraper.fetch_data()
 
-    if data is None:
-        logging.error("Failed to scrap job offers")
-    else:
-        logging.info(f"Scraped {len(data)} job offers")
+    logging.info(f"Scraped {len(data)} job offers")
 
-        result = olx_scraper.parse_offer(data)
+    result = olx_scraper.parse_offer(data)
 
-        if result is not None:
-            logging.info(f"Successfully parsed {len(result)} job offers")
+    if not result:
+        logging.error("Failed to parse job offers ")
+        olx_scraper.create_report("OLX", 0)
 
-        else:
-            logging.error("Failed to parse job offers")
+    logging.info(f"Successfully parsed {len(result)} job offers")
+    olx_scraper.create_report("OLX", len(result))
 
     return olx_scraper.return_parsed_data(result)

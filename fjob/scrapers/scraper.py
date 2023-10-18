@@ -5,6 +5,7 @@ from typing import Dict, List, Optional, Any
 from offers.models import offers, salaries
 import logging
 from dashboard.models import Report
+from scrapers.ReportObserver import ReportObserver
 
 
 logging.basicConfig(
@@ -45,7 +46,7 @@ class ParsedOffer:
     company_logo: Optional[str] = None
 
 
-class Scraper(ABC):
+class Scraper(ReportObserver, ABC):
     def __init__(self, url: str, search: Dict[str, str] = None):
         self.url = url
         self.search = search
