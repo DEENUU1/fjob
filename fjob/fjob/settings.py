@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     "contact",
     "notification_todo",
     "scrapers",
+    "dashboard",
     # api and libs
     "rest_framework",
     "drf_yasg",
