@@ -1,4 +1,4 @@
-from .dynamic.olx import OLXLocalization, OLX
+from .static.olx import OLX
 from .dynamic.pracujpl import PracujPL
 from typing import List, Dict, Any, Optional
 from celery import shared_task
@@ -57,41 +57,14 @@ def pracujpl_task(
 
 
 @shared_task()
-def olx_task(city: str, query: str = None, user=None) -> List[Optional[Dict[str, Any]]]:
+def olx_task() -> None:
     try:
-        l = OLXLocalization(city)
-        x = l.return_localization_data()
-        olx_scraper = OLX("https://www.olx.pl/api/v1/offers/")
-
-        if x is None:
-            logging.error("Failed to scrap localization data")
-        else:
-            logging.info(f"Successfully scraped localization data: {x}")
-            olx_scraper.set_param("city_id", str(x.city_id))
-            olx_scraper.set_param("region_id", str(x.region_id))
-
-        if query is not None:
-            olx_scraper.set_param("query", query)
-
-        logging.info(f"Scraping job offers from {olx_scraper.url}")
-        data = olx_scraper.fetch_data()
-
-        logging.info(f"Scraped {len(data)} job offers")
-
-        result = olx_scraper.parse_offer(data)
-
-        logging.info(f"Parsed {len(result)} job offers")
-
-        if user:
-            observer = ReportObserver("OLX", user)
-            observer.create_report(len(result))
-            observer.update_user_stats()
-
-        return olx_scraper.return_parsed_data(result)
+        olx_scraper = OLX()
+        olx_scraper.run()
 
     except Exception as e:
         logging.error(f"Error occurred during scraping: {e}")
-        return []
+        return
 
 
 def jjit_task() -> None:
