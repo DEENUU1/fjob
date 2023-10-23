@@ -11,13 +11,13 @@ from .views import (
 )
 
 urlpatterns = [
+    path("logout/", UserLogoutView.UserLogoutView.as_view(), name="logout"),
     path(
         "register",
         UserRegistrationView.UserRegisterView.as_view(),
         name="register",
     ),
     path("login", UserLoginView.UserLoginView.as_view(), name="login"),
-    path("logout", UserLogoutView.UserLogoutView.as_view(), name="logout"),
     path(
         "change-password",
         UserPasswordChangeView.UserPasswordChangeView.as_view(),

@@ -14,7 +14,7 @@ UserModel = get_user_model()
 class UserAccountDeleteView(DestroyAPIView):
     serializer_class = AccountDeleteSerializer
     permission_classes = (IsAuthenticated,)
-    authentication_classes = (SessionAuthentication,)
+    # authentication_classes = (SessionAuthentication,)
 
     def delete(self, request, *args, **kwargs):
         serializer = AccountDeleteSerializer.AccountDeleteSerializer(data=request.data)

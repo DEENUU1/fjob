@@ -10,7 +10,7 @@ class ReportListView(ListAPIView):
     pagination_class = CustomPagination
     serializer_class = ReportSerializer
     permission_classes = [IsAuthenticated]
-    authentication_classes = [SessionAuthentication]
+    # authentication_classes = [SessionAuthentication]
 
     def get_queryset(self):
         return Report.objects.all()

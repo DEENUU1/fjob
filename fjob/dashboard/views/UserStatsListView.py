@@ -10,7 +10,7 @@ class UserStatsListView(ListAPIView):
     pagination_class = CustomPagination
     serializer_class = UserStatsSerializer
     permission_classes = [IsAuthenticated]
-    authentication_classes = [SessionAuthentication]
+    # authentication_classes = [SessionAuthentication]
 
     def get_queryset(self):
         return UserStats.objects.all()

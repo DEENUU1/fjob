@@ -13,7 +13,7 @@ UserModel = get_user_model()
 
 class UserLoginView(APIView):
     permission_classes = (permissions.AllowAny,)
-    authentication_classes = (SessionAuthentication,)
+    # authentication_classes = (SessionAuthentication,)
     serializer_class = UserLoginSerializer.UserLoginSerializer
 
     def post(self, request):

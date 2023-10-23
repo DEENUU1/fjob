@@ -8,7 +8,7 @@ from payment.serializers import PackageSerializer
 
 class GetPackages(ListAPIView):
     serializer_class = PackageSerializer.PackageSerializer
-    authentication_classes = (SessionAuthentication,)
+    # authentication_classes = (SessionAuthentication,)
     permission_classes = [
         IsAuthenticated,
     ]

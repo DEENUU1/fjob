@@ -8,9 +8,9 @@ from payment.models import UserPackage, Package
 
 
 class GetUserFreeUses(APIView):
-    authentication_classes = [
-        SessionAuthentication,
-    ]
+    # authentication_classes = [
+    #     SessionAuthentication,
+    # ]
     permission_classes = [
         IsAuthenticated,
     ]

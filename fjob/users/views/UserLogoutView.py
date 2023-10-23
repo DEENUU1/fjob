@@ -1,22 +1,24 @@
 from django.contrib.auth import get_user_model
 from rest_framework import status
 
-# from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework.authentication import SessionAuthentication
-from django.contrib import auth
+from rest_framework_simplejwt.tokens import RefreshToken
 
 UserModel = get_user_model()
 
 
 class UserLogoutView(APIView):
-    authentication_classes = [SessionAuthentication]
+    permission_classes = [
+        IsAuthenticated,
+    ]
 
     def post(self, request):
         try:
-            auth.logout(request)
-            return Response({"message": "Ok"}, status=status.HTTP_200_OK)
+            refresh_token = request.data.get("refresh_token")
+            token = RefreshToken(refresh_token)
+            token.blacklist()
+            return Response(status=status.HTTP_205_RESET_CONTENT)
         except Exception as e:
-            print(e)
-            return Response({"message": "Error"}, status=status.HTTP_400_BAD_REQUEST)
+            return Response(status=status.HTTP_400_BAD_REQUEST)
