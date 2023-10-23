@@ -25,15 +25,8 @@ class UserRegisterSerializer(serializers.ModelSerializer):
         return username
 
     def create(self, validated_data):
-        with transaction.atomic():
-            user_obj = UserModel.objects.create_user(
-                email=validated_data["email"],
-                password=validated_data["password"],
-                username=validated_data["username"],
-            )
-            package = Package.objects.get(id=1)
-            #  Automatically add free trial package for a new user
-            user_package = UserPackage(active=True, package=package, user=user_obj)
-            user_package.save()
-
-        return user_obj
+        return UserModel.objects.create_user(
+            email=validated_data["email"],
+            password=validated_data["password"],
+            username=validated_data["username"],
+        )
