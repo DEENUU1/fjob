@@ -19,7 +19,7 @@ stripe.api_key = settings.STRIPE_SECRET_KEY
 
 class CreateCheckoutSession(APIView):
     permission_classes = [IsAuthenticated, IsPackageAlreadyOwned]
-    authentication_classes = [SessionAuthentication]
+    # authentication_classes = [SessionAuthentication]
 
     def get(self, request, package_id):
         user = request.user

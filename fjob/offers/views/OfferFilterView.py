@@ -15,9 +15,9 @@ from rest_framework.permissions import IsAuthenticated
 
 
 class OfferFilterView(APIView):
-    authentication_classes = [
-        SessionAuthentication,
-    ]
+    # authentication_classes = [
+    #     SessionAuthentication,
+    # ]
     permission_classes = [IsAuthenticated]
     serializer_class = OffersSerializer
     filter_form_class = OfferFilterForm
