@@ -4,7 +4,7 @@ from django.utils import timezone
 
 
 class Website(models.Model):
-    name = models.CharField(max_length=255, null=True, blank=True)
+    name = models.CharField(max_length=255)
     url = models.CharField(max_length=255, null=True, blank=True)
 
     class Meta:
@@ -17,7 +17,7 @@ class Website(models.Model):
 
 
 class ExperienceLevel(models.Model):
-    name = models.CharField(max_length=255, null=True, blank=True)
+    name = models.CharField(max_length=255)
 
     class Meta:
         ordering = ("-name",)
@@ -26,6 +26,30 @@ class ExperienceLevel(models.Model):
 
     def __str__(self):
         return self.name
+
+
+class ContractType(models.Model):
+    name = models.CharField(max_length=255)
+
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        ordering = ("-name",)
+        verbose_name = "Contract Type"
+        verbose_name_plural = "Contract Types"
+
+
+class WorkSchedule(models.Model):
+    name = models.CharField(max_length=255)
+
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        ordering = ("-name",)
+        verbose_name = "Work Schedule"
+        verbose_name_plural = "Work Schedules"
 
 
 class Salaries(models.Model):
@@ -38,15 +62,16 @@ class Salaries(models.Model):
         (1, "Brutto"),
         (2, "Netto"),
     ]
+
     salary_from = models.IntegerField(null=True, blank=True)
     salary_to = models.IntegerField(null=True, blank=True)
     currency = models.CharField(max_length=10, null=True, blank=True)
-    contract_type = models.CharField(max_length=20, null=True, blank=True)
-    work_schedule = models.CharField(max_length=20, null=True, blank=True)
     salary_schedule = models.IntegerField(
         choices=SALARY_SCHEDULE, null=True, blank=True
     )
     type = models.IntegerField(choices=TYPE, null=True, blank=True)
+    contract_type = models.ManyToManyField(ContractType, blank=True)
+    work_schedule = models.ManyToManyField(WorkSchedule, blank=True)
 
     class Meta:
         ordering = ("-salary_from",)
@@ -79,13 +104,13 @@ class Offers(models.Model):
     skills = models.CharField(max_length=255, null=True, blank=True)
     company_name = models.CharField(max_length=255, null=True, blank=True)
     company_logo = models.CharField(max_length=255, null=True, blank=True)
-    is_remote = models.BooleanField(null=True, blank=True)
-    is_hybrid = models.BooleanField(null=True, blank=True)
-    is_active = models.BooleanField(default=True)
+    is_remote = models.BooleanField(default=False)
+    is_hybrid = models.BooleanField(default=False)
+    is_active = models.BooleanField(default=False)
     is_promoted = models.BooleanField(default=False)
     date_created = models.DateTimeField(null=True, blank=True)
     date_finished = models.DateTimeField(null=True, blank=True)
-    date_scraped = models.DateTimeField(null=True, blank=True, auto_now=True)
+    date_scraped = models.DateTimeField(auto_now=True)
     experience_level = models.ManyToManyField(ExperienceLevel, blank=True)
     salary = models.ManyToManyField(Salaries, blank=True)
     website = models.ForeignKey(

@@ -1,11 +1,21 @@
 import json
 import logging
-from dataclasses import dataclass
 from typing import Dict, List, Optional, Any
-
+from .localization import Localization
+from .params_data import ParamsData
 import requests
-
-from scrapers.scraper import Scraper, ParsedOffer, Salary
+from ...utils.delete_html_tags import delete_html_tags
+from ...normalize import Normalize
+from ...scraper import (
+    Scraper,
+    ParsedOffer,
+    ParsedSalary,
+    ParsedWebsite,
+    ParsedLocalization,
+    ParsedExperienceLevel,
+    ParsedContractType,
+    ParsedWorkSchedule,
+)
 
 logging.basicConfig(
     filename="../logs.log",
@@ -14,30 +24,7 @@ logging.basicConfig(
 )
 
 
-@dataclass
-class Localization:
-    """
-    Dataclass for storing localization data
-    """
-
-    region: Optional[str] = None
-    city: Optional[str] = None
-
-
-@dataclass
-class ParamsData:
-    """
-    Dataclass for storing params data
-    """
-
-    type: Optional[str] = None
-    agreement: Optional[bool] = None
-    salary_from: Optional[int] = None
-    salary_to: Optional[int] = None
-    currency: Optional[str] = None
-    experience: Optional[bool] = None
-    availability: Optional[str] = None
-    workplace: Optional[str] = None
+normalize = Normalize()
 
 
 class OLX(Scraper):
@@ -56,24 +43,6 @@ class OLX(Scraper):
             "limit": "50",
             "category_id": "4",
         }
-
-    @staticmethod
-    def process_description(description: str) -> str:
-        """
-        Delete HTML tags from description
-        """
-        if description:
-            return (
-                description.replace("<p>", " ")
-                .replace("</p>", " ")
-                .replace("<strong>", " ")
-                .replace("</strong>", " ")
-                .replace("<li>", " ")
-                .replace("</li>", " ")
-                .replace("<ul>", " ")
-                .replace("</ul>", " ")
-            )
-        return ""
 
     @staticmethod
     def get_localization_data(localization: Dict[str, Dict[str, str]]) -> Localization:
@@ -106,6 +75,7 @@ class OLX(Scraper):
         experience = False
         availability = None
         workplace = None
+        salary_schedule = None
 
         for param in params:
             key = param["key"]
@@ -128,6 +98,7 @@ class OLX(Scraper):
                         salary_from = value.get("from")
                         salary_to = value.get("to")
                         currency = value.get("currency")
+                        salary_schedule = value.get("type")
                 elif (
                     key == "experience"
                     and isinstance(value, list)
@@ -148,6 +119,7 @@ class OLX(Scraper):
             experience=experience,
             availability=availability,
             workplace=workplace,
+            salary_schedule=salary_schedule,
         )
 
     def fetch_data(self) -> List[Dict[str, str]] | None:
@@ -161,7 +133,8 @@ class OLX(Scraper):
             logging.error(f"JSON decoding error occurred: {json_err}")
         return None
 
-    def get_next_page_url(self, json_data: Dict) -> Optional[str]:
+    @staticmethod
+    def get_next_page_url(json_data: Dict) -> Optional[str]:
         """
         Extract the URL for the next page
         """
@@ -188,41 +161,71 @@ class OLX(Scraper):
             return None
 
         parsed_data = []
+        website = ParsedWebsite(name="OLX", url="https://www.olx.pl/")
+
         for data in json_data["data"]:
             params_data = self.get_params(data["params"])
             localization_data = self.get_localization_data(data["location"])
-
-            is_remote = (
-                "zdalna" in params_data.workplace if params_data.workplace else False
-            )
-            is_hybrid = (
-                "hybrid" in params_data.workplace if params_data.workplace else False
+            parsed_experience_data = normalize.get_normalized_experience_level(
+                data["title"]
             )
 
-            salary = Salary(
+            exp_levels = []
+            for exp in parsed_experience_data:
+                exp_levels.append(ParsedExperienceLevel(name=exp))
+
+            is_remote = normalize.is_remote(params_data.workplace)
+            is_hybrid = normalize.is_hybrid(params_data.workplace)
+
+            work_schedule = []
+            work_schedule_data = normalize.get_normalized_work_schedule(
+                params_data.type
+            )
+            if work_schedule_data:
+                work_schedule.append(ParsedWorkSchedule(name=work_schedule_data))
+
+            contract_types = []
+            if params_data.agreement:
+                for contract in params_data.agreement:
+                    normalized_contract_name = normalize.get_normalized_contract_type(
+                        contract
+                    )
+                    if normalized_contract_name:
+                        contract_types.append(
+                            ParsedContractType(
+                                name=normalize.get_normalized_contract_type(contract)
+                            )
+                        )
+
+            salary = ParsedSalary(
                 salary_from=params_data.salary_from,
                 salary_to=params_data.salary_to,
                 currency=params_data.currency,
-                contract_type=params_data.agreement,
-                work_schedule=params_data.type,
+                contract_type=contract_types,
+                work_schedule=work_schedule,
+                salary_schedule=normalize.get_normalized_salary_schedule(
+                    params_data.salary_schedule
+                ),
+                type=1,
+            )
+
+            localization_object = ParsedLocalization(
+                region=localization_data.region,
+                city=localization_data.city,
+                country="Poland",
             )
 
             parsed_data.append(
                 ParsedOffer(
                     title=data["title"],
-                    id=data["id"],
-                    salary=[salary],
                     url=data["url"],
-                    region=localization_data.region,
-                    description=self.process_description(data["description"]),
-                    remote=is_remote,
-                    hybrid=is_hybrid,
-                    country="PL",
-                    city=localization_data.city,
-                    date_created=data["created_time"],
-                    date_finished=data["valid_to_time"],
-                    company_name=data["user"]["name"],
-                    company_logo=data["user"]["banner_mobile"],
+                    description=delete_html_tags(data["description"]),
+                    is_remote=is_remote,
+                    is_hybrid=is_hybrid,
+                    experience_level=exp_levels,
+                    salary=[salary],
+                    website=website,
+                    localizations=[localization_object],
                 )
             )
 
