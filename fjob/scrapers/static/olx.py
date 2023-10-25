@@ -15,6 +15,16 @@ logging.basicConfig(
 
 
 @dataclass
+class Localization:
+    """
+    Dataclass for storing localization data
+    """
+
+    region: Optional[str] = None
+    city: Optional[str] = None
+
+
+@dataclass
 class ParamsData:
     """
     Dataclass for storing params data
@@ -30,105 +40,22 @@ class ParamsData:
     workplace: Optional[str] = None
 
 
-@dataclass
-class LocalizationData:
-    """
-    Dataclass for storing localization data
-    """
-
-    region_id: Optional[int] = None
-    city_id: Optional[int] = None
-    city_name: Optional[str] = None
-
-
-@dataclass
-class Localization:
-    """
-    Dataclass for storing localization data
-    """
-
-    region: Optional[str] = None
-    city: Optional[str] = None
-
-
-class OLXLocalization:
-    """
-    Fetch localization data from OLX API
-    """
-
-    def __init__(self, city_name: str):
-        self.city_name = city_name.replace(" ", "-").lower()
-        self.base_url = (
-            f"https://www.olx.pl/api/v1/friendly-links/query-params/{self.city_name}"
-        )
-
-    def get_localization_data(self) -> dict | None:
-        try:
-            response = requests.get(self.base_url)
-            response.raise_for_status()
-            return json.loads(response.content)
-        except requests.exceptions.RequestException as e:
-            logging.error(f"Request error occurred: {e}")
-            return None
-
-    def return_localization_data(self) -> LocalizationData | None:
-        """
-        Returning localization data
-        """
-        data = self.get_localization_data()
-        if data:
-            return LocalizationData(
-                data["data"]["region_id"],
-                data["data"]["city_id"],
-                data["metadata"]["names"]["location"]["city"]["name"],
-            )
-        return None
-
-
 class OLX(Scraper):
     """
     A scraper for the OLX jobs board.
     """
 
-    def __init__(self, url: str):
+    def __init__(
+        self,
+        url: str = "https://www.olx.pl/api/v1/offers?offset=0&limit=40&category_id=4&filter_refiners=spell_checker&sl=18ae25cfa80x3938008f",
+    ):
         super().__init__(url)
         self.params = {
             "offset": "0",
             "sort_by": "created_at:desc",
-            "limit": "40",
+            "limit": "50",
             "category_id": "4",
         }
-
-    @staticmethod
-    def convert_search_query(query: str) -> str:
-        return query.replace(" ", "%20")
-
-    def set_param(self, key: str, value: str):
-        """
-        Set a query parameter for the URL.
-
-        Args:
-            key: The parameter key.
-            value: The parameter value.
-        """
-        if key == "query":
-            value = self.convert_search_query(value)
-        self.params[key] = value
-
-    def build_url(self) -> str:
-        """
-        Build the URL to be used for scraping.
-
-        Returns:
-            The URL to be used for scraping.
-        """
-        url = self.url
-        if self.params:
-            param_string = "&".join(
-                [f"{key}={value}" for key, value in self.params.items()]
-            )
-            url += f"?{param_string}"
-        return url
 
     @staticmethod
     def process_description(description: str) -> str:
@@ -225,13 +152,24 @@ class OLX(Scraper):
 
     def fetch_data(self) -> List[Dict[str, str]] | None:
         try:
-            r = requests.get(self.build_url())
+            r = requests.get(self.url)
             r.raise_for_status()
             return json.loads(r.content)
         except requests.exceptions.HTTPError as http_err:
             logging.error(f"HTTP error occurred: {http_err}")
         except requests.exceptions.JSONDecodeError as json_err:
             logging.error(f"JSON decoding error occurred: {json_err}")
+        return None
+
+    def get_next_page_url(self, json_data: Dict) -> Optional[str]:
+        """
+        Extract the URL for the next page
+        """
+        links = json_data.get("links")
+        if links:
+            next_page = links.get("next")
+            if next_page:
+                return next_page.get("href")
         return None
 
     def parse_offer(self, json_data: Dict[str, List]) -> List[ParsedOffer] | None:
@@ -289,3 +227,18 @@ class OLX(Scraper):
             )
 
         return parsed_data
+
+    def run(self) -> None:
+        while self.url:
+            json_data = self.fetch_data()
+
+            if not json_data:
+                logging.error("No data received")
+                break
+
+            parsed_data = self.parse_offer(json_data)
+            if not parsed_data:
+                break
+
+            self.save_data(parsed_data)
+            self.url = self.get_next_page_url(json_data)
