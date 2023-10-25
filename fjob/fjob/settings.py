@@ -43,11 +43,8 @@ INSTALLED_APPS = [
     # project applications
     "offers",
     "users",
-    "payment",
     "contact",
-    "notification_todo",
     "scrapers",
-    "dashboard",
     # api and libs
     "rest_framework",
     "drf_yasg",

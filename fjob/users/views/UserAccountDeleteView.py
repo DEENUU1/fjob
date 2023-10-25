@@ -1,6 +1,5 @@
 from django.contrib.auth import get_user_model
 from rest_framework import status
-from rest_framework.authentication import SessionAuthentication
 from rest_framework.generics import DestroyAPIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
@@ -14,7 +13,6 @@ UserModel = get_user_model()
 class UserAccountDeleteView(DestroyAPIView):
     serializer_class = AccountDeleteSerializer
     permission_classes = (IsAuthenticated,)
-    # authentication_classes = (SessionAuthentication,)
 
     def delete(self, request, *args, **kwargs):
         serializer = AccountDeleteSerializer.AccountDeleteSerializer(data=request.data)
