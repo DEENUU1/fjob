@@ -1,23 +1,23 @@
-from django import forms
+from django_filters import rest_framework as filters
+from .models import Offers
 
 
-class OfferFilterForm(forms.Form):
-    query = forms.CharField(max_length=100, required=False)
-    country = forms.ChoiceField(
-        choices=[
-            ("Poland", "Poland"),
-            ("Germany", "Germany"),
-        ]
+class OffersFilter(filters.FilterSet):
+    contract_type_name = filters.CharFilter(
+        field_name="contract_type__name",
+        lookup_expr="exact",
     )
-    city = forms.CharField(max_length=50, required=False)
-    min_salary = forms.IntegerField(required=False)
-    max_salary = forms.IntegerField(required=False)
-    experience_level = forms.ChoiceField(
-        choices=[
-            ("intern", "intern"),
-            ("junior", "junior"),
-            ("mid", "mid"),
-            ("senior", "senior"),
-        ]
-    )
-    advanced = forms.BooleanField(required=False)
+
+    class Meta:
+        model = Offers
+        fields = {
+            "experience_level__name": ["exact"],
+            "salary__salary_from": ["gte", "lte"],
+            "localizations__country": ["exact"],
+            "localizations__city": ["exact"],
+            "localizations__region": ["exact"],
+            "title": ["icontains"],
+            "is_remote": ["exact"],
+            "is_hybrid": ["exact"],
+            # 'contract_type_name': ['exact'],
+        }
