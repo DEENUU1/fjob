@@ -71,7 +71,8 @@ class Scraper(ABC):
         self.url = url
         self.search = search
 
-    def save_to_json(self, data, filename) -> None:
+    @staticmethod
+    def save_to_json(data: List[Optional[ParsedOffer]], filename: str) -> None:
         offers_data = []
         for offer in data:
             offer_data = asdict(offer)
@@ -96,11 +97,11 @@ class Scraper(ABC):
     def save_data(parsed_offers: List[ParsedOffer]) -> None:
         for parsed_offer in parsed_offers:
             if parsed_offer.website:
-                website, _ = Website.objects.get_or_create(
+                website_obj, _ = Website.objects.get_or_create(
                     name=parsed_offer.website.name
                 )
             else:
-                website = None
+                website_obj = None
 
             experience_levels = []
             if parsed_offer.experience_level:
@@ -154,7 +155,7 @@ class Scraper(ABC):
                 date_finished=datetime.strptime(parsed_offer.date_finished, "%Y-%m-%d")
                 if parsed_offer.date_finished
                 else None,
-                website=website,
+                website=website_obj,
             )
             offer.save()
 

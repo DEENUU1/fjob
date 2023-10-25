@@ -1,11 +1,11 @@
 import json
 import logging
-from dataclasses import dataclass
 from typing import Dict, List, Optional, Any
-
+from .localization import Localization
+from .params_data import ParamsData
 import requests
 
-from ..scraper import (
+from fjob.scrapers.scraper import (
     Scraper,
     ParsedOffer,
     ParsedSalary,
@@ -21,33 +21,6 @@ logging.basicConfig(
 )
 
 
-@dataclass
-class Localization:
-    """
-    Dataclass for storing localization data
-    """
-
-    region: Optional[str] = None
-    city: Optional[str] = None
-
-
-@dataclass
-class ParamsData:
-    """
-    Dataclass for storing params data
-    """
-
-    type: Optional[str] = None
-    agreement: Optional[bool] = None
-    salary_from: Optional[int] = None
-    salary_to: Optional[int] = None
-    currency: Optional[str] = None
-    experience: Optional[bool] = None
-    availability: Optional[str] = None
-    workplace: Optional[str] = None
-    salary_schedule: Optional[str] = None
-
-
 class OLX(Scraper):
     """
     A scraper for the OLX jobs board.
@@ -55,7 +28,8 @@ class OLX(Scraper):
 
     def __init__(
         self,
-        url: str = "https://www.olx.pl/api/v1/offers?offset=0&limit=40&category_id=4&filter_refiners=spell_checker&sl=18ae25cfa80x3938008f",
+        url: str = "https://www.o"
+        "lx.pl/api/v1/offers?offset=0&limit=40&category_id=4&filter_refiners=spell_checker&sl=18ae25cfa80x3938008f",
     ):
         super().__init__(url)
         self.params = {
@@ -182,24 +156,6 @@ class OLX(Scraper):
             if next_page:
                 return next_page.get("href")
         return None
-
-    @staticmethod
-    def get_experience_level(title: str) -> List[Optional[str]]:
-        result = []
-        skills = title.lower()
-
-        if "junior" in skills or "młodszy" in skills:
-            result.append("Junior")
-        if "intern" in skills or "internship" in skills or "stażysta" in skills:
-            result.append("Internship")
-        if "senior" in skills or "starszy" in skills or "expert" in skills:
-            result.append("Senior")
-        if "dyrektor" in skills or "direktor" in skills:
-            result.append("Director")
-        if "manager" in skills or "menedżer" in skills:
-            result.append("Manager")
-
-        return result
 
     def parse_offer(self, json_data: Dict[str, List]) -> List[ParsedOffer] | None:
         """

@@ -5,7 +5,7 @@ def chrome_driver_configuration() -> Options:
     """
     Configures Chrome WebDriver options for Selenium.
 
-    This static method creates a set of options that can be passed to the Chrome WebDriver
+    This scrapers method creates a set of options that can be passed to the Chrome WebDriver
     when creating an instance of it. These options modify the behavior of the Chrome browser
     during automated testing or scraping.
 
