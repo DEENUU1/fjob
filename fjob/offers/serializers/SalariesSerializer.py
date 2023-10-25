@@ -1,9 +1,8 @@
-# from rest_framework import serializers
-#
-# from offers.models import salaries
-#
-#
-# class SalariesSerializer(serializers.ModelSerializer):
-#     class Meta:
-#         model = salaries.Salaries
-#         fields = "__all__"
+from rest_framework import serializers
+from ..models import Salaries
+
+
+class SalariesSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Salaries
+        fields = "__all__"

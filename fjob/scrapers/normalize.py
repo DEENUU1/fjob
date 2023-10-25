@@ -48,7 +48,7 @@ class Normalize:
         ):
             result.append(EXPERIENCES.MIDDLE)
 
-        if "senior" in text or "starszy":
+        if "senior" in text or "starszy" in text:
             result.append(EXPERIENCES.SENIOR)
 
         if (
@@ -62,7 +62,12 @@ class Normalize:
         if "manager" in text or "menedżer" in text:
             result.append(EXPERIENCES.MANAGER)
 
-        if "director" in text or "dyrektor" in text or "president" or "prezes":
+        if (
+            "director" in text
+            or "dyrektor" in text
+            or "president" in text
+            or "prezes" in text
+        ):
             result.append(EXPERIENCES.DIRECTOR)
 
         if (
