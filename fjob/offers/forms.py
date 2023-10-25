@@ -19,5 +19,4 @@ class OffersFilter(filters.FilterSet):
             "title": ["icontains"],
             "is_remote": ["exact"],
             "is_hybrid": ["exact"],
-            # 'contract_type_name': ['exact'],
         }
