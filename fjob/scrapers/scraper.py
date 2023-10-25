@@ -2,8 +2,16 @@ from abc import ABC, abstractmethod
 from dataclasses import dataclass, asdict
 from typing import Dict, List, Optional, Any
 import json
-
-from offers.models import Website, ExperienceLevel, Salaries, Localization, Offers
+from django.db import transaction
+from offers.models import (
+    Website,
+    ExperienceLevel,
+    Salaries,
+    Localization,
+    Offers,
+    ContractType,
+    WorkSchedule,
+)
 import logging
 from datetime import datetime
 
@@ -105,40 +113,49 @@ class Scraper(ABC):
     @staticmethod
     def save_data(parsed_offers: List[ParsedOffer]) -> None:
         for parsed_offer in parsed_offers:
-            if parsed_offer.website:
-                website_obj, _ = Website.objects.get_or_create(
-                    name=parsed_offer.website.name,
-                    url=parsed_offer.website.url,
-                )
-            else:
-                website_obj = None
+            website, created = Website.objects.get_or_create(
+                name=parsed_offer.website.name,
+                url=parsed_offer.website.url,
+            )
 
             experience_levels = []
             if parsed_offer.experience_level:
-                for level in parsed_offer.experience_level:
-                    experience_level, _ = ExperienceLevel.objects.get_or_create(
-                        name=level.name
+                for exp_level in parsed_offer.experience_level:
+                    level, created = ExperienceLevel.objects.get_or_create(
+                        name=exp_level.name
                     )
-                    experience_levels.append(experience_level)
+                    experience_levels.append(level)
 
             salaries = []
             if parsed_offer.salary:
-                for salary in parsed_offer.salary:
-                    s = Salaries(
-                        salary_from=salary.salary_from,
-                        salary_to=salary.salary_to,
-                        currency=salary.currency,
-                        contract_type=",".join(
-                            [ct.name for ct in salary.contract_type]
-                        ),
-                        work_schedule=",".join(
-                            [ws.name for ws in salary.work_schedule]
-                        ),
-                        salary_schedule=salary.salary_schedule,
-                        type=salary.type,
+                for parsed_salary in parsed_offer.salary:
+                    salary = Salaries(
+                        salary_from=parsed_salary.salary_from,
+                        salary_to=parsed_salary.salary_to,
+                        currency=parsed_salary.currency,
+                        salary_schedule=parsed_salary.salary_schedule,
+                        type=parsed_salary.type,
                     )
-                    s.save()
-                    salaries.append(s)
+                    salary.save()
+                    if parsed_salary.contract_type:
+                        for contract_type in parsed_salary.contract_type:
+                            (
+                                contract_type_obj,
+                                created,
+                            ) = ContractType.objects.get_or_create(
+                                name=contract_type.name
+                            )
+                            salary.contract_type.add(contract_type_obj)
+                    if parsed_salary.work_schedule:
+                        for work_schedule in parsed_salary.work_schedule:
+                            (
+                                work_schedule_obj,
+                                created,
+                            ) = WorkSchedule.objects.get_or_create(
+                                name=work_schedule.name
+                            )
+                            salary.work_schedule.add(work_schedule_obj)
+                    salaries.append(salary)
 
             localizations = []
             if parsed_offer.localizations:
@@ -156,27 +173,21 @@ class Scraper(ABC):
                 title=parsed_offer.title,
                 url=parsed_offer.url,
                 description=parsed_offer.description,
-                skills=",".join(parsed_offer.skills) if parsed_offer.skills else "",
+                skills=", ".join(parsed_offer.skills) if parsed_offer.skills else None,
                 company_name=parsed_offer.company_name,
                 company_logo=parsed_offer.company_logo,
                 is_remote=parsed_offer.is_remote,
                 is_hybrid=parsed_offer.is_hybrid,
-                is_promoted=parsed_offer.is_promoted,
+                is_active=parsed_offer.is_active,
                 date_created=datetime.strptime(parsed_offer.date_created, "%Y-%m-%d")
                 if parsed_offer.date_created
                 else None,
                 date_finished=datetime.strptime(parsed_offer.date_finished, "%Y-%m-%d")
                 if parsed_offer.date_finished
                 else None,
-                website=website_obj,
+                website=website,
             )
             offer.save()
-
-            for level in experience_levels:
-                offer.experience_level.add(level)
-
-            for salary in salaries:
-                offer.salary.add(salary)
-
-            for loc in localizations:
-                offer.localizations.add(loc)
+            offer.experience_level.set(experience_levels)
+            offer.salary.set(salaries)
+            offer.localizations.set(localizations)

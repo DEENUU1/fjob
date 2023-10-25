@@ -188,9 +188,13 @@ class OLX(Scraper):
             contract_types = []
             if contract_type_data:
                 for contract in contract_type_data:
-                    contract_types.append(
-                        ParsedContractType(name=get_normalized_contract_type(contract))
-                    )
+                    normalized_contract_name = get_normalized_contract_type(contract)
+                    if normalized_contract_name:
+                        contract_types.append(
+                            ParsedContractType(
+                                name=get_normalized_contract_type(contract)
+                            )
+                        )
 
             salary = ParsedSalary(
                 salary_from=params_data.salary_from,
