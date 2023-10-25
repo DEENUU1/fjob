@@ -9,13 +9,9 @@ app = Celery("fjob")
 app.config_from_object(settings, namespace="CELERY")
 app.autodiscover_tasks()
 
-# app.conf.beat_schedule = {
-#     "check-medicine-expiration-every-day": {
-#         "task": "medicine.tasks.send_medicine_expired_notification",
-#         "schedule": 86400,  # Every 24H
-#     },
-#     "send-dish-every-day": {
-#         "task": "social.tasks.send_random_dish_to_newsletter_users",
-#         "schedule": 86400,  # Every 24H
-#     },
-# }
+app.conf.beat_schedule = {
+    "daily-olx-scraping": {
+        "task": "scrapers.tasks.olx_task",
+        "schedule": 86400,  # Every 24H
+    },
+}
