@@ -6,7 +6,7 @@ from ..forms import OffersFilter
 from django_filters import rest_framework as filters
 
 
-class OffersListView(generics.ListAPIView):
+class OfferListView(generics.ListAPIView):
     queryset = Offers.objects.filter(is_active=True)
     serializer_class = OffersSerializer
     filter_backends = (filters.DjangoFilterBackend, OrderingFilter)
