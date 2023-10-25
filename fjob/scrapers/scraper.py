@@ -5,7 +5,6 @@ import json
 
 from offers.models import Website, ExperienceLevel, Salaries, Localization, Offers
 import logging
-from django.db import transaction
 from datetime import datetime
 
 
@@ -34,8 +33,8 @@ class ParsedSalary:
     currency: Optional[str] = None
     contract_type: Optional[str] = None
     work_schedule: Optional[str] = None
-    salary_schedule: Optional[str] = None
-    type: Optional[str] = None
+    salary_schedule: Optional[int] = None
+    type: Optional[int] = None
 
 
 @dataclass

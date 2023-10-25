@@ -81,7 +81,7 @@ class Offers(models.Model):
     company_logo = models.CharField(max_length=255, null=True, blank=True)
     is_remote = models.BooleanField(default=False)
     is_hybrid = models.BooleanField(default=False)
-    is_active = models.BooleanField(default=True)
+    is_active = models.BooleanField(default=False)
     is_promoted = models.BooleanField(default=False)
     date_created = models.DateTimeField(null=True, blank=True)
     date_finished = models.DateTimeField(null=True, blank=True)

@@ -4,8 +4,9 @@ from typing import Dict, List, Optional, Any
 from .localization import Localization
 from .params_data import ParamsData
 import requests
-
-from fjob.scrapers.scraper import (
+from ...utils.get_normalized_experience_level import get_normalized_experience_level
+from ...utils.get_normalized_salary_schedule import get_normalized_salary_schedule
+from ...scraper import (
     Scraper,
     ParsedOffer,
     ParsedSalary,
@@ -146,7 +147,8 @@ class OLX(Scraper):
             logging.error(f"JSON decoding error occurred: {json_err}")
         return None
 
-    def get_next_page_url(self, json_data: Dict) -> Optional[str]:
+    @staticmethod
+    def get_next_page_url(json_data: Dict) -> Optional[str]:
         """
         Extract the URL for the next page
         """
@@ -178,7 +180,7 @@ class OLX(Scraper):
         for data in json_data["data"]:
             params_data = self.get_params(data["params"])
             localization_data = self.get_localization_data(data["location"])
-            parsed_experience_data = self.get_experience_level(data["title"])
+            parsed_experience_data = get_normalized_experience_level(data["title"])
 
             exp_levels = []
             for exp in parsed_experience_data:
@@ -197,8 +199,10 @@ class OLX(Scraper):
                 currency=params_data.currency,
                 contract_type=params_data.agreement,
                 work_schedule=params_data.type,
-                salary_schedule=params_data.salary_schedule,
-                type="Brutto",
+                salary_schedule=get_normalized_salary_schedule(
+                    params_data.salary_schedule
+                ),
+                type=1,
             )
 
             localization_object = ParsedLocalization(

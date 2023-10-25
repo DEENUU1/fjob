@@ -64,3 +64,5 @@ def get_normalized_experience_level(text: str) -> List[Optional[str]]:
         or "specjalist" in text
     ):
         result.append(EXPERIENCES.PRINCIPAL)
+
+    return result
