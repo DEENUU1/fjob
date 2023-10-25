@@ -14,4 +14,8 @@ app.conf.beat_schedule = {
         "task": "scrapers.tasks.olx_task",
         "schedule": 86400,  # Every 24H
     },
+    "delete-expired-offers": {
+        "task": "offers.tasks.task_delete_offers_older_than_30_days",
+        "schedule": 86400,  # Every 24H
+    },
 }
