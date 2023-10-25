@@ -1,5 +1,19 @@
 from django.contrib import admin
-from .models import Website, Offers, Salaries, Localization
+from .models import Website, Offers, Salaries, Localization, ContractType, WorkSchedule
+
+
+class ContractTypeAdmin(admin.ModelAdmin):
+    list_display = ["name"]
+    list_filter = ["name"]
+    search_fields = ["name"]
+    ordering = ["-name"]
+
+
+class WorkScheduleAdmin(admin.ModelAdmin):
+    list_display = ["name"]
+    list_filter = ["name"]
+    search_fields = ["name"]
+    ordering = ["-name"]
 
 
 class WebsiteAdmin(admin.ModelAdmin):
@@ -14,12 +28,10 @@ class SalariesAdmin(admin.ModelAdmin):
         "salary_from",
         "salary_to",
         "currency",
-        "contract_type",
-        "work_schedule",
         "salary_schedule",
         "type",
     ]
-    list_filter = ["currency", "contract_type", "work_schedule", "salary_schedule"]
+    list_filter = ["currency", "salary_schedule"]
     search_fields = ["currency", "contract_type"]
     ordering = ["-salary_from"]
 
@@ -51,3 +63,5 @@ admin.site.register(Website, WebsiteAdmin)
 admin.site.register(Salaries, SalariesAdmin)
 admin.site.register(Localization, LocalizationAdmin)
 admin.site.register(Offers, OffersAdmin)
+admin.site.register(ContractType, ContractTypeAdmin)
+admin.site.register(WorkSchedule, WorkScheduleAdmin)

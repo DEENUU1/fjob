@@ -6,6 +6,7 @@ from .params_data import ParamsData
 import requests
 from ...utils.get_normalized_experience_level import get_normalized_experience_level
 from ...utils.get_normalized_salary_schedule import get_normalized_salary_schedule
+from ...utils.delete_html_tags import delete_html_tags
 from ...scraper import (
     Scraper,
     ParsedOffer,
@@ -39,24 +40,6 @@ class OLX(Scraper):
             "limit": "50",
             "category_id": "4",
         }
-
-    @staticmethod
-    def process_description(description: str) -> str:
-        """
-        Delete HTML tags from description
-        """
-        if description:
-            return (
-                description.replace("<p>", " ")
-                .replace("</p>", " ")
-                .replace("<strong>", " ")
-                .replace("</strong>", " ")
-                .replace("<li>", " ")
-                .replace("</li>", " ")
-                .replace("<ul>", " ")
-                .replace("</ul>", " ")
-            )
-        return ""
 
     @staticmethod
     def get_localization_data(localization: Dict[str, Dict[str, str]]) -> Localization:
@@ -215,7 +198,7 @@ class OLX(Scraper):
                 ParsedOffer(
                     title=data["title"],
                     url=data["url"],
-                    description=self.process_description(data["description"]),
+                    description=delete_html_tags(data["description"]),
                     is_remote=is_remote,
                     is_hybrid=is_hybrid,
                     experience_level=exp_levels,

@@ -28,6 +28,30 @@ class ExperienceLevel(models.Model):
         return self.name
 
 
+class ContractType(models.Model):
+    name = models.CharField(max_length=255)
+
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        ordering = ("-name",)
+        verbose_name = "Contract Type"
+        verbose_name_plural = "Contract Types"
+
+
+class WorkSchedule(models.Model):
+    name = models.CharField(max_length=255)
+
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        ordering = ("-name",)
+        verbose_name = "Work Schedule"
+        verbose_name_plural = "Work Schedules"
+
+
 class Salaries(models.Model):
     SALARY_SCHEDULE = [
         (1, "Monthly"),
@@ -38,15 +62,16 @@ class Salaries(models.Model):
         (1, "Brutto"),
         (2, "Netto"),
     ]
+
     salary_from = models.IntegerField(null=True, blank=True)
     salary_to = models.IntegerField(null=True, blank=True)
     currency = models.CharField(max_length=10, null=True, blank=True)
-    contract_type = models.CharField(max_length=20, null=True, blank=True)
-    work_schedule = models.CharField(max_length=20, null=True, blank=True)
     salary_schedule = models.IntegerField(
         choices=SALARY_SCHEDULE, null=True, blank=True
     )
     type = models.IntegerField(choices=TYPE, null=True, blank=True)
+    contract_type = models.ManyToManyField(ContractType, blank=True)
+    work_schedule = models.ManyToManyField(WorkSchedule, blank=True)
 
     class Meta:
         ordering = ("-salary_from",)
