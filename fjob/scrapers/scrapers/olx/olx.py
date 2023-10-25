@@ -7,6 +7,8 @@ import requests
 from ...utils.get_normalized_experience_level import get_normalized_experience_level
 from ...utils.get_normalized_salary_schedule import get_normalized_salary_schedule
 from ...utils.delete_html_tags import delete_html_tags
+from ...utils.get_normalized_work_schedule import get_normalized_work_schedule
+from ...utils.get_normalized_contract_type import get_normalized_contract_type
 from ...scraper import (
     Scraper,
     ParsedOffer,
@@ -14,6 +16,8 @@ from ...scraper import (
     ParsedWebsite,
     ParsedLocalization,
     ParsedExperienceLevel,
+    ParsedContractType,
+    ParsedWorkSchedule,
 )
 
 logging.basicConfig(
@@ -30,8 +34,7 @@ class OLX(Scraper):
 
     def __init__(
         self,
-        url: str = "https://www.o"
-        "lx.pl/api/v1/offers?offset=0&limit=40&category_id=4&filter_refiners=spell_checker&sl=18ae25cfa80x3938008f",
+        url: str = "https://www.olx.pl/api/v1/offers?offset=0&limit=40&category_id=4&filter_refiners=spell_checker&sl=18ae25cfa80x3938008f",
     ):
         super().__init__(url)
         self.params = {
@@ -176,12 +179,25 @@ class OLX(Scraper):
                 "hybrid" in params_data.workplace if params_data.workplace else False
             )
 
+            work_schedule_data = get_normalized_work_schedule(params_data.type)
+            work_schedule = []
+            if work_schedule_data:
+                work_schedule.append(ParsedWorkSchedule(name=work_schedule_data))
+
+            contract_type_data = params_data.agreement
+            contract_types = []
+            if contract_type_data:
+                for contract in contract_type_data:
+                    contract_types.append(
+                        ParsedContractType(name=get_normalized_contract_type(contract))
+                    )
+
             salary = ParsedSalary(
                 salary_from=params_data.salary_from,
                 salary_to=params_data.salary_to,
                 currency=params_data.currency,
-                contract_type=params_data.agreement,
-                work_schedule=params_data.type,
+                contract_type=contract_types,
+                work_schedule=work_schedule,
                 salary_schedule=get_normalized_salary_schedule(
                     params_data.salary_schedule
                 ),

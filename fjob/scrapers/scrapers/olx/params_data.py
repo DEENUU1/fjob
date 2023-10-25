@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Optional, List
 from dataclasses import dataclass
 
 
@@ -9,7 +9,7 @@ class ParamsData:
     """
 
     type: Optional[str] = None
-    agreement: Optional[bool] = None
+    agreement: Optional[List[str]] = None
     salary_from: Optional[int] = None
     salary_to: Optional[int] = None
     currency: Optional[str] = None

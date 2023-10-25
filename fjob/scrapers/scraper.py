@@ -22,6 +22,16 @@ class ParsedWebsite:
 
 
 @dataclass
+class ParsedWorkSchedule:
+    name: str
+
+
+@dataclass
+class ParsedContractType:
+    name: str
+
+
+@dataclass
 class ParsedExperienceLevel:
     name: str
 
@@ -31,8 +41,8 @@ class ParsedSalary:
     salary_from: Optional[int] = None
     salary_to: Optional[int] = None
     currency: Optional[str] = None
-    contract_type: Optional[str] = None
-    work_schedule: Optional[str] = None
+    contract_type: List[Optional[ParsedContractType]] = None
+    work_schedule: List[Optional[ParsedWorkSchedule]] = None
     salary_schedule: Optional[int] = None
     type: Optional[int] = None
 
@@ -97,7 +107,8 @@ class Scraper(ABC):
         for parsed_offer in parsed_offers:
             if parsed_offer.website:
                 website_obj, _ = Website.objects.get_or_create(
-                    name=parsed_offer.website.name
+                    name=parsed_offer.website.name,
+                    url=parsed_offer.website.url,
                 )
             else:
                 website_obj = None
@@ -117,10 +128,14 @@ class Scraper(ABC):
                         salary_from=salary.salary_from,
                         salary_to=salary.salary_to,
                         currency=salary.currency,
-                        contract_type=salary.contract_type,
-                        work_schedule=salary.work_schedule,
-                        # salary_schedule=salary.salary_schedule,
-                        # type=salary.type,
+                        contract_type=",".join(
+                            [ct.name for ct in salary.contract_type]
+                        ),
+                        work_schedule=",".join(
+                            [ws.name for ws in salary.work_schedule]
+                        ),
+                        salary_schedule=salary.salary_schedule,
+                        type=salary.type,
                     )
                     s.save()
                     salaries.append(s)
