@@ -3,7 +3,14 @@ from selenium.webdriver.common.by import By
 import time
 from typing import List, Optional
 from bs4 import BeautifulSoup
-from ..scraper import ParsedOffer, Salary, Scraper
+from ..scraper import (
+    ParsedSalary,
+    ParsedLocalization,
+    ParsedWebsite,
+    ParsedOffer,
+    ParsedExperienceLevel,
+    Scraper,
+)
 import logging
 
 logging.basicConfig(
@@ -93,6 +100,7 @@ class JJIT(Scraper):
         skills = self.data[idx]["skills"]
         if "New" in skills:
             skills.remove("New")
+        return skills
 
     def is_remote(self, skills: List[str], idx: int) -> bool:
         if "remote" in skills:
@@ -102,17 +110,28 @@ class JJIT(Scraper):
             return False
 
     @staticmethod
-    def get_experience_level(skills: List[str]) -> Optional[str]:
-        if "Senior" in skills:
-            return "senior"
-        elif "Mid" in skills:
-            return "mid"
-        elif "Junior" in skills:
-            return "junior"
-        elif "Trainee" in skills:
-            return "trainee"
+    def is_hybrid(title: str) -> bool:
+        if "hybrid" in title.lower():
+            return True
         else:
-            return None
+            return False
+
+    @staticmethod
+    def get_experience_level(skills: List[str]) -> List[Optional[str]]:
+        result = []
+        skills = "".join(skills).lower()
+        if "junior" in skills or "młodszy" in skills:
+            result.append("Junior")
+        if "intern" in skills or "internship" in skills or "stażysta" in skills:
+            result.append("Internship")
+        if "senior" in skills or "starszy" in skills or "expert" in skills:
+            result.append("Senior")
+        if "dyrektor" in skills or "direktor" in skills:
+            result.append("Director")
+        if "manager" in skills or "menedżer" in skills:
+            result.append("Manager")
+
+        return result
 
     @staticmethod
     def process_localization(localization: str) -> str:
@@ -127,6 +146,8 @@ class JJIT(Scraper):
         if not self.data:
             return parsed_offer
 
+        website = ParsedWebsite(name="JustJoinIT", url="https://justjoin.it")
+
         try:
             for idx, offer in enumerate(self.data):
                 salary_from, salary_to = self.process_salary(offer["salary"])
@@ -134,24 +155,36 @@ class JJIT(Scraper):
                 is_remote = self.is_remote(offer["skills"], idx)
                 skills = self.process_skills(idx)
                 experience_level = self.get_experience_level(offer["skills"])
-                localization = self.process_localization(offer["localization"])
+                localization_data = self.process_localization(offer["localization"])
+                is_hybrid = self.is_hybrid(offer["title"])
 
-                salary = Salary(
+                localization = ParsedLocalization(
+                    city=localization_data,
+                )
+
+                exp_levels = []
+                for exp in experience_level:
+                    exp_levels.append(ParsedExperienceLevel(name=exp))
+
+                salary = ParsedSalary(
                     salary_from=salary_from,
                     salary_to=salary_to,
                     currency=currency,
+                    salary_schedule="Monthly",
+                    type="Netto",
                 )
 
                 parsed_offer.append(
                     ParsedOffer(
                         title=offer["title"],
-                        id=offer["url"],
                         url=f"https://justjoin.it{offer['url']}",
-                        salary=[salary],
-                        city=localization,
-                        remote=is_remote,
-                        experience_level=experience_level if experience_level else None,
                         skills=skills,
+                        is_remote=is_remote,
+                        is_hybrid=is_hybrid,
+                        experience_level=exp_levels,
+                        salary=[salary],
+                        website=website,
+                        localizations=[localization],
                     )
                 )
 

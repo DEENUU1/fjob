@@ -1,6 +1,13 @@
 import httpx
 from bs4 import BeautifulSoup
-from ..scraper import Scraper, ParsedOffer
+from ..scraper import (
+    Scraper,
+    ParsedOffer,
+    ParsedLocalization,
+    ParsedSalary,
+    ParsedWebsite,
+    ParsedExperienceLevel,
+)
 from typing import List, Dict, Any, Optional
 import logging
 
@@ -82,18 +89,70 @@ class TheProtocol(Scraper):
             logging.error(f"Error occurred during parsing data: {e}")
             return None
 
+    @staticmethod
+    def get_experience_level(title: str) -> List[Optional[str]]:
+        result = []
+        skills = title.lower()
+
+        if "junior" in skills or "młodszy" in skills:
+            result.append("Junior")
+        if "intern" in skills or "internship" in skills or "stażysta" in skills:
+            result.append("Internship")
+        if "senior" in skills or "starszy" in skills or "expert" in skills:
+            result.append("Senior")
+        if "dyrektor" in skills or "direktor" in skills:
+            result.append("Director")
+        if "manager" in skills or "menedżer" in skills:
+            result.append("Manager")
+
+        return result
+
+    @staticmethod
+    def is_remote(title: str) -> bool:
+        title = title.lower()
+        if "remote" in title or "zdalny" in title:
+            return True
+        return False
+
+    @staticmethod
+    def is_hybrid(title: str) -> bool:
+        if "hybrid" in title.lower() or "hybryd" in title.lower():
+            return True
+        else:
+            return False
+
     def parse_offer(self, data: List[Dict[str, Any]]) -> List[Optional[ParsedOffer]]:
         parsed_offers = []
+
+        website = ParsedWebsite(name="theprotocol.it", url="https://theprotocol.it/")
+
         try:
             for offer in data:
+                experience_levels = self.get_experience_level(offer.get("title", None))
+                is_remote = self.is_remote(offer.get("title", None))
+                is_hybrid = self.is_hybrid(offer.get("title", None))
+
+                exp_levels = []
+                if experience_levels:
+                    for exp in experience_levels:
+                        exp_levels.append(ParsedExperienceLevel(name=exp))
+
+                localization = ParsedLocalization(
+                    country="Poland", city=offer.get("localization", None)
+                )
+
                 parsed_offers.append(
                     ParsedOffer(
                         title=offer.get("title", None),
                         company_name=offer.get("company_name", None),
                         company_logo=offer.get("company_logo", None),
                         skills=offer.get("skills", None),
-                        city=offer.get("localization", None),
                         url=f"{'https://theprotocol.it/'}{offer.get('url', None)}",
+                        is_hybrid=is_hybrid,
+                        is_remote=is_remote,
+                        experience_level=exp_levels,
+                        website=website,
+                        localizations=[localization],
                     )
                 )
         except Exception as e:

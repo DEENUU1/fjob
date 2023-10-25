@@ -5,7 +5,14 @@ from bs4 import BeautifulSoup
 import requests
 import re
 
-from scrapers.scraper import Scraper, ParsedOffer, Salary
+from ..scraper import (
+    Scraper,
+    ParsedOffer,
+    ParsedWebsite,
+    ParsedSalary,
+    ParsedLocalization,
+    ParsedExperienceLevel,
+)
 
 logging.basicConfig(
     filename="../logs.log",

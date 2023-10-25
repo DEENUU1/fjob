@@ -5,7 +5,14 @@ from typing import Dict, List, Optional, Any
 
 import requests
 
-from scrapers.scraper import Scraper, ParsedOffer, Salary
+from ..scraper import (
+    Scraper,
+    ParsedOffer,
+    ParsedSalary,
+    ParsedWebsite,
+    ParsedLocalization,
+    ParsedExperienceLevel,
+)
 
 logging.basicConfig(
     filename="../logs.log",
@@ -38,6 +45,7 @@ class ParamsData:
     experience: Optional[bool] = None
     availability: Optional[str] = None
     workplace: Optional[str] = None
+    salary_schedule: Optional[str] = None
 
 
 class OLX(Scraper):
@@ -106,6 +114,7 @@ class OLX(Scraper):
         experience = False
         availability = None
         workplace = None
+        salary_schedule = None
 
         for param in params:
             key = param["key"]
@@ -128,6 +137,7 @@ class OLX(Scraper):
                         salary_from = value.get("from")
                         salary_to = value.get("to")
                         currency = value.get("currency")
+                        salary_schedule = value.get("type")
                 elif (
                     key == "experience"
                     and isinstance(value, list)
@@ -148,6 +158,7 @@ class OLX(Scraper):
             experience=experience,
             availability=availability,
             workplace=workplace,
+            salary_schedule=salary_schedule,
         )
 
     def fetch_data(self) -> List[Dict[str, str]] | None:
@@ -172,6 +183,24 @@ class OLX(Scraper):
                 return next_page.get("href")
         return None
 
+    @staticmethod
+    def get_experience_level(title: str) -> List[Optional[str]]:
+        result = []
+        skills = title.lower()
+
+        if "junior" in skills or "młodszy" in skills:
+            result.append("Junior")
+        if "intern" in skills or "internship" in skills or "stażysta" in skills:
+            result.append("Internship")
+        if "senior" in skills or "starszy" in skills or "expert" in skills:
+            result.append("Senior")
+        if "dyrektor" in skills or "direktor" in skills:
+            result.append("Director")
+        if "manager" in skills or "menedżer" in skills:
+            result.append("Manager")
+
+        return result
+
     def parse_offer(self, json_data: Dict[str, List]) -> List[ParsedOffer] | None:
         """
         Parse fetched data and return a list of ParsedOffer objects.
@@ -188,9 +217,16 @@ class OLX(Scraper):
             return None
 
         parsed_data = []
+        website = ParsedWebsite(name="OLX", url="https://www.olx.pl/")
+
         for data in json_data["data"]:
             params_data = self.get_params(data["params"])
             localization_data = self.get_localization_data(data["location"])
+            parsed_experience_data = self.get_experience_level(data["title"])
+
+            exp_levels = []
+            for exp in parsed_experience_data:
+                exp_levels.append(ParsedExperienceLevel(name=exp))
 
             is_remote = (
                 "zdalna" in params_data.workplace if params_data.workplace else False
@@ -199,30 +235,33 @@ class OLX(Scraper):
                 "hybrid" in params_data.workplace if params_data.workplace else False
             )
 
-            salary = Salary(
+            salary = ParsedSalary(
                 salary_from=params_data.salary_from,
                 salary_to=params_data.salary_to,
                 currency=params_data.currency,
                 contract_type=params_data.agreement,
                 work_schedule=params_data.type,
+                salary_schedule=params_data.salary_schedule,
+                type="Brutto",
+            )
+
+            localization_object = ParsedLocalization(
+                region=localization_data.region,
+                city=localization_data.city,
+                country="Poland",
             )
 
             parsed_data.append(
                 ParsedOffer(
                     title=data["title"],
-                    id=data["id"],
-                    salary=[salary],
                     url=data["url"],
-                    region=localization_data.region,
                     description=self.process_description(data["description"]),
-                    remote=is_remote,
-                    hybrid=is_hybrid,
-                    country="PL",
-                    city=localization_data.city,
-                    date_created=data["created_time"],
-                    date_finished=data["valid_to_time"],
-                    company_name=data["user"]["name"],
-                    company_logo=data["user"]["banner_mobile"],
+                    is_remote=is_remote,
+                    is_hybrid=is_hybrid,
+                    experience_level=exp_levels,
+                    salary=[salary],
+                    website=website,
+                    localizations=[localization_object],
                 )
             )
 

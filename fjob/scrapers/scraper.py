@@ -1,10 +1,12 @@
 from abc import ABC, abstractmethod
-from dataclasses import dataclass
+from dataclasses import dataclass, asdict
 from typing import Dict, List, Optional, Any
+import json
 
-from offers.models import offers, salaries
+from offers.models import Website, ExperienceLevel, Salaries, Localization, Offers
 import logging
 from django.db import transaction
+from datetime import datetime
 
 
 logging.basicConfig(
@@ -15,18 +17,18 @@ logging.basicConfig(
 
 
 @dataclass
-class Website:
+class ParsedWebsite:
     name: str
     url: Optional[str] = None
 
 
 @dataclass
-class ExperienceLevel:
+class ParsedExperienceLevel:
     name: str
 
 
 @dataclass
-class Salary:
+class ParsedSalary:
     salary_from: Optional[int] = None
     salary_to: Optional[int] = None
     currency: Optional[str] = None
@@ -37,7 +39,7 @@ class Salary:
 
 
 @dataclass
-class Localization:
+class ParsedLocalization:
     country: Optional[str] = None
     city: Optional[str] = None
     region: Optional[str] = None
@@ -58,16 +60,25 @@ class ParsedOffer:
     is_promoted: Optional[bool] = False
     date_created: Optional[str] = None
     date_finished: Optional[str] = None
-    experience_level: Optional[List[ExperienceLevel]] = None
-    salary: Optional[List[Salary]] = None
-    website: Optional[Website] = None
-    localizations: Optional[List[Localization]] = None
+    experience_level: Optional[List[ParsedExperienceLevel]] = None
+    salary: Optional[List[ParsedSalary]] = None
+    website: Optional[ParsedWebsite] = None
+    localizations: Optional[List[ParsedLocalization]] = None
 
 
 class Scraper(ABC):
     def __init__(self, url: str, search: Dict[str, str] = None):
         self.url = url
         self.search = search
+
+    def save_to_json(self, data, filename) -> None:
+        offers_data = []
+        for offer in data:
+            offer_data = asdict(offer)
+            offers_data.append(offer_data)
+
+        with open(filename, "w", encoding="utf-8") as f:
+            json.dump(offers_data, f, ensure_ascii=False, indent=4)
 
     @abstractmethod
     def fetch_data(self):
@@ -82,46 +93,76 @@ class Scraper(ABC):
         return [offer.__dict__ for offer in parsed_data]
 
     @staticmethod
-    def save_data(data_list: List[ParsedOffer]) -> None:
-        try:
-            with transaction.atomic():
-                for parsed_offer in data_list:
-                    existing_offer = offers.Offers.objects.filter(
-                        url=parsed_offer.url
-                    ).first()
-                    if existing_offer:
-                        continue
+    def save_data(parsed_offers: List[ParsedOffer]) -> None:
+        for parsed_offer in parsed_offers:
+            if parsed_offer.website:
+                website, _ = Website.objects.get_or_create(
+                    name=parsed_offer.website.name
+                )
+            else:
+                website = None
 
-                    offer = offers.Offers(
-                        title=parsed_offer.title,
-                        url=parsed_offer.url,
-                        street=parsed_offer.street,
-                        region=parsed_offer.region,
-                        additional_data=parsed_offer.additional_data,
-                        description=parsed_offer.description,
-                        remote=parsed_offer.remote,
-                        hybrid=parsed_offer.hybrid,
-                        country=parsed_offer.country,
-                        city=parsed_offer.city,
-                        date_created=parsed_offer.date_created,
-                        date_finished=parsed_offer.date_finished,
-                        experience_level=parsed_offer.experience_level,
-                        company_name=parsed_offer.company_name,
-                        company_logo=parsed_offer.company_logo,
+            experience_levels = []
+            if parsed_offer.experience_level:
+                for level in parsed_offer.experience_level:
+                    experience_level, _ = ExperienceLevel.objects.get_or_create(
+                        name=level.name
                     )
-                    offer.save()
+                    experience_levels.append(experience_level)
 
-                    if parsed_offer.salary:
-                        for parsed_salary in parsed_offer.salary:
-                            salary = salaries.Salaries(
-                                salary_from=parsed_salary.salary_from,
-                                salary_to=parsed_salary.salary_to,
-                                currency=parsed_salary.currency,
-                                contract_type=parsed_salary.contract_type,
-                                work_schedule=parsed_salary.work_schedule,
-                            )
-                            salary.offer = offer
-                            salary.save()
-            logging.info(f"Saved scraped data to database")
-        except Exception as e:
-            logging.error(f"Error occurred while saving data to database: {e}")
+            salaries = []
+            if parsed_offer.salary:
+                for salary in parsed_offer.salary:
+                    s = Salaries(
+                        salary_from=salary.salary_from,
+                        salary_to=salary.salary_to,
+                        currency=salary.currency,
+                        contract_type=salary.contract_type,
+                        work_schedule=salary.work_schedule,
+                        # salary_schedule=salary.salary_schedule,
+                        # type=salary.type,
+                    )
+                    s.save()
+                    salaries.append(s)
+
+            localizations = []
+            if parsed_offer.localizations:
+                for loc in parsed_offer.localizations:
+                    localization = Localization(
+                        country=loc.country,
+                        city=loc.city,
+                        region=loc.region,
+                        street=loc.street,
+                    )
+                    localization.save()
+                    localizations.append(localization)
+
+            offer = Offers(
+                title=parsed_offer.title,
+                url=parsed_offer.url,
+                description=parsed_offer.description,
+                skills=",".join(parsed_offer.skills) if parsed_offer.skills else "",
+                company_name=parsed_offer.company_name,
+                company_logo=parsed_offer.company_logo,
+                is_remote=parsed_offer.is_remote,
+                is_hybrid=parsed_offer.is_hybrid,
+                is_active=parsed_offer.is_active,
+                is_promoted=parsed_offer.is_promoted,
+                date_created=datetime.strptime(parsed_offer.date_created, "%Y-%m-%d")
+                if parsed_offer.date_created
+                else None,
+                date_finished=datetime.strptime(parsed_offer.date_finished, "%Y-%m-%d")
+                if parsed_offer.date_finished
+                else None,
+                website=website,
+            )
+            offer.save()
+
+            for level in experience_levels:
+                offer.experience_level.add(level)
+
+            for salary in salaries:
+                offer.salary.add(salary)
+
+            for loc in localizations:
+                offer.localizations.add(loc)
