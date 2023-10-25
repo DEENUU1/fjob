@@ -10,7 +10,9 @@ UserModel = get_user_model()
 
 
 class UserRegisterView(APIView):
-    permission_classes = [AllowAny]
+    permission_classes = [
+        AllowAny,
+    ]
     serializer_class = UserRegisterSerializer.UserRegisterSerializer
 
     def post(self, request):
