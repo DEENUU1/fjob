@@ -15,34 +15,53 @@ logging.basicConfig(
 
 
 @dataclass
+class Website:
+    name: str
+    url: Optional[str] = None
+
+
+@dataclass
+class ExperienceLevel:
+    name: str
+
+
+@dataclass
 class Salary:
     salary_from: Optional[int] = None
     salary_to: Optional[int] = None
     currency: Optional[str] = None
     contract_type: Optional[str] = None
     work_schedule: Optional[str] = None
+    salary_schedule: Optional[str] = None
+    type: Optional[str] = None
+
+
+@dataclass
+class Localization:
+    country: Optional[str] = None
+    city: Optional[str] = None
+    region: Optional[str] = None
+    street: Optional[str] = None
 
 
 @dataclass
 class ParsedOffer:
     title: Optional[str] = None
-    id: Optional[str] = None
-    salary: Optional[List[Salary]] = None
     url: Optional[str] = None
-    street: Optional[str] = None
-    region: Optional[str] = None
-    additional_data: Optional[Dict[str, str]] = None
     description: Optional[str] = None
-    remote: Optional[bool] = None
-    hybrid: Optional[bool] = None
-    country: Optional[str] = None
-    city: Optional[str] = None
-    date_created: Optional[str] = None
-    date_finished: Optional[str] = None
-    experience_level: Optional[str] = None
     skills: Optional[List[str]] = None
     company_name: Optional[str] = None
     company_logo: Optional[str] = None
+    is_remote: Optional[bool] = False
+    is_hybrid: Optional[bool] = False
+    is_active: Optional[bool] = True
+    is_promoted: Optional[bool] = False
+    date_created: Optional[str] = None
+    date_finished: Optional[str] = None
+    experience_level: Optional[List[ExperienceLevel]] = None
+    salary: Optional[List[Salary]] = None
+    website: Optional[Website] = None
+    localizations: Optional[List[Localization]] = None
 
 
 class Scraper(ABC):

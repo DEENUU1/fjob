@@ -4,7 +4,7 @@ from django.utils import timezone
 
 
 class Website(models.Model):
-    name = models.CharField(max_length=255, null=True, blank=True)
+    name = models.CharField(max_length=255)
     url = models.CharField(max_length=255, null=True, blank=True)
 
     class Meta:
@@ -17,7 +17,7 @@ class Website(models.Model):
 
 
 class ExperienceLevel(models.Model):
-    name = models.CharField(max_length=255, null=True, blank=True)
+    name = models.CharField(max_length=255)
 
     class Meta:
         ordering = ("-name",)
@@ -79,13 +79,13 @@ class Offers(models.Model):
     skills = models.CharField(max_length=255, null=True, blank=True)
     company_name = models.CharField(max_length=255, null=True, blank=True)
     company_logo = models.CharField(max_length=255, null=True, blank=True)
-    is_remote = models.BooleanField(null=True, blank=True)
-    is_hybrid = models.BooleanField(null=True, blank=True)
+    is_remote = models.BooleanField(default=False)
+    is_hybrid = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)
     is_promoted = models.BooleanField(default=False)
     date_created = models.DateTimeField(null=True, blank=True)
     date_finished = models.DateTimeField(null=True, blank=True)
-    date_scraped = models.DateTimeField(null=True, blank=True, auto_now=True)
+    date_scraped = models.DateTimeField(auto_now=True)
     experience_level = models.ManyToManyField(ExperienceLevel, blank=True)
     salary = models.ManyToManyField(Salaries, blank=True)
     website = models.ForeignKey(
