@@ -4,11 +4,8 @@ from typing import Dict, List, Optional, Any
 from .localization import Localization
 from .params_data import ParamsData
 import requests
-from ...utils.get_normalized_experience_level import get_normalized_experience_level
-from ...utils.get_normalized_salary_schedule import get_normalized_salary_schedule
 from ...utils.delete_html_tags import delete_html_tags
-from ...utils.get_normalized_work_schedule import get_normalized_work_schedule
-from ...utils.get_normalized_contract_type import get_normalized_contract_type
+from ...normalize import Normalize
 from ...scraper import (
     Scraper,
     ParsedOffer,
@@ -25,6 +22,9 @@ logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s - %(levelname)s - %(message)s",
 )
+
+
+normalize = Normalize()
 
 
 class OLX(Scraper):
@@ -166,33 +166,34 @@ class OLX(Scraper):
         for data in json_data["data"]:
             params_data = self.get_params(data["params"])
             localization_data = self.get_localization_data(data["location"])
-            parsed_experience_data = get_normalized_experience_level(data["title"])
+            parsed_experience_data = normalize.get_normalized_experience_level(
+                data["title"]
+            )
 
             exp_levels = []
             for exp in parsed_experience_data:
                 exp_levels.append(ParsedExperienceLevel(name=exp))
 
-            is_remote = (
-                "zdalna" in params_data.workplace if params_data.workplace else False
-            )
-            is_hybrid = (
-                "hybrid" in params_data.workplace if params_data.workplace else False
-            )
+            is_remote = normalize.is_remote(params_data.workplace)
+            is_hybrid = normalize.is_hybrid(params_data.workplace)
 
-            work_schedule_data = get_normalized_work_schedule(params_data.type)
             work_schedule = []
+            work_schedule_data = normalize.get_normalized_work_schedule(
+                params_data.type
+            )
             if work_schedule_data:
                 work_schedule.append(ParsedWorkSchedule(name=work_schedule_data))
 
-            contract_type_data = params_data.agreement
             contract_types = []
-            if contract_type_data:
-                for contract in contract_type_data:
-                    normalized_contract_name = get_normalized_contract_type(contract)
+            if params_data.agreement:
+                for contract in params_data.agreement:
+                    normalized_contract_name = normalize.get_normalized_contract_type(
+                        contract
+                    )
                     if normalized_contract_name:
                         contract_types.append(
                             ParsedContractType(
-                                name=get_normalized_contract_type(contract)
+                                name=normalize.get_normalized_contract_type(contract)
                             )
                         )
 
@@ -202,7 +203,7 @@ class OLX(Scraper):
                 currency=params_data.currency,
                 contract_type=contract_types,
                 work_schedule=work_schedule,
-                salary_schedule=get_normalized_salary_schedule(
+                salary_schedule=normalize.get_normalized_salary_schedule(
                     params_data.salary_schedule
                 ),
                 type=1,
