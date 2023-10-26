@@ -25,8 +25,8 @@ urlpatterns = [
     path("admin/", admin.site.urls),
     path("offers/", include("offers.urls")),
     path("users/", include("users.urls")),
-    path("contact/", include("contact.urls")),
-    path("report/", include("report.urls")),
+    path("messages/", include("contact.urls")),
+    path("reports/", include("report.urls")),
     path("token/", jwt_views.TokenObtainPairView.as_view(), name="token_obtain_pair"),
     path("token/refresh/", jwt_views.TokenRefreshView.as_view(), name="token_refresh"),
     re_path(

@@ -5,7 +5,7 @@ from .views import SendMessage
 
 urlpatterns = [
     path(
-        "send",
+        "contact/",
         SendMessage.SendMessage.as_view(),
         name="send_message",
     ),
