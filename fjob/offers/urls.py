@@ -7,6 +7,7 @@ from .views import (
     OfferDeleteView,
     OfferUpdateView,
     WebsiteListView,
+    ExperienceLevelListView,
 )
 
 urlpatterns = [
@@ -25,5 +26,10 @@ urlpatterns = [
         name="offer_update",
     ),
     path("websites/", WebsiteListView.WebsiteListView.as_view(), name="websites"),
+    path(
+        "experiences/",
+        ExperienceLevelListView.ExperienceLevelListView.as_view(),
+        name="experience_levels",
+    ),
     path("number/", OfferCountView.OfferCountView.as_view(), name="offer_count"),
 ]
