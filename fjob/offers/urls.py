@@ -6,6 +6,7 @@ from .views import (
     OfferDetailsView,
     OfferDeleteView,
     OfferUpdateView,
+    WebsiteListView,
 )
 
 urlpatterns = [
@@ -23,5 +24,6 @@ urlpatterns = [
         OfferUpdateView.OfferUpdateView.as_view(),
         name="offer_update",
     ),
+    path("websites/", WebsiteListView.WebsiteListView.as_view(), name="websites"),
     path("number/", OfferCountView.OfferCountView.as_view(), name="offer_count"),
 ]
