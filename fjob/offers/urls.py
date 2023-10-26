@@ -6,6 +6,11 @@ from .views import (
     OfferDetailsView,
     OfferDeleteView,
     OfferUpdateView,
+    WebsiteListView,
+    ExperienceLevelListView,
+    ContractTypeListView,
+    WorkScheduleListView,
+    LocalizationListView,
 )
 
 urlpatterns = [
@@ -22,6 +27,27 @@ urlpatterns = [
         "update/<int:pk>/",
         OfferUpdateView.OfferUpdateView.as_view(),
         name="offer_update",
+    ),
+    path("websites/", WebsiteListView.WebsiteListView.as_view(), name="websites"),
+    path(
+        "experiences/",
+        ExperienceLevelListView.ExperienceLevelListView.as_view(),
+        name="experience_levels",
+    ),
+    path(
+        "contracts/",
+        ContractTypeListView.ContractTypeListView.as_view(),
+        name="contracts",
+    ),
+    path(
+        "work_schedules/",
+        WorkScheduleListView.WorkScheduleListView.as_view(),
+        name="work_schedules",
+    ),
+    path(
+        "countries/",
+        LocalizationListView.LocalizationListView.as_view(),
+        name="countries",
     ),
     path("number/", OfferCountView.OfferCountView.as_view(), name="offer_count"),
 ]
