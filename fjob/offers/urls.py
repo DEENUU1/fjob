@@ -10,6 +10,7 @@ from .views import (
     ExperienceLevelListView,
     ContractTypeListView,
     WorkScheduleListView,
+    LocalizationListView,
 )
 
 urlpatterns = [
@@ -42,6 +43,11 @@ urlpatterns = [
         "work_schedules/",
         WorkScheduleListView.WorkScheduleListView.as_view(),
         name="work_schedules",
+    ),
+    path(
+        "countries/",
+        LocalizationListView.LocalizationListView.as_view(),
+        name="countries",
     ),
     path("number/", OfferCountView.OfferCountView.as_view(), name="offer_count"),
 ]
