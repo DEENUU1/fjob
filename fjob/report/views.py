@@ -7,7 +7,7 @@ from .serializers import (
     UpdateReportMessageSerializer,
     CreateReportMessageSerializer,
 )
-from .permissions import IsSuerUserPermission
+from fjob.permissions import IsSuerUserPermission
 from rest_framework.permissions import IsAuthenticated
 
 
