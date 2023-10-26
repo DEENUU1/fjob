@@ -7,14 +7,18 @@ from .serializers import (
     UpdateReportMessageSerializer,
     CreateReportMessageSerializer,
 )
+from .permissions import IsSuerUserPermission
+from rest_framework.permissions import IsAuthenticated
 
 
 class ReportMessageCreateView(generics.CreateAPIView):
+    permission_classes = [IsAuthenticated]
     queryset = ReportMessage.objects.all()
     serializer_class = CreateReportMessageSerializer
 
 
 class ReportMessageUpdateView(generics.UpdateAPIView):
+    permission_classes = [IsSuerUserPermission, IsAuthenticated]
     queryset = ReportMessage.objects.all()
     serializer_class = UpdateReportMessageSerializer
 
@@ -25,6 +29,7 @@ class ReportMessageUpdateView(generics.UpdateAPIView):
 
 
 class ReportMessageListView(generics.ListAPIView):
+    permission_classes = [IsSuerUserPermission, IsAuthenticated]
     queryset = ReportMessage.objects.all()
     serializer_class = ReportMessageSerializer
     filter_backends = [DjangoFilterBackend, filters.OrderingFilter]
