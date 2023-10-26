@@ -18,4 +18,8 @@ app.conf.beat_schedule = {
         "task": "offers.tasks.task_delete_offers_older_than_30_days",
         "schedule": 86400,  # Every 24H
     },
+    "delete-expired-contacts": {
+        "task": "contact.tasks.delete_old_contacts",
+        "schedule": 86400,  # Every 24H
+    },
 }
