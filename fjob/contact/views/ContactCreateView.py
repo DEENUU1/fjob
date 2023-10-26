@@ -3,12 +3,12 @@ from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from contact.serializers import ContactSerializer
+from ..serializers.ContactCreateSerializer import ContactCreateSerializer
 
 
-class SendMessage(APIView):
+class ContactCreateView(APIView):
     permission_classes = [AllowAny]
-    serializer_class = ContactSerializer.ContactSerializer
+    serializer_class = ContactCreateSerializer
 
     def post(self, request):
         serializer = self.serializer_class(data=request.data)

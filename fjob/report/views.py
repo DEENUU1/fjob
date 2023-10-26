@@ -19,7 +19,7 @@ class ReportMessageCreateView(generics.CreateAPIView):
 
 
 class ReportMessageUpdateView(generics.UpdateAPIView):
-    permission_classes = [IsSuerUserPermission, IsAuthenticated]
+    permission_classes = [IsSuerUserPermission]
     queryset = ReportMessage.objects.all()
     serializer_class = UpdateReportMessageSerializer
 
