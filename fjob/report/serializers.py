@@ -2,7 +2,7 @@ from rest_framework import serializers
 from .models import ReportMessage
 
 
-class ReportMessageSerializer(serializers.ModelSerializer):
+class CreateReportMessageSerializer(serializers.ModelSerializer):
     class Meta:
         model = ReportMessage
-        fields = "__all__"
+        fields = ["message", "offer", "user"]
