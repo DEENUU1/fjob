@@ -9,6 +9,7 @@ from .serializers import (
 )
 from fjob.permissions import IsSuerUserPermission
 from rest_framework.permissions import IsAuthenticated
+from fjob.pagination import CustomPagination
 
 
 class ReportMessageCreateView(generics.CreateAPIView):
@@ -30,6 +31,7 @@ class ReportMessageUpdateView(generics.UpdateAPIView):
 
 class ReportMessageListView(generics.ListAPIView):
     permission_classes = [IsSuerUserPermission, IsAuthenticated]
+    pagination_class = CustomPagination
     queryset = ReportMessage.objects.all()
     serializer_class = ReportMessageSerializer
     filter_backends = [DjangoFilterBackend, filters.OrderingFilter]
