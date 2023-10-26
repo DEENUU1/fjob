@@ -9,9 +9,9 @@ from .views import (
 urlpatterns = [
     path("", ReportMessageCreateView.as_view(), name="reportmessage-create"),
     path(
-        "<int:pk>/",
+        "read/<int:pk>/",
         ReportMessageUpdateView.as_view(),
         name="reportmessage-update",
     ),
-    path("all/", ReportMessageListView.as_view(), name="reportmessage-list"),
+    path("list/", ReportMessageListView.as_view(), name="reportmessage-list"),
 ]

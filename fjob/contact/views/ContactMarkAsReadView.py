@@ -10,6 +10,6 @@ class ContactMarkAsReadView(generics.UpdateAPIView):
     serializer_class = ContactUpdateSerializer
 
     def perform_update(self, serializer):
-        serializer.save(reviewed=True)
+        serializer.save(read=True)
         serializer.save()
         return super().perform_update(serializer)

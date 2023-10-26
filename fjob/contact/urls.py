@@ -1,6 +1,6 @@
 from django.urls import path
 
-from .views import ContactCreateView, ContactMarkAsReadView
+from .views import ContactCreateView, ContactMarkAsReadView, ContactListView
 
 
 urlpatterns = [
@@ -14,4 +14,5 @@ urlpatterns = [
         ContactMarkAsReadView.ContactMarkAsReadView.as_view(),
         name="mark_as_read",
     ),
+    path("list/", ContactListView.ContactListView.as_view(), name="list_messages"),
 ]
