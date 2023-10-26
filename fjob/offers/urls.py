@@ -8,6 +8,7 @@ from .views import (
     OfferUpdateView,
     WebsiteListView,
     ExperienceLevelListView,
+    ContractTypeListView,
 )
 
 urlpatterns = [
@@ -30,6 +31,11 @@ urlpatterns = [
         "experiences/",
         ExperienceLevelListView.ExperienceLevelListView.as_view(),
         name="experience_levels",
+    ),
+    path(
+        "contracts/",
+        ContractTypeListView.ContractTypeListView.as_view(),
+        name="contracts",
     ),
     path("number/", OfferCountView.OfferCountView.as_view(), name="offer_count"),
 ]
