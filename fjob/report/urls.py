@@ -7,11 +7,11 @@ from .views import (
 
 
 urlpatterns = [
-    path("create/", ReportMessageCreateView.as_view(), name="reportmessage-create"),
+    path("", ReportMessageCreateView.as_view(), name="reportmessage-create"),
     path(
-        "reviewed/<int:pk>/",
+        "<int:pk>/",
         ReportMessageUpdateView.as_view(),
         name="reportmessage-update",
     ),
-    path("", ReportMessageListView.as_view(), name="reportmessage-list"),
+    path("all/", ReportMessageListView.as_view(), name="reportmessage-list"),
 ]
