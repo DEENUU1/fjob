@@ -9,6 +9,7 @@ from .views import (
     WebsiteListView,
     ExperienceLevelListView,
     ContractTypeListView,
+    WorkScheduleListView,
 )
 
 urlpatterns = [
@@ -36,6 +37,11 @@ urlpatterns = [
         "contracts/",
         ContractTypeListView.ContractTypeListView.as_view(),
         name="contracts",
+    ),
+    path(
+        "work_schedules/",
+        WorkScheduleListView.WorkScheduleListView.as_view(),
+        name="work_schedules",
     ),
     path("number/", OfferCountView.OfferCountView.as_view(), name="offer_count"),
 ]
