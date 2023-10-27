@@ -1,10 +1,12 @@
 import axios from "axios";
 import {useState} from "react";
 import "../Styles/LoginStyle.css";
+import ErrorAlert from "./Alert.jsx";
 
 export const Login = () => {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
+    const [errorMessages, setErrorMessages] = useState([]);
 
     const submit = async e => {
         e.preventDefault();
@@ -13,22 +15,39 @@ export const Login = () => {
             username: username,
             password: password
           };
+        try {
+            const {data} = await axios.post('http://localhost:8000/token/', user,
+                {
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                },
+                {
+                    withCredentials: true
+                });
 
-        const {data} = await axios.post('http://localhost:8000/token/', user ,{headers: {
-            'Content-Type': 'application/json'
-        }}, {withCredentials: true});
+            console.log(data)
+            localStorage.clear();
+            localStorage.setItem('access_token', data.access);
+            localStorage.setItem('refresh_token', data.refresh);
+            axios.defaults.headers.common['Authorization'] = `Bearer ${data['access']}`;
+            window.location.href = '/'
+        } catch (error) {
+          console.error(error);
 
-        console.log(data)
-        localStorage.clear();
-        localStorage.setItem('access_token', data.access);
-        localStorage.setItem('refresh_token', data.refresh);
-        axios.defaults.headers.common['Authorization'] = `Bearer ${data['access']}`;
-        window.location.href = '/'
-
+          if (error.response && error.response.data) {
+            const errorData = error.response.data;
+            const errorMessages = Object.values(errorData).flat();
+            setErrorMessages(errorMessages);
+          } else {
+            setErrorMessages(["An error occurred."]);
+          }
+        }
     }
 
     return(
         <div className="Auth-form-container">
+        {errorMessages.length > 0 && <ErrorAlert errors={errorMessages} />}
         <form className="Auth-form" onSubmit={submit}>
           <div className="Auth-form-content">
             <h3 className="Auth-form-title">Sign In</h3>

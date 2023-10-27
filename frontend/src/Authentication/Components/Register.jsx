@@ -28,8 +28,6 @@ export const Register = () => {
         withCredentials: true
       });
 
-      console.log(data);
-
       navigate('/login');
     } catch (error) {
       console.error(error);

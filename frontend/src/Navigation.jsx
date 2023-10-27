@@ -10,17 +10,20 @@ export function Navigation() {
             setIsAuth(true);
         }
     }, [isAuth]);
+
     return (
         <div>
             <Navbar bg="dark" variant="dark">
                 <Navbar.Brand href="/">FJob</Navbar.Brand>
-                <Nav.Link href="/register">Register</Nav.Link>
                 <Nav className="me-auto">
                     {isAuth ? <Nav.Link href="/">Home</Nav.Link> : null}
                 </Nav>
                 <Nav>
                     {isAuth ? <Nav.Link href="/logout">Logout</Nav.Link> :
                         <Nav.Link href="/login">Login</Nav.Link>
+                    }
+                    {isAuth ?  null :
+                        <Nav.Link href="/register">Register</Nav.Link>
                     }
                 </Nav>
             </Navbar>
