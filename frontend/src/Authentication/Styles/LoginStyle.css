@@ -1,0 +1,46 @@
+.Auth-form-container {
+  width: 100%;
+  max-width: 360px;
+  margin: 0 auto;
+  padding: 15px;
+}
+
+.Auth-form {
+  padding: 20px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+.Auth-form-title {
+  text-align: center;
+  font-size: 1.5rem;
+  margin-bottom: 20px;
+}
+
+.form-group {
+  margin-bottom: 15px;
+}
+
+.form-control {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+.form-control:focus {
+  border-color: #3498db;
+}
+
+.btn-primary {
+  background-color: #3498db;
+  border: none;
+  border-radius: 5px;
+  color: #fff;
+  font-size: 1rem;
+  padding: 10px 15px;
+}
+
+.btn-primary:hover {
+  background-color: #2980b9;
+}
