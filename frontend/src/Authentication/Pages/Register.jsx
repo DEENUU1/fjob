@@ -1,6 +1,6 @@
 import axios from "axios";
 import {useState} from "react";
-import "../Styles/LoginStyle.css";
+import "../../../public/css/login.css";
 import {useNavigate} from "react-router-dom";
 import ErrorAlert from "../../Components/Alert.jsx";
 

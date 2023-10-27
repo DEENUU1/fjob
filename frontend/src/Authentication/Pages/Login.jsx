@@ -1,6 +1,6 @@
 import axios from "axios";
 import {useState} from "react";
-import "../Styles/LoginStyle.css";
+import "../../../public/css/login.css";
 import ErrorAlert from "../../Components/Alert.jsx";
 
 export const Login = () => {
