@@ -50,27 +50,27 @@ services:
             - db
             - redis
 
-#    react:
-#        build:
-#            context: .
-#            dockerfile: ./config/react/Dockerfile
-#        container_name: fjob-react-dev
-#        volumes:
-#            - ./frontend:/app
-#        ports:
-#            - "3000:3000"
-#        depends_on:
-#            - web
+    react:
+        build:
+            context: .
+            dockerfile: ./config/react/Dockerfile
+        container_name: fjob-react-dev
+        volumes:
+            - ./frontend:/app
+        ports:
+            - "3000:3000"
+        depends_on:
+            - web
 
 
-#    celery_beat:
-#        build:
-#            context: .
-#            dockerfile: ./config/django/Dockerfile
-#        container_name: myfridge-celery-beat-dev
-#        command: celery -A myfridge.celery beat -l info
-#        volumes:
-#            - ./myfridge:/app/
-#        depends_on:
-#            - db
-#            - redis
+    celery_beat:
+        build:
+            context: .
+            dockerfile: ./config/django/Dockerfile
+        container_name: myfridge-celery-beat-dev
+        command: celery -A fjob.celery beat -l info
+        volumes:
+            - ./fjob:/app/
+        depends_on:
+            - db
+            - redis
