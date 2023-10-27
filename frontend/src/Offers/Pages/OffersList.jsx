@@ -7,6 +7,8 @@ export const OfferList = () => {
   const [sortBy, setSortBy] = useState("-date_scraped");
   const [countries, setCountries] = useState([]);
   const [country, setCountry] = useState("");
+  const [isRemote, setIsRemote] = useState(false);
+  const [isHybrid, setIsHybrid] = useState(false);
 
   const orderingOptions = {
     "Newest": "-date_scraped",
@@ -25,6 +27,14 @@ export const OfferList = () => {
 
     if (country) {
       params.localizations__country = country;
+    }
+
+    if (isRemote) {
+      params.is_remote = true;
+    }
+
+    if (isHybrid) {
+      params.is_hybrid = true;
     }
 
     axios
@@ -57,7 +67,7 @@ export const OfferList = () => {
 
   useEffect(() => {
     loadOffers();
-  }, [sortBy, country]); // Trigger loadOffers when sortBy or country change
+  }, [sortBy, country, isRemote, isHybrid]); // Trigger loadOffers when any filter options change
 
   useEffect(() => {
     loadCountries();
@@ -71,6 +81,16 @@ export const OfferList = () => {
   const handleCountryChange = (event) => {
     const newCountry = event.target.value;
     setCountry(newCountry);
+  };
+
+  const handleRemoteChange = (event) => {
+    const isRemoteValue = event.target.checked;
+    setIsRemote(isRemoteValue);
+  };
+
+  const handleHybridChange = (event) => {
+    const isHybridValue = event.target.checked;
+    setIsHybrid(isHybridValue);
   };
 
   if (isLoading) {
@@ -97,6 +117,16 @@ export const OfferList = () => {
           </option>
         ))}
       </select>
+
+      <label>
+        <input type="checkbox" onChange={handleRemoteChange} checked={isRemote} />
+        Remote
+      </label>
+
+      <label>
+        <input type="checkbox" onChange={handleHybridChange} checked={isHybrid} />
+        Hybrid
+      </label>
 
       <ul>
         {offers.map((offer) => (
