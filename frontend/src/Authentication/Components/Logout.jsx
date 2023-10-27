@@ -1,6 +1,6 @@
 import {useEffect, useState} from "react";
 import axios from "axios";
-import ErrorAlert from "./Alert.jsx";
+import ErrorAlert from "../../Components/Alert.jsx";
 import {useNavigate} from "react-router-dom";
 
 export const Logout = () => {

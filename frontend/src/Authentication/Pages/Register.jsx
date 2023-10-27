@@ -2,7 +2,7 @@ import axios from "axios";
 import {useState} from "react";
 import "../Styles/LoginStyle.css";
 import {useNavigate} from "react-router-dom";
-import ErrorAlert from "./Alert.jsx";
+import ErrorAlert from "../../Components/Alert.jsx";
 
 export const Register = () => {
     const [username, setUsername] = useState('');

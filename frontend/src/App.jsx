@@ -1,9 +1,9 @@
 import './App.css';
 import {BrowserRouter, Routes, Route} from 'react-router-dom'
-import {Login} from "./Authentication/Components/Login.jsx";
-import {Navigation} from './Navigation.jsx';
+import {Login} from "./Authentication/Pages/Login.jsx";
+import {Navigation} from './Components/Navigation.jsx';
 import {Logout} from './Authentication/Components/Logout.jsx';
-import {Register} from './Authentication/Components/Register.jsx';
+import {Register} from './Authentication/Pages/Register.jsx';
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap/dist/js/bootstrap.bundle.min";
 

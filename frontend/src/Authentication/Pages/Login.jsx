@@ -1,7 +1,7 @@
 import axios from "axios";
 import {useState} from "react";
 import "../Styles/LoginStyle.css";
-import ErrorAlert from "./Alert.jsx";
+import ErrorAlert from "../../Components/Alert.jsx";
 
 export const Login = () => {
     const [username, setUsername] = useState('');
