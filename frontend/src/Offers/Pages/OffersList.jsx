@@ -3,10 +3,10 @@ import axios from "axios";
 
 export const OfferList = () => {
   const [offers, setOffers] = useState([]);
-  const [experienceLevels, setExperienceLevels] = useState([]); // Stan do przechowywania poziomów doświadczenia
   const [isLoading, setIsLoading] = useState(true);
   const [sortBy, setSortBy] = useState("-date_scraped");
-  const [experienceLevel, setExperienceLevel] = useState("");
+  const [countries, setCountries] = useState([]);
+  const [country, setCountry] = useState("");
 
   const orderingOptions = {
     "Newest": "-date_scraped",
@@ -21,8 +21,11 @@ export const OfferList = () => {
     const token = localStorage.getItem("access_token");
     const params = {
       ordering: sortBy,
-      experience_level__name: experienceLevel,
     };
+
+    if (country) {
+      params.localizations__country = country;
+    }
 
     axios
       .get(`http://localhost:8000/offers/`, {
@@ -41,11 +44,11 @@ export const OfferList = () => {
       });
   };
 
-  const loadExperienceLevels = () => {
+  const loadCountries = () => {
     axios
-      .get("http://localhost:8000/offers/experiences/")
+      .get("http://localhost:8000/offers/countries/")
       .then((response) => {
-        setExperienceLevels(response.data);
+        setCountries(response.data);
       })
       .catch((error) => {
         console.error(error);
@@ -54,20 +57,20 @@ export const OfferList = () => {
 
   useEffect(() => {
     loadOffers();
-    loadExperienceLevels();
+  }, [sortBy, country]); // Trigger loadOffers when sortBy or country change
 
+  useEffect(() => {
+    loadCountries();
   }, []);
 
   const handleSortChange = (event) => {
     const newSortBy = event.target.value;
     setSortBy(newSortBy);
-    loadOffers();
   };
 
-  const handleExperienceLevelChange = (event) => {
-    const newExperienceLevel = event.target.value;
-    setExperienceLevel(newExperienceLevel);
-    loadOffers();
+  const handleCountryChange = (event) => {
+    const newCountry = event.target.value;
+    setCountry(newCountry);
   };
 
   if (isLoading) {
@@ -85,12 +88,12 @@ export const OfferList = () => {
         ))}
       </select>
 
-      <label htmlFor="experienceLevel">Experience Level:</label>
-      <select id="experienceLevel" onChange={handleExperienceLevelChange} value={experienceLevel}>
+      <label htmlFor="country">Country:</label>
+      <select id="country" onChange={handleCountryChange} value={country}>
         <option value="">All</option>
-        {experienceLevels.map((level) => (
-          <option key={level.id} value={level.name}>
-            {level.name}
+        {countries.map((country) => (
+          <option key={country.country} value={country.country}>
+            {country.country}
           </option>
         ))}
       </select>
