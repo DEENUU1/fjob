@@ -11,6 +11,7 @@ class OffersSerializer(serializers.ModelSerializer):
     experience_level = ExperienceLevelSerializer(many=True)
     salary = SalariesSerializer(many=True)
     localizations = LocalizationSerializer(many=True)
+    is_new = serializers.ReadOnlyField()
 
     class Meta:
         model = Offers
