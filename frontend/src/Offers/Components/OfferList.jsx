@@ -2,6 +2,8 @@ import React from "react";
 import "../Styles/OfferList.css";
 import {OfferExperience} from "./Experience.jsx";
 import {RemoteHybridOffer} from "./RemoteHybrid.jsx";
+import {Localization} from "./Localization.jsx";
+
 
 
 export const OfferList = ({ offers }) => {
@@ -17,21 +19,21 @@ export const OfferList = ({ offers }) => {
                 <RemoteHybridOffer offer={offer} />
               </div>
 
-              <div className="card-description">
-                <p>{offer.description.substring(0, 100) + "..."}</p>
-              </div>
-
               <div className="card-additional">
-              <div className="offer-skills">
-                {offer.skills ? (
-                  <ul>
-                    {offer.skills.split(',').map((skill, index) => (
-                      <li key={index} style={{ border: '1px solid black', display: 'inline-block' }}>{skill}</li>
-                    ))}
-                  </ul>
-                ) : (
-                  <span></span>
-                )}
+                <div className="offer-skills">
+                  {offer.skills ? (
+                    <span>
+                      {offer.skills.split(',').map((skill, index) => (
+                        <span className="skills" key={index}>{skill}</span>
+                      ))}
+                    </span>
+                  ) : (
+                    <span></span>
+                  )}
+                </div>
+
+              <div className="card-description">
+                <p>{offer.description.substring(0, 200) + "..."}</p>
               </div>
 
 
@@ -67,11 +69,13 @@ export const OfferList = ({ offers }) => {
               </div>
               </div>
 
-              <div className="offer-meta">
-                <span className="date-scraped">{offer.date_scraped} </span>
-                <span className="website-source"><a href={offer.website.url}>{offer.website.name}</a></span>
+              <div className="card-footer">
+                <Localization localizations={offer.localizations} />
+                <div className="offer-meta">
+                  <span className="date-scraped">{offer.date_scraped} </span>
+                  <span className="website-source"><a href={offer.website.url}>{offer.website.name}</a></span>
+                </div>
               </div>
-
             </div>
           </a>
       ))}

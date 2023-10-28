@@ -4,11 +4,12 @@ a.offer {
 }
 
 .card-container {
-  width: 1000px;
+  width: 800px;
   margin: 0 auto;
   border: 1px solid #ccc;
   border-radius: 5px;
   padding: 10px;
+  margin-bottom: 10px;
 }
 
 .card-header {
@@ -17,7 +18,8 @@ a.offer {
 }
 
 .card-description {
-  padding: 10px;
+  margin-top: 10px;
+  font-size: 20px;
 }
 
 .card-additional {
@@ -35,9 +37,17 @@ a.offer {
   padding: 0 5px;
 }
 
-.offer-skills p {
-  margin-bottom: 0;
+.skills {
+  border: 2px solid black;
+  border-radius: 10px;
+  background-color: green;
+  color: white;
+  font-weight: inherit;
+  padding: 3px;
+  display: inline-block;
+  margin-right: 10px;
 }
+
 
 .offer-remote span,
 .offer-hybrid span {
@@ -58,4 +68,9 @@ a.offer {
 .offer-contract-type li {
   display: inline-block;
   padding: 0 5px;
+}
+
+.card-footer {
+  display: flex;
+  justify-content: space-between;
 }
