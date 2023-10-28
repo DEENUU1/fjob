@@ -1,19 +1,40 @@
-import React from "react";
+import React, {useState} from "react";
 import "../Styles/OfferList.css";
 import {OfferExperience} from "./Experience.jsx";
 import {RemoteHybridOffer} from "./RemoteHybrid.jsx";
 import {Localization} from "./Localization.jsx";
-
+import {CreateReport} from "./CreateReportModal.jsx";
 
 
 export const OfferList = ({ offers }) => {
+    const [showModal, setShowModal] = useState(false);
+
+  const handleShowModal = () => {
+    console.log("Opening modal")
+    setShowModal(true);
+  };
+
+  const handleCloseModal = () => {
+    console.log("Closing modal")
+    setShowModal(false);
+  };
+
   return (
     <ul>
       {offers.map((offer) => (
-          <a className="offer" href={offer.url}>
+          <div className="offer">
             <div className="card-container">
               <div className="card-header">
-                <h2>{offer.title}</h2>
+                <h2>
+                  <a className="offer-url" href={offer.url}>
+                    {offer.title}
+                  </a>
+                </h2>
+
+                <button onClick={handleShowModal}>Report</button>
+                {showModal && (
+                  <CreateReport offerId={offer.id} onClose={handleCloseModal} />
+                )}
 
                 <OfferExperience offer={offer} />
                 <RemoteHybridOffer offer={offer} />
@@ -77,7 +98,7 @@ export const OfferList = ({ offers }) => {
                 </div>
               </div>
             </div>
-          </a>
+          </div>
       ))}
     </ul>
   );

@@ -5,18 +5,6 @@ import {OfferList} from "../Components/OfferList.jsx";
 export const OffersListPage = () => {
   const [offers, setOffers] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [sortBy, setSortBy] = useState("-date_scraped");
-  const [countries, setCountries] = useState([]);
-  const [country, setCountry] = useState("");
-  const [isRemote, setIsRemote] = useState(false);
-  const [isHybrid, setIsHybrid] = useState(false);
-
-  const orderingOptions = {
-    "Newest": "-date_scraped",
-    "Oldest": "date_scraped",
-    "Highest Salary": "salary__salary_from",
-    "Lowest Salary": "-salary__salary_from",
-  };
 
   const loadOffers = () => {
     setIsLoading(true);
