@@ -16,7 +16,8 @@ export function Navigation() {
             <Navbar bg="light" variant="light">
                 <Navbar.Brand href="/">FJob</Navbar.Brand>
                 <Nav className="me-auto">
-                    {isAuth ? <Nav.Link href="/">Home</Nav.Link> : null}
+                    <Nav.Link href="/">Home</Nav.Link>
+                    <Nav.Link href="/contact">Contact</Nav.Link>
                 </Nav>
                 <Nav>
                     {isAuth ? <Nav.Link href="/logout">Logout</Nav.Link> :
