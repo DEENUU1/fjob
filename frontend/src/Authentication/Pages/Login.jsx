@@ -26,7 +26,6 @@ export const Login = () => {
                     withCredentials: true
                 });
 
-            console.log(data)
             localStorage.clear();
             localStorage.setItem('access_token', data.access);
             localStorage.setItem('refresh_token', data.refresh);

@@ -1,10 +1,10 @@
-import React from "react";
-import { useState } from "react";
-import { useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import "../Styles/ReportModal.css";
 import axios from "axios";
+import {IoClose} from "react-icons/io5";
 
-export const CreateReport = ({ offerId }) => {
+
+export const CreateReport = ({ offerId, onClose }) => {
   const [message, setMessage] = useState("");
 
   useEffect(() => {
@@ -12,44 +12,41 @@ export const CreateReport = ({ offerId }) => {
   }, [offerId]);
 
   const handleSubmit = async () => {
-  const token = localStorage.getItem("access_token");
-  const data = {
-    message,
-    offer: offerId,
-    user: 1,
-  };
+    const token = localStorage.getItem("access_token");
+    const data = {
+      message,
+      offer: offerId,
+      user: 1,
+    };
 
-  try {
-    const response = await axios.post(
-      "http://localhost:8000/reports/",
-      data,
-      {
+    try {
+      const response = await axios.post("http://localhost:8000/reports/", data, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
-      }
-    );
-
-    console.log("Message sent successfully!");
-  } catch (error) {
-    console.error(error);
-  }
+      });
+      console.log("Report sent");
+      // Close the modal after the report is sent
+      onClose();
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   return (
     <div className="modal">
       <div className="modal-content">
         <div className="modal-header">
-          <h2>Tell us what is wrong with this job offer.</h2>
-          <button type="button" className="close" data-dismiss="modal">
-            &times;
+          <h2 className="modal-title">Report offer</h2>
+          <button type="button" className="close" onClick={onClose}>
+            <IoClose />
           </button>
         </div>
         <div className="modal-body">
           <input
             type="text"
             className="form-control"
-            placeholder="Wprowadź wiadomość"
+            placeholder="Tell us what is wrong with this offer"
             value={message}
             onChange={(e) => setMessage(e.target.value)}
           />

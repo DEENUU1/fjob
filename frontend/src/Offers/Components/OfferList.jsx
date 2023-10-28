@@ -5,17 +5,14 @@ import {RemoteHybridOffer} from "./RemoteHybrid.jsx";
 import {Localization} from "./Localization.jsx";
 import {CreateReport} from "./CreateReportModal.jsx";
 
-
 export const OfferList = ({ offers }) => {
     const [showModal, setShowModal] = useState(false);
 
   const handleShowModal = () => {
-    console.log("Opening modal")
     setShowModal(true);
   };
 
   const handleCloseModal = () => {
-    console.log("Closing modal")
     setShowModal(false);
   };
 
