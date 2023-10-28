@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import {OfferList} from "../Components/OfferList.jsx";
 
-export const OfferList = () => {
+export const OffersListPage = () => {
   const [offers, setOffers] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [sortBy, setSortBy] = useState("-date_scraped");
@@ -46,6 +47,7 @@ export const OfferList = () => {
       })
       .then((response) => {
         setOffers(response.data.results);
+        console.log(response.data.results);
         setIsLoading(false);
       })
       .catch((error) => {
@@ -67,7 +69,7 @@ export const OfferList = () => {
 
   useEffect(() => {
     loadOffers();
-  }, [sortBy, country, isRemote, isHybrid]); // Trigger loadOffers when any filter options change
+  }, [sortBy, country, isRemote, isHybrid]);
 
   useEffect(() => {
     loadCountries();
@@ -128,11 +130,7 @@ export const OfferList = () => {
         Hybrid
       </label>
 
-      <ul>
-        {offers.map((offer) => (
-          <li key={offer.id}>{offer.title}</li>
-        ))}
-      </ul>
+      <OfferList offers={offers}/>
     </div>
   );
 };
