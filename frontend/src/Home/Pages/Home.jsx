@@ -14,7 +14,7 @@ export const Home = () => {
                             FJob collects data on job offers from many websites to help you find the best offer easily and quickly.
                     </h6>
                         <br />
-                        <h6><a className="btn btn-dark start start-two" href="#">Get Started</a></h6>
+                        <h6><a className="btn btn-dark start start-two" href="/offers">Get Started</a></h6>
                     </div>
                     <div className="col-sm-9 showcase-img">
                         <img src="../../../public/images/reading-woman.png " alt="Reading Woman" className="img-fluid" />

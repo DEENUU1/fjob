@@ -1,0 +1,76 @@
+a.offer {
+  color: inherit;
+  text-decoration: none;
+}
+
+.card-container {
+  width: 800px;
+  margin: 0 auto;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  padding: 10px;
+  margin-bottom: 10px;
+}
+
+.card-header {
+  background-color: #f3f3f3;
+  padding: 10px;
+}
+
+.card-description {
+  margin-top: 10px;
+  font-size: 20px;
+}
+
+.card-additional {
+  padding: 10px;
+}
+
+.card-meta {
+  font-size: 0.8em;
+  text-align: right;
+  padding: 10px;
+}
+
+.offer-exp li {
+  display: inline-block;
+  padding: 0 5px;
+}
+
+.skills {
+  border: 2px solid black;
+  border-radius: 10px;
+  background-color: green;
+  color: white;
+  font-weight: inherit;
+  padding: 3px;
+  display: inline-block;
+  margin-right: 10px;
+}
+
+
+.offer-remote span,
+.offer-hybrid span {
+  color: #000000;
+}
+
+.offer-salary-container ul {
+  margin: 0;
+  padding: 0;
+}
+
+.offer-salary-container li {
+  list-style-type: none;
+  margin-bottom: 10px;
+}
+
+.offer-work-schedule li,
+.offer-contract-type li {
+  display: inline-block;
+  padding: 0 5px;
+}
+
+.card-footer {
+  display: flex;
+  justify-content: space-between;
+}
