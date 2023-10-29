@@ -1,4 +1,6 @@
 import React, { useState } from 'react';
+import "../Styles/passwordchangeform.css";
+
 
 export const PasswordResetForm = ({token}) => {
   const [oldPassword, setOldPassword] = useState('');
@@ -16,14 +18,12 @@ export const PasswordResetForm = ({token}) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Define the API endpoint and headers
     const endpoint = 'http://localhost:8000/users/change-password/';
     const headers = {
       'Content-Type': 'application/json',
-      'Authorization': `Bearer ${token}`, // Replace with your actual access tokenrer', // Replace with your actual access token
+      'Authorization': `Bearer ${token}`,
     };
 
-    // Create a data object with old_password and new_password
     const data = {
       old_password: oldPassword,
       new_password: newPassword,
@@ -47,8 +47,8 @@ export const PasswordResetForm = ({token}) => {
   };
 
   return (
-    <div>
-      <h2>Password Reset</h2>
+    <div className="form-container">
+      <h2>Change password</h2>
       <form onSubmit={handleSubmit}>
         <div>
           <label htmlFor="oldPassword">Old Password</label>
@@ -72,7 +72,7 @@ export const PasswordResetForm = ({token}) => {
         </div>
         <button type="submit">Reset Password</button>
       </form>
-      <p>{message}</p>
+      <strong>{message}</strong>
     </div>
   );
 };
