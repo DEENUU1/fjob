@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import "../Styles/passwordchangeform.css";
 
 
-export const PasswordResetForm = ({token}) => {
+export const ChangePasswordForm = ({token}) => {
   const [oldPassword, setOldPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [message, setMessage] = useState('');
@@ -18,7 +18,7 @@ export const PasswordResetForm = ({token}) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const endpoint = 'http://localhost:8000/users/change-password/';
+    const endpoint = 'http://localhost:8000/users/change-password';
     const headers = {
       'Content-Type': 'application/json',
       'Authorization': `Bearer ${token}`,
