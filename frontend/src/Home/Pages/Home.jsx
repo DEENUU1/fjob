@@ -8,7 +8,7 @@ export const Home = () => {
                 <div className="row">
                     <div className="col-sm-3 talk">
                         <h1>FJob</h1>
-                        <h2>Find job quicker</h2>
+                        <h3>Find job quicker</h3>
                         <br />
                         <h6 className="bold-four">
                             FJob collects data on job offers from many websites to help you find the best offer easily and quickly.

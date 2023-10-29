@@ -7,7 +7,6 @@ export const UserDeleteAccountPage = () => {
 
     return (
         <div>
-            <Header username={username}/>
             <AccountDeleteForm token={token} />
         </div>
     );

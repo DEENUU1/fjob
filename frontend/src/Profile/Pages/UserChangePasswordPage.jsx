@@ -7,7 +7,6 @@ export const UserChangePasswordPage = () => {
 
     return (
         <div>
-            <Header username={username}/>
             <ChangePasswordForm token={token} />
         </div>
     );
