@@ -10,6 +10,10 @@ import {Home} from './Home/Pages/Home.jsx';
 import {Footer} from './Components/Footer.jsx';
 import {OffersListPage} from './Offers/Pages/OffersListPage.jsx';
 import {ContactFormPage} from "./Contact/Pages/ContactFormPage.jsx"
+import {UserProfilePage} from "./Profile/Pages/UserProfilePage.jsx";
+import {UserChangePasswordPage} from "./Profile/Pages/UserChangePasswordPage.jsx";
+import {UserDeleteAccountPage} from "./Profile/Pages/UserDeleteAccountPage.jsx";
+
 
 function App() {
     return <BrowserRouter>
@@ -21,6 +25,9 @@ function App() {
             <Route path="/" element={<Home/>}/>
             <Route path="/offers" element={<OffersListPage/>}/>
             <Route path="/contact" element={<ContactFormPage/>}/>
+            <Route path="/profile" element={<UserProfilePage/>}/>
+            <Route path="/profile/delete" element={<UserDeleteAccountPage/>}/>
+            <Route path="/profile/password_change" element={<UserChangePasswordPage/>} />
         </Routes>
     <Footer></Footer>
     </BrowserRouter>;

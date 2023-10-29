@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import Alert from 'react-bootstrap/Alert';
-import "../../public/css/alert.css";
+import "./alert.css";
 
 function ErrorAlert({ errors }) {
   const [show, setShow] = useState(true);
