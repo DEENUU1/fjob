@@ -10,6 +10,8 @@ import {Home} from './Home/Pages/Home.jsx';
 import {Footer} from './Components/Footer.jsx';
 import {OffersListPage} from './Offers/Pages/OffersListPage.jsx';
 import {ContactFormPage} from "./Contact/Pages/ContactFormPage.jsx"
+import {UserProfilePage} from "./Profile/Pages/UserProfilePage.jsx";
+
 
 function App() {
     return <BrowserRouter>
@@ -21,6 +23,7 @@ function App() {
             <Route path="/" element={<Home/>}/>
             <Route path="/offers" element={<OffersListPage/>}/>
             <Route path="/contact" element={<ContactFormPage/>}/>
+            <Route path="/profile" element={<UserProfilePage/>}/>
         </Routes>
     <Footer></Footer>
     </BrowserRouter>;

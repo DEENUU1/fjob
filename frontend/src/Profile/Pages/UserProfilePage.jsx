@@ -1,8 +1,8 @@
 import {Header} from "../Components/Header.jsx";
 
 
-const UserProfilePage = () => {
-    const username = localStorage.get("username");
+export const UserProfilePage = () => {
+    const username = localStorage.getItem("username");
 
 
     return (
@@ -11,5 +11,3 @@ const UserProfilePage = () => {
         </div>
     );
 };
-
-export default UserProfile;
