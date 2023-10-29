@@ -1,6 +1,6 @@
 import axios from "axios";
 import {useState} from "react";
-import "../../../public/css/login.css";
+import "../Styles/login.css";
 import ErrorAlert from "../../Components/Alert.jsx";
 
 export const Login = () => {
@@ -29,6 +29,8 @@ export const Login = () => {
             localStorage.clear();
             localStorage.setItem('access_token', data.access);
             localStorage.setItem('refresh_token', data.refresh);
+            localStorage.setItem('username', data.username);
+            // localStorage.setItem('user_id', data.user_id);
             axios.defaults.headers.common['Authorization'] = `Bearer ${data['access']}`;
             window.location.href = '/'
         } catch (error) {

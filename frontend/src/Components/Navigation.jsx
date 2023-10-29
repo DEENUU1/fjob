@@ -20,6 +20,7 @@ export function Navigation() {
                     <Nav.Link href="/contact">Contact</Nav.Link>
                 </Nav>
                 <Nav>
+                    {isAuth ? <Nav.Link href="/profile">{localStorage.getItem("username")}</Nav.Link> : null}
                     {isAuth ? <Nav.Link href="/logout">Logout</Nav.Link> :
                         <Nav.Link href="/login">Login</Nav.Link>
                     }
