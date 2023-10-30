@@ -18,7 +18,7 @@ export const ChangePasswordForm = ({token}) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const endpoint = 'http://localhost:8000/users/change-password';
+    const endpoint = 'http://localhost:8000/users/change-password/';
     const headers = {
       'Content-Type': 'application/json',
       'Authorization': `Bearer ${token}`,
