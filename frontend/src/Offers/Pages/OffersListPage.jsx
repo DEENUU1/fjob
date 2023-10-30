@@ -6,15 +6,16 @@ export const OffersListPage = () => {
   const [offers, setOffers] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [sortOption, setSortOption] = useState("");
+  const [query, setQuery] = useState("");
   const token = localStorage.getItem("access_token");
+  const sortUrl = sortOption ? `&ordering=${sortOption}` : "";
+  const queryUrl = query ? `&search=${query}` : "";
 
   const loadOffers = () => {
     setIsLoading(true);
 
-    const sortUrl = sortOption ? `&ordering=${sortOption}` : "";
-
     axios
-      .get(`http://localhost:8000/offers/?${sortUrl}`, {
+      .get(`http://localhost:8000/offers/?${sortUrl}${queryUrl}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -31,14 +32,25 @@ export const OffersListPage = () => {
 
   useEffect(() => {
     loadOffers();
-  }, [sortOption]);
+  }, [sortOption, query]);
 
   if (isLoading) {
     return <div>Loading...</div>;
   }
 
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    setQuery(e.currentTarget.elements.query.value)
+  }
+
   return (
     <div>
+      <div className="search-container">
+        <form className="search-form" onSubmit={handleSubmit}>
+          <input id="query" type="text" name="query"  placeholder="Search..." />
+          <button type="submit">Search</button>
+        </form>
+      </div>
       <div className="sort-container">
         <select value={sortOption} onChange={(e) => setSortOption(e.target.value)}>
           <option value="">Sort by</option>

@@ -1,5 +1,5 @@
 from rest_framework import generics
-from rest_framework.filters import OrderingFilter
+from rest_framework.filters import OrderingFilter, SearchFilter
 from rest_framework.permissions import IsAuthenticated
 from fjob.pagination import CustomPagination
 from ..models import Offers
@@ -14,7 +14,7 @@ class OfferListView(generics.ListAPIView):
     ]
     queryset = Offers.objects.filter(is_active=True)
     serializer_class = OffersSerializer
-    filter_backends = (filters.DjangoFilterBackend, OrderingFilter)
+    filter_backends = (filters.DjangoFilterBackend, OrderingFilter, SearchFilter)
     filter_class = OffersFilter
     pagination_class = CustomPagination
     ordering_fields = [
@@ -23,3 +23,4 @@ class OfferListView(generics.ListAPIView):
         "salary__salary_from",
         "-salary__salary_from",
     ]
+    search_fields = ["title", "description", "skills"]
