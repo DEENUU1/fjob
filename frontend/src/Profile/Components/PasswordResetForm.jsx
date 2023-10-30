@@ -70,7 +70,7 @@ export const ChangePasswordForm = ({token}) => {
             required
           />
         </div>
-        <button type="submit">Reset Password</button>
+        <button className="button-reset" type="submit">Reset Password</button>
       </form>
       <strong>{message}</strong>
     </div>

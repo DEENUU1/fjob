@@ -14,12 +14,12 @@
   text-decoration: none;
 }
 
-.button-update {
+.link-update {
     background-color: cornflowerblue;
     color: white;
 }
 
-.button-delete {
+.link-delete {
     background-color: red;
     color: white;
 }
