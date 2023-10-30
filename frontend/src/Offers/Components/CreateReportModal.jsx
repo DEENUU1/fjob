@@ -1,23 +1,24 @@
 import React, { useState, useEffect } from "react";
-import "../Styles/ReportModal.css";
+import "../Styles/reportmodal.css";
 import axios from "axios";
 import {IoClose} from "react-icons/io5";
-
+import {toast} from "react-toastify";
 
 export const CreateReport = ({ offerId, onClose }) => {
   const [message, setMessage] = useState("");
+  const token = localStorage.getItem("access_token");
+  const userid = localStorage.getItem("user_id");
+  const data = {
+      message,
+      offer: offerId,
+      user: userid,
+  };
 
   useEffect(() => {
     setMessage("");
   }, [offerId]);
 
   const handleSubmit = async () => {
-    const token = localStorage.getItem("access_token");
-    const data = {
-      message,
-      offer: offerId,
-      user: 1,
-    };
 
     try {
       const response = await axios.post("http://localhost:8000/reports/", data, {
@@ -25,11 +26,30 @@ export const CreateReport = ({ offerId, onClose }) => {
           Authorization: `Bearer ${token}`,
         },
       });
-      console.log("Report sent");
-      // Close the modal after the report is sent
+
+      toast.success('Report sent', {
+        position: "top-center",
+        autoClose: 5000,
+        hideProgressBar: true,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "dark",
+      });
       onClose();
+
     } catch (error) {
-      console.log(error);
+      toast.error('Failed to send report!', {
+        position: "top-center",
+        autoClose: 5000,
+        hideProgressBar: true,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "dark",
+      });
     }
   };
 
@@ -37,7 +57,6 @@ export const CreateReport = ({ offerId, onClose }) => {
     <div className="modal">
       <div className="modal-content">
         <div className="modal-header">
-          <h2 className="modal-title">Report offer</h2>
           <button type="button" className="close" onClick={onClose}>
             <IoClose />
           </button>

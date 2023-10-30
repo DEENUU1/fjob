@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import "../Styles/passwordchangeform.css";
+import {toast} from "react-toastify";
 
 
 export const ChangePasswordForm = ({token}) => {
   const [oldPassword, setOldPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
-  const [message, setMessage] = useState('');
 
   const handleOldPasswordChange = (e) => {
     setOldPassword(e.target.value);
@@ -18,7 +18,7 @@ export const ChangePasswordForm = ({token}) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const endpoint = 'http://localhost:8000/users/change-password';
+    const endpoint = 'http://localhost:8000/users/change-password/';
     const headers = {
       'Content-Type': 'application/json',
       'Authorization': `Bearer ${token}`,
@@ -37,12 +37,39 @@ export const ChangePasswordForm = ({token}) => {
       });
 
       if (response.status === 200) {
-        setMessage('Password successfully changed.');
+        toast.success('Password has been changed', {
+          position: "top-center",
+          autoClose: 5000,
+          hideProgressBar: true,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "dark",
+        });
       } else {
-        setMessage('Password change failed. Please check your old password.');
+        toast.error('Invalid credential!', {
+          position: "top-center",
+          autoClose: 5000,
+          hideProgressBar: true,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "dark",
+        });
       }
     } catch (error) {
-      setMessage('An error occurred while changing the password.');
+        toast.error('Error!', {
+          position: "top-center",
+          autoClose: 5000,
+          hideProgressBar: true,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "dark",
+      });
     }
   };
 
@@ -70,9 +97,8 @@ export const ChangePasswordForm = ({token}) => {
             required
           />
         </div>
-        <button type="submit">Reset Password</button>
+        <button className="button-reset" type="submit">Reset Password</button>
       </form>
-      <strong>{message}</strong>
     </div>
   );
 };

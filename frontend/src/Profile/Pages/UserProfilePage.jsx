@@ -9,8 +9,8 @@ export const UserProfilePage = () => {
         <div>
             <Header username={username}/>
             <div className="options">
-            <Button className="button button-delete" href="/profile/delete" variant="link">Delete Account</Button>
-            <Button className="button button-update" href="/profile/password_change" variant="link">Change Password</Button>
+            <Button className="button link-delete" href="/profile/delete" variant="link">Delete Account</Button>
+            <Button className="button link-update" href="/profile/password_change" variant="link">Change Password</Button>
             </div>
         </div>
     );

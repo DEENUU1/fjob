@@ -13,11 +13,13 @@ import {ContactFormPage} from "./Contact/Pages/ContactFormPage.jsx"
 import {UserProfilePage} from "./Profile/Pages/UserProfilePage.jsx";
 import {UserChangePasswordPage} from "./Profile/Pages/UserChangePasswordPage.jsx";
 import {UserDeleteAccountPage} from "./Profile/Pages/UserDeleteAccountPage.jsx";
-
+import {ToastContainer} from "react-toastify";
+import "react-toastify/dist/ReactToastify.min.css";
 
 function App() {
     return <BrowserRouter>
     <Navigation></Navigation>
+    <ToastContainer/>
         <Routes>
             <Route path="/login" element={<Login/>}/>
             <Route path="/logout" element={<Logout/>}/>

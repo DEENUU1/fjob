@@ -1,5 +1,5 @@
 import React, {useState} from "react";
-import "../Styles/OfferList.css";
+import "../Styles/offerlist.css";
 import {OfferExperience} from "./Experience.jsx";
 import {RemoteHybridOffer} from "./RemoteHybrid.jsx";
 import {Localization} from "./Localization.jsx";

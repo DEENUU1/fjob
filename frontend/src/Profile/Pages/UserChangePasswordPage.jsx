@@ -1,5 +1,5 @@
 import {Header} from "../Components/Header.jsx";
-import {ChangePasswordForm} from "../Components/PasswordResetForm.jsx";
+import {ChangePasswordForm} from "../Components/ChangePasswordForm.jsx";
 
 
 export const UserChangePasswordPage = () => {

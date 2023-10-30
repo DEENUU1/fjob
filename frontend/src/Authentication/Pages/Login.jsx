@@ -2,11 +2,11 @@ import axios from "axios";
 import {useState} from "react";
 import "../Styles/login.css";
 import ErrorAlert from "../../Components/Alert.jsx";
+import {toast} from "react-toastify";
 
 export const Login = () => {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
-    const [errorMessages, setErrorMessages] = useState([]);
 
     const submit = async e => {
         e.preventDefault();
@@ -32,6 +32,16 @@ export const Login = () => {
             localStorage.setItem('username', data.username);
             localStorage.setItem('user_id', data.user_id);
             axios.defaults.headers.common['Authorization'] = `Bearer ${data['access']}`;
+            toast.success('Successfully logged in', {
+                position: "top-center",
+                autoClose: 5000,
+                hideProgressBar: true,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+                theme: "dark",
+            });
             window.location.href = '/'
         } catch (error) {
           console.error(error);
@@ -39,16 +49,43 @@ export const Login = () => {
           if (error.response && error.response.data) {
             const errorData = error.response.data;
             const errorMessages = Object.values(errorData).flat();
-            setErrorMessages(errorMessages);
+            toast.error('Failed to log in!', {
+                position: "top-center",
+                autoClose: 5000,
+                hideProgressBar: true,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+                theme: "dark",
+            });
+            toast.error(errorMessages, {
+                position: "top-center",
+                autoClose: 5000,
+                hideProgressBar: true,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+                theme: "dark",
+            });
           } else {
-            setErrorMessages(["An error occurred."]);
+            toast.error('Error!', {
+                position: "top-center",
+                autoClose: 5000,
+                hideProgressBar: true,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+                theme: "dark",
+            });
           }
         }
     }
 
     return(
         <div className="Auth-form-container">
-        {errorMessages.length > 0 && <ErrorAlert errors={errorMessages} />}
         <form className="Auth-form" onSubmit={submit}>
           <div className="Auth-form-content">
             <h3 className="Auth-form-title">Sign In</h3>

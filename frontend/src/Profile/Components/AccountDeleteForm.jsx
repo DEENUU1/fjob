@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
 import "../Styles/passwordchangeform.css";
 import {useNavigate}  from "react-router-dom";
+import {toast} from "react-toastify";
 
 export const AccountDeleteForm = ({token}) => {
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [message, setMessage] = useState('');
   const navigate = useNavigate();
 
 
@@ -46,12 +46,40 @@ export const AccountDeleteForm = ({token}) => {
 
       if (response.status === 204) {
         localStorage.clear()
+        toast.success('Your account has been deleted', {
+          position: "top-center",
+          autoClose: 5000,
+          hideProgressBar: true,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "dark",
+        });
         navigate("/login")
       } else {
-        setMessage('Error: check your credentials');
+        toast.error('Invalid credentials!', {
+          position: "top-center",
+          autoClose: 5000,
+          hideProgressBar: true,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "dark",
+        });
       }
     } catch (error) {
-      setMessage('An error occurred while deleting your account.');
+        toast.error('Error!', {
+          position: "top-center",
+          autoClose: 5000,
+          hideProgressBar: true,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "dark",
+        });
     }
   };
 
@@ -91,7 +119,6 @@ export const AccountDeleteForm = ({token}) => {
         </div>
         <button className="button-delete" type="submit">Delete account</button>
       </form>
-      <strong>{message}</strong>
     </div>
   );
 };
