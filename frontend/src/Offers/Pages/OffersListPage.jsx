@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { OfferList } from "../Components/OfferList.jsx";
+import "../Styles/filtersearch.css";
+
 
 export const OffersListPage = () => {
   const [offers, setOffers] = useState([]);
@@ -45,22 +47,24 @@ export const OffersListPage = () => {
 
   return (
     <div>
-      <div className="search-container">
-        <form className="search-form" onSubmit={handleSubmit}>
-          <input id="query" type="text" name="query"  placeholder="Search..." />
-          <button type="submit">Search</button>
-        </form>
+      <div className="filter-search">
+        <div className="search-container">
+          <form className="search-form" onSubmit={handleSubmit}>
+            <input id="query" type="text" name="query"  placeholder="Search..." />
+            <button type="submit">Search</button>
+          </form>
+        </div>
+        <div className="sort-container">
+          <select value={sortOption} onChange={(e) => setSortOption(e.target.value)}>
+            <option value="">Sort by</option>
+            <option value="-date_scraped">Newest</option>
+            <option value="date_scraped">Oldest</option>
+            <option value="-salary__salary_from">Salary highest</option>
+            <option value="salary__salary_from">Salary lowest</option>
+          </select>
+        </div>
       </div>
-      <div className="sort-container">
-        <select value={sortOption} onChange={(e) => setSortOption(e.target.value)}>
-          <option value="">Sort by</option>
-          <option value="-date_scraped">Newest</option>
-          <option value="date_scraped">Oldest</option>
-          <option value="-salary__salary_from">Salary highest</option>
-          <option value="salary__salary_from">Salary lowest</option>
-        </select>
-      </div>
-      <OfferList offers={offers} />
+       <OfferList offers={offers} />
     </div>
   );
 };

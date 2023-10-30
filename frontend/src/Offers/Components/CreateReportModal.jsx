@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import "../Styles/ReportModal.css";
+import "../Styles/reportmodal.css";
 import axios from "axios";
 import {IoClose} from "react-icons/io5";
 
