@@ -1,14 +1,13 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
 import "../Styles/passwordchangeform.css";
-import {useNavigate}  from "react-router-dom";
-import {toast} from "react-toastify";
+import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 
-export const AccountDeleteForm = ({token}) => {
-  const [username, setUsername] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+export const AccountDeleteForm = ({ token }) => {
+  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const navigate = useNavigate();
-
 
   const handleUsernameChange = (e) => {
     setUsername(e.target.value);
@@ -25,10 +24,10 @@ export const AccountDeleteForm = ({token}) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const endpoint = 'http://localhost:8000/users/account-delete/';
+    const endpoint = "http://localhost:8000/users/account-delete/";
     const headers = {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${token}`,
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
     };
 
     const data = {
@@ -39,14 +38,14 @@ export const AccountDeleteForm = ({token}) => {
 
     try {
       const response = await fetch(endpoint, {
-        method: 'DELETE',
+        method: "DELETE",
         headers: headers,
         body: JSON.stringify(data),
       });
 
       if (response.status === 204) {
-        localStorage.clear()
-        toast.success('Your account has been deleted', {
+        localStorage.clear();
+        toast.success("Your account has been deleted", {
           position: "top-center",
           autoClose: 5000,
           hideProgressBar: true,
@@ -56,9 +55,9 @@ export const AccountDeleteForm = ({token}) => {
           progress: undefined,
           theme: "dark",
         });
-        navigate("/login")
+        navigate("/login");
       } else {
-        toast.error('Invalid credentials!', {
+        toast.error("Invalid credentials!", {
           position: "top-center",
           autoClose: 5000,
           hideProgressBar: true,
@@ -70,16 +69,16 @@ export const AccountDeleteForm = ({token}) => {
         });
       }
     } catch (error) {
-        toast.error('Error!', {
-          position: "top-center",
-          autoClose: 5000,
-          hideProgressBar: true,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-          theme: "dark",
-        });
+      toast.error("Error!", {
+        position: "top-center",
+        autoClose: 5000,
+        hideProgressBar: true,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "dark",
+      });
     }
   };
 
@@ -109,15 +108,17 @@ export const AccountDeleteForm = ({token}) => {
         </div>
         <div>
           <label htmlFor="password">Password</label>
-            <input
-                type="password"
-                id="password"
-                value={password}
-                onChange={handlePasswordChange}
-                required
-            />
+          <input
+            type="password"
+            id="password"
+            value={password}
+            onChange={handlePasswordChange}
+            required
+          />
         </div>
-        <button className="button-delete" type="submit">Delete account</button>
+        <button className="button-delete" type="submit">
+          Delete account
+        </button>
       </form>
     </div>
   );

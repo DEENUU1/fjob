@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import axios from "axios";
 import "../Styles/contactformpage.css";
-import {Header} from "../Components/Header.jsx";
-import {toast} from "react-toastify";
+import { Header } from "../Components/Header.jsx";
+import { toast } from "react-toastify";
 
 export const ContactFormPage = () => {
   const [name, setName] = useState("");
@@ -23,7 +23,7 @@ export const ContactFormPage = () => {
       );
 
       if (response.status === 201) {
-        toast.success('Message sent', {
+        toast.success("Message sent", {
           position: "top-center",
           autoClose: 5000,
           hideProgressBar: true,
@@ -34,7 +34,7 @@ export const ContactFormPage = () => {
           theme: "dark",
         });
       } else {
-        toast.error('Failed to send message!', {
+        toast.error("Failed to send message!", {
           position: "top-center",
           autoClose: 5000,
           hideProgressBar: true,
@@ -44,10 +44,9 @@ export const ContactFormPage = () => {
           progress: undefined,
           theme: "dark",
         });
-
       }
     } catch (e) {
-      toast.error('Error!', {
+      toast.error("Error!", {
         position: "top-center",
         autoClose: 5000,
         hideProgressBar: true,
@@ -62,29 +61,43 @@ export const ContactFormPage = () => {
 
   return (
     <div>
-        <Header />
-        <form className="contact-form" onSubmit={handleSubmit}>
-          <div>
-            <label htmlFor="name">Name</label>
-            <input type="text" id="name" name="name" className="required" value={name} onChange={(event) => setName(event.target.value)} />
-          </div>
-          <div>
-            <label htmlFor="email">Email</label>
-            <input type="email" id="email" name="email" className="required" value={email} onChange={(event) => setEmail(event.target.value)} />
-          </div>
-          <div>
-            <label htmlFor="message">Message</label>
-            <textarea
-              id="message"
-              name="message"
-              value={content}
-              onChange={(event) => setContent(event.target.value)}
-            />
-          </div>
-          <div>
-            <button type="submit">Send Message</button>
-          </div>
-        </form>
+      <Header />
+      <form className="contact-form" onSubmit={handleSubmit}>
+        <div>
+          <label htmlFor="name">Name</label>
+          <input
+            type="text"
+            id="name"
+            name="name"
+            className="required"
+            value={name}
+            onChange={(event) => setName(event.target.value)}
+          />
+        </div>
+        <div>
+          <label htmlFor="email">Email</label>
+          <input
+            type="email"
+            id="email"
+            name="email"
+            className="required"
+            value={email}
+            onChange={(event) => setEmail(event.target.value)}
+          />
+        </div>
+        <div>
+          <label htmlFor="message">Message</label>
+          <textarea
+            id="message"
+            name="message"
+            value={content}
+            onChange={(event) => setContent(event.target.value)}
+          />
+        </div>
+        <div>
+          <button type="submit">Send Message</button>
+        </div>
+      </form>
     </div>
   );
 };

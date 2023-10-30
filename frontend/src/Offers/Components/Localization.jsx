@@ -13,7 +13,8 @@ export const Localization = ({ localizations }) => {
     <div className="offer-location">
       {localizations.length > 0 && (
         <span>
-          {localizations[0].country} {localizations[0].region} {localizations[0].city}
+          {localizations[0].country} {localizations[0].region}{" "}
+          {localizations[0].city}
         </span>
       )}
       {count > 0 && <div>+ {count} locations</div>}

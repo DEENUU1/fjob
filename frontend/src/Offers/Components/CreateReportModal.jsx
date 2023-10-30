@@ -1,17 +1,17 @@
 import React, { useState, useEffect } from "react";
 import "../Styles/reportmodal.css";
 import axios from "axios";
-import {IoClose} from "react-icons/io5";
-import {toast} from "react-toastify";
+import { IoClose } from "react-icons/io5";
+import { toast } from "react-toastify";
 
 export const CreateReport = ({ offerId, onClose }) => {
   const [message, setMessage] = useState("");
   const token = localStorage.getItem("access_token");
   const userid = localStorage.getItem("user_id");
   const data = {
-      message,
-      offer: offerId,
-      user: userid,
+    message,
+    offer: offerId,
+    user: userid,
   };
 
   useEffect(() => {
@@ -19,15 +19,18 @@ export const CreateReport = ({ offerId, onClose }) => {
   }, [offerId]);
 
   const handleSubmit = async () => {
-
     try {
-      const response = await axios.post("http://localhost:8000/reports/", data, {
-        headers: {
-          Authorization: `Bearer ${token}`,
+      const response = await axios.post(
+        "http://localhost:8000/reports/",
+        data,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
         },
-      });
+      );
 
-      toast.success('Report sent', {
+      toast.success("Report sent", {
         position: "top-center",
         autoClose: 5000,
         hideProgressBar: true,
@@ -38,9 +41,8 @@ export const CreateReport = ({ offerId, onClose }) => {
         theme: "dark",
       });
       onClose();
-
     } catch (error) {
-      toast.error('Failed to send report!', {
+      toast.error("Failed to send report!", {
         position: "top-center",
         autoClose: 5000,
         hideProgressBar: true,
@@ -71,7 +73,11 @@ export const CreateReport = ({ offerId, onClose }) => {
           />
         </div>
         <div className="modal-footer">
-          <button type="button" className="btn btn-primary" onClick={handleSubmit}>
+          <button
+            type="button"
+            className="btn btn-primary"
+            onClick={handleSubmit}
+          >
             Send
           </button>
         </div>

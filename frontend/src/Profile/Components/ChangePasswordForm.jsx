@@ -1,11 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
 import "../Styles/passwordchangeform.css";
-import {toast} from "react-toastify";
+import { toast } from "react-toastify";
 
-
-export const ChangePasswordForm = ({token}) => {
-  const [oldPassword, setOldPassword] = useState('');
-  const [newPassword, setNewPassword] = useState('');
+export const ChangePasswordForm = ({ token }) => {
+  const [oldPassword, setOldPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
 
   const handleOldPasswordChange = (e) => {
     setOldPassword(e.target.value);
@@ -18,10 +17,10 @@ export const ChangePasswordForm = ({token}) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const endpoint = 'http://localhost:8000/users/change-password/';
+    const endpoint = "http://localhost:8000/users/change-password/";
     const headers = {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${token}`,
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
     };
 
     const data = {
@@ -31,13 +30,13 @@ export const ChangePasswordForm = ({token}) => {
 
     try {
       const response = await fetch(endpoint, {
-        method: 'PUT',
+        method: "PUT",
         headers: headers,
         body: JSON.stringify(data),
       });
 
       if (response.status === 200) {
-        toast.success('Password has been changed', {
+        toast.success("Password has been changed", {
           position: "top-center",
           autoClose: 5000,
           hideProgressBar: true,
@@ -48,7 +47,7 @@ export const ChangePasswordForm = ({token}) => {
           theme: "dark",
         });
       } else {
-        toast.error('Invalid credential!', {
+        toast.error("Invalid credential!", {
           position: "top-center",
           autoClose: 5000,
           hideProgressBar: true,
@@ -60,15 +59,15 @@ export const ChangePasswordForm = ({token}) => {
         });
       }
     } catch (error) {
-        toast.error('Error!', {
-          position: "top-center",
-          autoClose: 5000,
-          hideProgressBar: true,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-          theme: "dark",
+      toast.error("Error!", {
+        position: "top-center",
+        autoClose: 5000,
+        hideProgressBar: true,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "dark",
       });
     }
   };
@@ -97,7 +96,9 @@ export const ChangePasswordForm = ({token}) => {
             required
           />
         </div>
-        <button className="button-reset" type="submit">Reset Password</button>
+        <button className="button-reset" type="submit">
+          Reset Password
+        </button>
       </form>
     </div>
   );
