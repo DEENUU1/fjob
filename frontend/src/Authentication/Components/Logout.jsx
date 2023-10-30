@@ -1,10 +1,9 @@
 import {useEffect, useState} from "react";
 import axios from "axios";
-import ErrorAlert from "../../Components/Alert.jsx";
 import {useNavigate} from "react-router-dom";
+import {toast} from "react-toastify";
 
 export const Logout = () => {
-    const [errorMessages, setErrorMessages] = useState([]);
     const navigate = useNavigate();
 
 
@@ -24,11 +23,27 @@ export const Logout = () => {
               console.error(error);
 
               if (error.response && error.response.data) {
-                const errorData = error.response.data;
-                const errorMessages = Object.values(errorData).flat();
-                setErrorMessages(errorMessages);
+                toast.error('Failed to logout!', {
+                    position: "top-center",
+                    autoClose: 5000,
+                    hideProgressBar: true,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    draggable: true,
+                    progress: undefined,
+                    theme: "dark",
+                });
               } else {
-                setErrorMessages(["An error occurred."]);
+                  toast.error('Error!', {
+                    position: "top-center",
+                    autoClose: 5000,
+                    hideProgressBar: true,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    draggable: true,
+                    progress: undefined,
+                    theme: "dark",
+                  });
               }
             }
         })();
@@ -37,7 +52,6 @@ export const Logout = () => {
 
     return (
         <div>
-        {errorMessages.length > 0 && <ErrorAlert errors={errorMessages} />}
         </div>
     )
 }

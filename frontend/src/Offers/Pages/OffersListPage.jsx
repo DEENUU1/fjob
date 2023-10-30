@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { OfferList } from "../Components/OfferList.jsx";
 import "../Styles/filtersearch.css";
+import {toast} from "react-toastify";
 
 
 export const OffersListPage = () => {
@@ -26,8 +27,17 @@ export const OffersListPage = () => {
         setOffers(response.data.results);
         setIsLoading(false);
       })
-      .catch((error) => {
-        console.error(error);
+      .catch((e) => {
+        toast.error('Failed to load job offers!', {
+          position: "top-center",
+          autoClose: 5000,
+          hideProgressBar: true,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "dark",
+        });
         setIsLoading(false);
       });
   };

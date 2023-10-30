@@ -2,8 +2,8 @@
   position: fixed;
   top: 50%;
   left: 50%;
-  width: 500px;
-  height: 400px;
+  width: 350px;
+  height: 250px;
   transform: translate(-50%, -50%);
   opacity: 1;
   display: flex;
@@ -24,6 +24,7 @@
   padding: 0;
   margin: 0;
   cursor: pointer;
+  margin-left: auto;
 }
 
 .close:hover {

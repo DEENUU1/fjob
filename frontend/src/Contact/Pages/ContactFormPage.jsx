@@ -2,12 +2,12 @@ import React, { useState } from "react";
 import axios from "axios";
 import "../Styles/contactformpage.css";
 import {Header} from "../Components/Header.jsx";
+import {toast} from "react-toastify";
 
 export const ContactFormPage = () => {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [content, setContent] = useState("");
-  const [success, setSuccess] = useState(false);
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -22,16 +22,41 @@ export const ContactFormPage = () => {
         },
       );
 
-      if (response.status === 200) {
-        setSuccess(true);
-        console.log("Works");
+      if (response.status === 201) {
+        toast.success('Message sent', {
+          position: "top-center",
+          autoClose: 5000,
+          hideProgressBar: true,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "dark",
+        });
       } else {
-        setSuccess(false);
-        console.log("Works");
+        toast.error('Failed to send message!', {
+          position: "top-center",
+          autoClose: 5000,
+          hideProgressBar: true,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "dark",
+        });
 
       }
-    } catch (error) {
-      console.log(error);
+    } catch (e) {
+      toast.error('Error!', {
+        position: "top-center",
+        autoClose: 5000,
+        hideProgressBar: true,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "dark",
+      });
     }
   };
 
@@ -59,7 +84,6 @@ export const ContactFormPage = () => {
           <div>
             <button type="submit">Send Message</button>
           </div>
-          {success && <p>Message sent successfully!</p>}
         </form>
     </div>
   );
