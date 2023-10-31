@@ -1,14 +1,14 @@
 from abc import abstractmethod, ABC
-from typing import List, Dict, Optional
+from typing import List, Optional, Dict, Any
 from ...scraper import ParsedOffer
 
 
 class Process(ABC):
     def __init__(self):
-        self.parsed_data: List[ParsedOffer] = []
+        self.processed_data: List[ParsedOffer] = []
 
     @abstractmethod
-    def parse_html(self, html: List[Optional[str]]) -> None:
+    def parse_html(self, html: List[Optional[str]] | Optional[str]) -> Dict[str, Any]:
         pass
 
     @abstractmethod
