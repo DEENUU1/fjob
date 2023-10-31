@@ -5,7 +5,7 @@ from .localization import Localization
 from .params_data import ParamsData
 import requests
 from ...utils.delete_html_tags import delete_html_tags
-from ...normalize import Normalize
+from fjob.scrapers.utils.normalize import Normalize
 from ...scraper import (
     Scraper,
     ParsedOffer,
