@@ -2,7 +2,6 @@ from .scrapers.olx.olx import OLX
 from celery import shared_task
 import logging
 
-
 logging.basicConfig(
     filename="../logs.log",
     level=logging.INFO,

@@ -1,5 +1,5 @@
 from abc import abstractmethod, ABC
-from ..models import PageContent
+from ...models import PageContent
 import logging
 
 
@@ -20,12 +20,13 @@ class GetContentStrategy(ABC):
     - __len__: Returns the length of the content.
     """
 
-    def __init__(self, website: str):
+    def __init__(self, website: str, base_url: str):
         self.data = []
         self.website = website
+        self.base_url = base_url
 
     @abstractmethod
-    def fetch_content(self) -> None:
+    def fetch_content(self):
         pass
 
     def save_to_db(self) -> bool:

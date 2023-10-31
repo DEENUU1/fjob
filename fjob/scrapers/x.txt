@@ -1,0 +1,1027 @@
+JJIT
+
+from selenium import webdriver
+from selenium.webdriver.common.by import By
+import time
+from typing import List, Optional
+from bs4 import BeautifulSoup
+from ..scraper import (
+    ParsedSalary,
+    ParsedLocalization,
+    ParsedWebsite,
+    ParsedOffer,
+    ParsedExperienceLevel,
+    Scraper,
+)
+import logging
+
+logging.basicConfig(
+    filename="../logs.log",
+    level=logging.INFO,
+    format="%(asctime)s - %(levelname)s - %(message)s",
+)
+
+
+BASE_URL = "https://justjoin.it/all-locations/ux"
+PIXELS_TO_SCROLL = "500"
+
+
+class JJIT(Scraper):
+    def __init__(self, url: str = BASE_URL):
+        super().__init__(url)
+        self.data = []
+        self.driver = webdriver.Chrome()
+        self.driver.get(BASE_URL)
+
+    def fetch_data(self):
+        try:
+            last_height = 0
+            while True:
+                self.extract_job_offers()
+                self.driver.execute_script(f"window.scrollBy(0, {PIXELS_TO_SCROLL});")
+                time.sleep(1)
+
+                new_height = self.driver.execute_script("return window.scrollY")
+                if new_height == last_height:
+                    break
+                last_height = new_height
+        except Exception as e:
+            logging.error(f"Error occurred during scraping: {e}")
+
+    def extract_job_offers(self) -> None:
+        try:
+            elements = self.driver.find_elements(By.CLASS_NAME, "css-gfqoze")
+            for element in elements:
+                offer = {}
+
+                soup = BeautifulSoup(element.get_attribute("innerHTML"), "html.parser")
+                title_element = soup.find("h2", class_="css-r6vvd4")
+                url_element = soup.find("a", class_="css-4lqp8g")
+                salary_element = soup.find("div", class_="css-1qaewdq")
+                skill_elements = soup.find_all("div", class_="css-1am4i4o")
+                skills = [skill.text for skill in skill_elements]
+                localization_element = soup.find("div", class_="css-h3r3z8")
+
+                if title_element:
+                    offer["title"] = title_element.text
+                if url_element:
+                    offer["url"] = url_element.get("href")
+                if salary_element:
+                    offer["salary"] = salary_element.text
+                if skills:
+                    offer["skills"] = skills
+                if localization_element:
+                    offer["localization"] = localization_element.text
+
+                self.data.append(offer)
+        except Exception as e:
+            logging.error(f"Error occurred during extracting job offers: {e}")
+
+    @staticmethod
+    def process_salary(salary: str):
+        if "Undisclosed" in salary:
+            return None, None
+
+        if "-" in salary:
+            text = salary.split(" - ")
+            num1, num2 = text
+            return int(num1.replace(" ", "")), int(
+                num2.replace(" ", "").replace("PLN", "")
+            )
+        else:
+            return int(salary.replace("PLN", "").replace(" ", "")), None
+
+    @staticmethod
+    def get_currency(salary: str) -> Optional[str]:
+        if "PLN" in salary:
+            return "PLN"
+        else:
+            return None
+
+    def process_skills(self, idx: int) -> None:
+        skills = self.data[idx]["skills"]
+        if "New" in skills:
+            skills.remove("New")
+        return skills
+
+    def is_remote(self, skills: List[str], idx: int) -> bool:
+        if "remote" in skills:
+            self.data[idx]["skills"].remove("Fully remote")
+            return True
+        else:
+            return False
+
+    @staticmethod
+    def is_hybrid(title: str) -> bool:
+        if "hybrid" in title.lower():
+            return True
+        else:
+            return False
+
+    @staticmethod
+    def get_experience_level(skills: List[str]) -> List[Optional[str]]:
+        result = []
+        skills = "".join(skills).lower()
+        if "junior" in skills or "młodszy" in skills:
+            result.append("Junior")
+        if "intern" in skills or "internship" in skills or "stażysta" in skills:
+            result.append("Internship")
+        if "senior" in skills or "starszy" in skills or "expert" in skills:
+            result.append("Senior")
+        if "dyrektor" in skills or "direktor" in skills:
+            result.append("Director")
+        if "manager" in skills or "menedżer" in skills:
+            result.append("Manager")
+
+        return result
+
+    @staticmethod
+    def process_localization(localization: str) -> str:
+        if ", " in localization:
+            return localization.split(", ")[0]
+        else:
+            return localization
+
+    def parse_offer(self, json_data=None) -> List[Optional[ParsedOffer]]:
+        parsed_offer = []
+
+        if not self.data:
+            return parsed_offer
+
+        website = ParsedWebsite(name="JustJoinIT", url="https://justjoin.it")
+
+        try:
+            for idx, offer in enumerate(self.data):
+                salary_from, salary_to = self.process_salary(offer["salary"])
+                currency = self.get_currency(offer["salary"])
+                is_remote = self.is_remote(offer["skills"], idx)
+                skills = self.process_skills(idx)
+                experience_level = self.get_experience_level(offer["skills"])
+                localization_data = self.process_localization(offer["localization"])
+                is_hybrid = self.is_hybrid(offer["title"])
+
+                localization = ParsedLocalization(
+                    city=localization_data,
+                )
+
+                exp_levels = []
+                for exp in experience_level:
+                    exp_levels.append(ParsedExperienceLevel(name=exp))
+
+                salary = ParsedSalary(
+                    salary_from=salary_from,
+                    salary_to=salary_to,
+                    currency=currency,
+                    salary_schedule="Monthly",
+                    type="Netto",
+                )
+
+                parsed_offer.append(
+                    ParsedOffer(
+                        title=offer["title"],
+                        url=f"https://justjoin.it{offer['url']}",
+                        skills=skills,
+                        is_remote=is_remote,
+                        is_hybrid=is_hybrid,
+                        experience_level=exp_levels,
+                        salary=[salary],
+                        website=website,
+                        localizations=[localization],
+                    )
+                )
+
+        except Exception as e:
+            logging.error(f"Error occurred during parsing: {e}")
+
+        logging.info(f"Parsed {len(parsed_offer)} offers from justjoin.it")
+        return parsed_offer
+
+def jjit_task() -> None:
+    try:
+        jjit_scraper = jjit.JJIT()
+        jjit_scraper.fetch_data()
+        parsed_offer = jjit_scraper.parse_offer()
+        jjit_scraper.save_data(parsed_offer)
+
+    except Exception as e:
+        logging.error(f"Error occurred during scraping: {e}")
+
+
+
+NFJ
+
+
+from selenium import webdriver
+from bs4 import BeautifulSoup
+import time
+from ..chrome_driver import chrome_driver_configuration
+
+
+BASE_URL = "https://nofluffjobs.com/pl"
+driver = webdriver.Chrome(options=chrome_driver_configuration())
+categories = [
+    "backend",
+    "frontend",
+    "fullstack",
+    "mobile",
+    "embedded",
+    "artificial-intelligence",
+    "data",
+    "data",
+    "business-intelligence",
+    "business-analyst",
+    "product-management",
+    "testing",
+    "devops",
+    "sys-administrator",
+    "security",
+    "architecture",
+    "game-dev",
+    "project-manager",
+    "agile",
+    "design",
+    "support",
+    "erp",
+    "other",
+    "hr",
+    "marketing",
+    "sales",
+    "finance",
+    "office-administration",
+    "consulting",
+    "customer-service",
+]
+
+
+def get_page_content(category):
+    page = 1
+    data = []
+    while True:
+        url = f"{BASE_URL}/{category}?page={page}"
+        print(url)
+        # try:
+        driver.get(url)
+        # except urllib3.exceptions.MaxRetryError as e:
+        #     print(f"Error: {e}")
+        #     time.sleep(10)  # Wait and then retry
+        #     continue
+
+        html = driver.page_source
+        soup = BeautifulSoup(html, "html.parser")
+        jobs = soup.find("div", class_="list-container ng-star-inserted")
+
+        a_tag = soup.find("a")
+        if not a_tag:
+            break
+        if not jobs:
+            break
+        page += 1
+
+        if jobs:
+            data.append(jobs)
+        time.sleep(2)
+
+    # driver.quit()
+    return data
+
+
+def extract_job_offers(jobs):
+    if jobs:
+        job_list = jobs.find_all("a")
+        for job in job_list:
+            data = {}
+
+            job_url = job["href"]
+            title = job.find(
+                "h3",
+                class_="posting-title__position text-truncate color-main ng-star-inserted",
+            )
+            company = job.find(
+                "span",
+                class_="d-block posting-title__company text-truncate",
+            )
+            salary = job.find(
+                "span",
+                class_="text-truncate badgy salary tw-btn tw-btn-secondary-outline tw-btn-xs ng-star-inserted",
+            )
+            localization = job.find(
+                "span",
+                class_="tw-text-ellipsis tw-inline-block tw-overflow-hidden tw-whitespace-nowrap lg:tw-max-w-[100px] tw-text-right",
+            )
+            if title and company and salary and localization and job_url:
+                data["url"] = f"{BASE_URL}{job_url}"
+                data["title"] = title.text
+                data["company"] = company.text
+                data["salary"] = salary.text
+                data["localization"] = localization.text
+                print(data)
+
+
+for category in categories:
+    jobs = get_page_content(category)
+    for job in jobs:
+        extract_job_offers(job)
+
+
+
+PRACAPL
+
+from bs4 import BeautifulSoup
+import httpx
+from typing import List, Dict, Any, Optional, Tuple
+from ..scraper import (
+    Scraper,
+    ParsedOffer,
+    ParsedLocalization,
+    ParsedSalary,
+    ParsedWebsite,
+    ParsedExperienceLevel,
+)
+import logging
+
+
+logging.basicConfig(
+    filename="../logs.log",
+    level=logging.INFO,
+    format="%(asctime)s - %(levelname)s - %(message)s",
+)
+
+
+BASE_URL = f"https://www.praca.pl/oferty-pracy_"
+
+
+def get_max_page() -> int:
+    try:
+        response = httpx.get(f"{BASE_URL}1")
+        soup = BeautifulSoup(response.text, "html.parser")
+        pagination = soup.find("a", class_="pagination__item--last")
+        if pagination:
+            return int(pagination.text)
+        else:
+            return 1
+    except Exception as e:
+        logging.error(f"Error occurred during getting max page: {e}")
+
+    return 1
+
+
+class PracaPL(Scraper):
+    def __init__(self, max_page: int, url: str = BASE_URL):
+        super().__init__(url)
+        self.max_page = max_page
+        self.page = 1
+        self.extract_data_list = []
+
+    def fetch_data(self) -> Optional[str]:
+        try:
+            response = httpx.get(f"{BASE_URL}{self.page}")
+            return response.text
+        except Exception as e:
+            logging.error(f"Error occurred during fetching data: {e}")
+            return None
+
+    @staticmethod
+    def get_experience_levels(data: str) -> Optional[str]:
+        result = None
+
+        if not data:
+            return result
+
+        if "mid" in data:
+            result = "Mid"
+        if "senior" in data:
+            result = "Senior"
+        if "asystent" in data:
+            result = "Asystent"
+        if "pracownik fizyczny" in data:
+            result = "Pracownik fizyczny"
+        if "praktykant/stażysta" in data:
+            result = "Praktykant/stażysta"
+        if "asystent" in data:
+            result = "Asystent"
+        if "junuior" in data:
+            result = "Junior"
+        if "ekspert" in data:
+            result = "Ekspert"
+        if "kierownik/koordynator" in data:
+            result = "Kierownik/koordynator"
+        if "menedżer" in data:
+            result = "Menedżer"
+        if "dyrektor" in data:
+            result = "Dyrektor"
+        if "prezes" in data:
+            result = "Prezes"
+
+        return result
+
+    @staticmethod
+    def get_contract_type(data: str) -> Optional[str]:
+        result = None
+        if not data:
+            return result
+
+        if "umowa o prace" in data:
+            result = "Umowa o prace"
+        if "umowa o dzieło" in data:
+            result = "Umowa o dzieło"
+        if "umowa zlecenie" in data:
+            result = "Umowa zlecenie"
+        if "kontrakt B2B" in data:
+            result = "Kontrakt B2B"
+        if "umowa o pracę tymczasową" in data:
+            result = "Umowa o pracę tymczasową"
+        if "umowa agencyjna" in data:
+            result = "Umowa agencyjna"
+        if "umowa o staż/praktykę" in data:
+            result = "Umowa o staż/praktykę"
+        if "umowa na zastępstwo" in data:
+            result = "Umowa na zastępstwo"
+
+        return result
+
+    @staticmethod
+    def get_work_schedule(data: str) -> Optional[str]:
+        result = None
+        if not data:
+            return result
+
+        if "pełny etat" in data:
+            result = "Pełny etat"
+        if "część etatu" in data:
+            result = "Część etatu"
+        if "tymczasowa/dodatkowa" in data:
+            result = "Tymczasowa/dodatkowa"
+
+        return result
+
+    def extract_data(self, data: str) -> None:
+        if not data:
+            return
+
+        try:
+            soup = BeautifulSoup(data, "html.parser")
+            offers = soup.find_all("li", class_="listing__item")
+        except Exception as e:
+            logging.error(f"Error occurred during extracting data: {e}")
+            return None
+
+        try:
+            for offer in offers:
+                offer_data = {}
+
+                title_element = offer.find("a", class_="listing__title")
+                work_mode_element = offer.find("span", class_="listing__work-model")
+                localization_element = offer.find(
+                    "span", class_="listing__location-name"
+                )
+                employer_name_element = offer.find("a", class_="listing__employer-name")
+                employer_img_element = offer.find("img", class_="listing__logo")
+                details_element = offer.find("div", class_="listing__main-details")
+
+                if details_element:
+                    offer_data["details"] = details_element.text
+                if title_element:
+                    offer_data["title"] = title_element.text
+                    offer_data["url"] = title_element.get("href")
+                if work_mode_element:
+                    offer_data["work_mode"] = work_mode_element.text
+                if localization_element:
+                    offer_data["localization"] = localization_element.text
+                if employer_img_element:
+                    offer_data["employer_img"] = employer_img_element.get("src")
+                if employer_name_element:
+                    offer_data["employer_name"] = employer_name_element.text
+
+                self.extract_data_list.append(offer_data)
+        except Exception as e:
+            logging.error(f"Error occurred during extracting data: {e}")
+            return None
+
+    @staticmethod
+    def is_remote_hybrid(data: str) -> Tuple[bool, bool]:
+        if not data:
+            return False, False
+
+        hybrid = False
+        remote = False
+        if "hybrydowa" in data:
+            hybrid = True
+
+        if "zdalna" in data:
+            remote = True
+
+        return hybrid, remote
+
+    @staticmethod
+    def parse_localization(data: str) -> Optional[str]:
+        if not data:
+            return None
+
+        city = data.split()[0]
+        return city
+
+    def parse_offer(
+        self, data_list: List[Dict[str, Any]]
+    ) -> List[Optional[ParsedOffer]]:
+        parsed_offers = []
+        if not data_list:
+            return []
+
+        website = ParsedWebsite(name="Praca.pl", url="https://www.praca.pl")
+        try:
+            for data in data_list:
+                hybrid, remote = self.is_remote_hybrid(data.get("localization", ""))
+                localization = self.parse_localization(data.get("localization", ""))
+                experience_data = self.get_experience_levels(data.get("details", ""))
+                contract_type = self.get_contract_type(data.get("details", ""))
+                work_schedule = self.get_work_schedule(data.get("details", ""))
+
+                experience = ParsedExperienceLevel(name=experience_data)
+                salary = ParsedSalary(
+                    contract_type=contract_type, work_schedule=work_schedule
+                )
+                localization = ParsedLocalization(city=localization, country="Poland")
+
+                parsed_offers.append(
+                    ParsedOffer(
+                        title=data.get("title", ""),
+                        url=data.get("url", ""),
+                        company_name=data.get("employer_name", ""),
+                        company_logo=data.get("employer_img", ""),
+                        is_remote=remote,
+                        is_hybrid=hybrid,
+                        salary=[salary],
+                        website=website.url,
+                        localizations=[localization],
+                        experience_level=[experience],
+                    )
+                )
+        except Exception as e:
+            logging.error(f"Error occurred during parsing data: {e}")
+            return []
+        return parsed_offers
+
+    def pipeline(self) -> List[Optional[ParsedOffer]]:
+        try:
+            for i in range(1, self.max_page + 1):
+                fetched_data = self.fetch_data()
+                self.extract_data(fetched_data)
+                self.page += 1
+            logging.info(f"Parsed {len(self.extract_data_list)} offers from pracapl")
+            return self.parse_offer(self.extract_data_list)
+        except Exception as e:
+            logging.error(f"An error occurred while scraping data from pracapl {e}")
+            return []
+
+
+def pracapl_task() -> None:
+    try:
+        max_page = get_max_page()
+        pracapl_scraper = PracaPL(max_page=max_page)
+        data = pracapl_scraper.pipeline()
+        pracapl_scraper.save_data(data)
+
+    except Exception as e:
+        logging.error(f"Error occurred during scraping: {e}")
+
+
+
+
+PRACUJPL
+
+
+import logging
+from typing import Dict, Optional, Tuple, List
+from bs4 import BeautifulSoup
+
+import requests
+import re
+
+from ..scraper import (
+    Scraper,
+    ParsedOffer,
+    ParsedWebsite,
+    ParsedSalary,
+    ParsedLocalization,
+    ParsedExperienceLevel,
+)
+
+logging.basicConfig(
+    filename="../logs.log",
+    level=logging.INFO,
+    format="%(asctime)s - %(levelname)s - %(message)s",
+)
+
+
+class PracujPLIT(Scraper):
+    """
+    A scraper for the Pracuj.pl jobs board.
+    """
+
+    def __init__(self, url: str = "https://it.pracuj.pl/praca") -> None:
+        super().__init__(url)
+        self.max_page_number = None
+
+    def fetch_data(self) -> Optional[str]:
+        try:
+            response = requests.get(self.url)
+            response.raise_for_status()
+            return response.text
+        except Exception as e:
+            logging.error(f"Error occurred: {e}")
+        return None
+
+    @staticmethod
+    def get_max_page_number(data: str) -> Optional[int]:
+        if not data:
+            return None
+
+        soup = BeautifulSoup(data, "html.parser")
+        max_page_element = soup.find(
+            "span", {"data-test": "top-pagination-max-page-number"}
+        )
+        if max_page_element:
+            return int(max_page_element.text)
+        return None
+
+    def run(self) -> None:
+        data = self.fetch_data()
+        if data:
+            self.max_page_number = self.get_max_page_number(data)
+
+        if self.max_page_number:
+            for page in range(1, self.max_page_number + 1):
+                self.url = f"https://it.pracuj.pl/praca?pn={page}"
+                data = self.fetch_data()
+                if data:
+                    parsed_data = self.parse_offer(data)
+                    print(parsed_data)
+                    # self.save_data(parsed_data)
+                else:
+                    logging.info("No data received")
+
+    @staticmethod
+    def get_experience_level(data: List[str]) -> Optional[str]:
+        if not data:
+            return None
+
+        if "Mid" in data:
+            return "Mid"
+        if "Senior" in data:
+            return "Senior"
+        if "Junior" in data:
+            return "Junior"
+        if "Praktykant" in data:
+            return "Praktykant"
+        if "Stażysta" in data:
+            return "Stażysta"
+
+    @staticmethod
+    def is_remote(data: List[str]) -> bool:
+        if "Praca zdalna" in data:
+            return True
+        return False
+
+    @staticmethod
+    def is_hybrid(data: List[str]) -> bool:
+        if "Praca hybrydowa" in data:
+            return True
+        return False
+
+    @staticmethod
+    def get_contract_type(data: List[str]) -> List[Optional[str]]:
+        result = []
+        if not data:
+            return []
+
+        if "Umowa o pracę" in data:
+            result.append("Umowa o pracę")
+        elif "Umowa zlecenie" in data:
+            result.append("Umowa zlecenie")
+        elif "Umowa o dzieło" in data:
+            result.append("Umowa o dzieło")
+        elif "Kontrakt B2B" in data:
+            result.append("Kontrakt B2B")
+        elif "Umowa o zastępstwo" in data:
+            result.append("Umowa o zastępstwo")
+        elif "Umowa agencyjna" in data:
+            result.append("Umowa agencyjna")
+        elif "Umowa o pracę tymczasową" in data:
+            result.append("Umowa o pracę tymczasową")
+        elif "Umowa o staż / praktyki" in data:
+            result.append("Umowa o staż / praktyki")
+
+        return result
+
+    @staticmethod
+    def parse_localization(text: str) -> Optional[str]:
+        result = None
+        if not text:
+            return None
+
+        if "localizacji":
+            result = None
+
+        split_data = text.split()
+        if len(split_data) == 1:
+            result = text
+        else:
+            result = split_data[0]
+
+        return result
+
+    def parse_offer(self, data: str) -> List[ParsedOffer]:
+        parsed_data = []
+
+        soup = BeautifulSoup(data, "html.parser")
+        offers_section = soup.find("div", {"data-test": "section-offers"})
+        if offers_section:
+            offers = offers_section.find_all(
+                "div", class_="listing-it_bp811tr listing-it_po9665q"
+            )
+
+            if offers:
+                for offer in offers:
+                    title = None
+                    additional_data = None
+                    url = None
+                    parsed_localization = None
+                    skills_list = None
+                    company_logo = None
+                    company_name = None
+
+                    title_element = offer.find(
+                        "a", class_="listing-it_o1bdr2ew listing-it_n194fgoq"
+                    )
+                    company_element = offer.find("img", class_="listing-it_ia9ocxs")
+                    skills_container = offer.find(
+                        "div", {"data-test": "technologies-list"}
+                    )
+                    additional_data_container = offer.find(
+                        "ul", class_="listing-it_b1ef77ng"
+                    )
+                    localization_element = offer.find(
+                        "h5", {"date-test": "text-region"}
+                    )
+
+                    if localization_element:
+                        localization_text = localization_element.text
+                        parsed_localization = self.parse_localization(localization_text)
+
+                    if additional_data_container:
+                        additional_data_list = additional_data_container.find_all("li")
+                        if additional_data_list:
+                            additional_data = [
+                                data.text for data in additional_data_list
+                            ]
+
+                    if skills_container:
+                        skills = skills_container.find_all(
+                            "span", {"data-test": "technologies-item"}
+                        )
+                        if skills:
+                            skills_list = [skill.text for skill in skills]
+
+                    if company_element:
+                        company_logo = company_element.get("src")
+                        company_name = company_element.get("alt")
+                    if title_element:
+                        url = title_element.get("href")
+                        title = title_element.text
+
+                    salaries = []
+                    if additional_data:
+                        contracts = self.get_contract_type(additional_data)
+                        for contract in contracts:
+                            salaries.append(Salary(contract_type=contract))
+
+                    parsed_data.append(
+                        ParsedOffer(
+                            title=title if title else None,
+                            url=url if url else None,
+                            remote=self.is_remote(additional_data)
+                            if additional_data
+                            else None,
+                            hybrid=self.is_hybrid(additional_data)
+                            if additional_data
+                            else None,
+                            country="PL",
+                            additional_data=additional_data
+                            if additional_data
+                            else None,
+                            salary=salaries if salaries else None,
+                            city=parsed_localization if parsed_localization else None,
+                            skills=skills_list if skills_list else None,
+                            company_name=company_name if company_name else None,
+                            company_logo=company_logo if company_logo else None,
+                            experience_level=self.get_experience_level(additional_data)
+                            if additional_data
+                            else None,
+                        )
+                    )
+
+        return parsed_data
+
+
+
+
+@shared_task()
+def pracujpl_task() -> List[Optional[Dict[str, Any]]]:
+    try:
+        scraper = PracujPLIT()
+        scraper.run()
+    except Exception as e:
+        logging.error(f"Error occurred during scraping: {e}")
+        return []
+
+
+
+THEPROTOCOL
+
+
+import httpx
+from bs4 import BeautifulSoup
+from ..scraper import (
+    Scraper,
+    ParsedOffer,
+    ParsedLocalization,
+    ParsedSalary,
+    ParsedWebsite,
+    ParsedExperienceLevel,
+)
+from typing import List, Dict, Any, Optional
+import logging
+
+
+logging.basicConfig(
+    filename="../logs.log",
+    level=logging.INFO,
+    format="%(asctime)s - %(levelname)s - %(message)s",
+)
+
+
+BASE_URL = "https://theprotocol.it/?pageNumber="
+MAX_PAGE_NUM = 54
+
+
+class TheProtocol(Scraper):
+    def __init__(self):
+        super().__init__(url=BASE_URL)
+        self.page_num = 1
+        self.data = []
+
+    def fetch_data(self) -> Optional[str]:
+        try:
+            response = httpx.get(f"{BASE_URL}{self.page_num}")
+            return response.text
+        except Exception as e:
+            logging.error(f"Error occurred during fetching data: {e}")
+            return None
+
+    def parse_data(self, response: str) -> None:
+        try:
+            soup = BeautifulSoup(response, "html.parser")
+            job_cards = soup.find_all("a", class_="anchorClass_a6of9et")
+        except Exception as e:
+            logging.error(f"Error occurred during extracting data: {e}")
+            return None
+
+        try:
+            for card in job_cards:
+                offer_data = {}
+
+                title = card.find("h2", class_="titleText_t1280ha4")
+                url = card.get("href")
+                company_logo = card.find("img")
+                details = card.find_all("div", class_="rootClass_rpqnjlt")
+                skill_divs = card.find_all(
+                    "div", {"data-test": "chip-expectedTechnology"}
+                )
+                skills = []
+                if skill_divs:
+                    for div in skill_divs:
+                        spans = div.find_all("span", class_="Label_l1fs6hs4")
+                        for span in spans:
+                            skills.append(span.text)
+                localization = card.find("div", {"data-test": "text-workplaces"})
+                d = {}
+                for idx, detail in enumerate(details):
+                    if idx == 0:
+                        d["company_name"] = detail
+
+                    if idx == 1:
+                        d["work_mode"] = detail
+                if title:
+                    offer_data["title"] = title.text
+                if company_logo:
+                    offer_data["company_logo"] = company_logo["src"]
+                if d.get("company_name", None):
+                    offer_data["company_name"] = d["company_name"].text
+                if d.get("work_mode", None):
+                    offer_data["work_mode"] = d["work_mode"].text
+                if skills:
+                    offer_data["skills"] = skills
+                if localization:
+                    offer_data["localization"] = localization.text
+                if url:
+                    offer_data["url"] = url
+                self.data.append(offer_data)
+        except Exception as e:
+            logging.error(f"Error occurred during parsing data: {e}")
+            return None
+
+    @staticmethod
+    def get_experience_level(title: str) -> List[Optional[str]]:
+        result = []
+        skills = title.lower()
+
+        if "junior" in skills or "młodszy" in skills:
+            result.append("Junior")
+        if "intern" in skills or "internship" in skills or "stażysta" in skills:
+            result.append("Internship")
+        if "senior" in skills or "starszy" in skills or "expert" in skills:
+            result.append("Senior")
+        if "dyrektor" in skills or "direktor" in skills:
+            result.append("Director")
+        if "manager" in skills or "menedżer" in skills:
+            result.append("Manager")
+
+        return result
+
+    @staticmethod
+    def is_remote(title: str) -> bool:
+        title = title.lower()
+        if "remote" in title or "zdalny" in title:
+            return True
+        return False
+
+    @staticmethod
+    def is_hybrid(title: str) -> bool:
+        if "hybrid" in title.lower() or "hybryd" in title.lower():
+            return True
+        else:
+            return False
+
+    def parse_offer(self, data: List[Dict[str, Any]]) -> List[Optional[ParsedOffer]]:
+        parsed_offers = []
+
+        website = ParsedWebsite(name="theprotocol.it", url="https://theprotocol.it/")
+
+        try:
+            for offer in data:
+                experience_levels = self.get_experience_level(offer.get("title", None))
+                is_remote = self.is_remote(offer.get("title", None))
+                is_hybrid = self.is_hybrid(offer.get("title", None))
+
+                exp_levels = []
+                if experience_levels:
+                    for exp in experience_levels:
+                        exp_levels.append(ParsedExperienceLevel(name=exp))
+
+                localization = ParsedLocalization(
+                    country="Poland", city=offer.get("localization", None)
+                )
+
+                parsed_offers.append(
+                    ParsedOffer(
+                        title=offer.get("title", None),
+                        company_name=offer.get("company_name", None),
+                        company_logo=offer.get("company_logo", None),
+                        skills=offer.get("skills", None),
+                        url=f"{'https://theprotocol.it/'}{offer.get('url', None)}",
+                        is_hybrid=is_hybrid,
+                        is_remote=is_remote,
+                        experience_level=exp_levels,
+                        website=website,
+                        localizations=[localization],
+                    )
+                )
+        except Exception as e:
+            logging.error(f"Error occurred during parsing offer: {e}")
+            return []
+
+        return parsed_offers
+
+    def pipeline(self) -> List[Optional[ParsedOffer]]:
+        try:
+            for i in range(1, MAX_PAGE_NUM):
+                response = self.fetch_data()
+                self.parse_data(response)
+                self.page_num += 1
+
+            logging.info(f"Parsed {len(self.data)} offers from theprotocol.it")
+            return self.parse_offer(self.data)
+        except Exception as e:
+            logging.error(f"Error occurred during pipeline: {e}")
+            return []
+
+
+
+def theprotocol_task() -> None:
+    try:
+        theprotocol_scraper = TheProtocol()
+        data = theprotocol_scraper.pipeline()
+        theprotocol_scraper.save_data(data)
+
+    except Exception as e:
+        logging.error(f"Error occurred during scraping: {e}")
