@@ -1,6 +1,7 @@
 from .scrapers.theprotocol import get_content as get_content_theprotocol
 from .scrapers.justjoinit import get_content as get_content_justjoinit
 from .scrapers.pracapl import get_content as get_content_pracapl
+from .scrapers.pracujpl import get_content as get_content_pracujpl
 import logging
 
 
@@ -49,3 +50,18 @@ def run_pracapl():
 
     except Exception as e:
         logging.error(f"Failed to run pracapl scraper: {e}")
+
+
+def run_pracujpl():
+    try:
+        # max_page = get_content_pracujpl.get_max_page_number()
+        max_page = 3
+        scraper = get_content_pracujpl.GetPracujPLContent(max_page)
+        scraper.fetch_content()
+        logging.info(
+            f"Successfully fetched content for {scraper.website} get {scraper.__len__()} elements"
+        )
+        scraper.save_to_db()
+
+    except Exception as e:
+        logging.error(f"Failed to run pracujpl scraper: {e}")
