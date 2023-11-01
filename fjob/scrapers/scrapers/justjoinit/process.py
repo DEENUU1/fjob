@@ -24,6 +24,10 @@ class JJITProcess(Process):
         skill_elements = soup.find_all("div", class_="css-1am4i4o")
         skills = [skill.text for skill in skill_elements]
         localization_element = soup.find("div", class_="css-h3r3z8")
+        company_logo_div = soup.find("div", class_="css-xlz5cy")
+        company_logo = company_logo_div.find("img")
+        company_name_div = soup.find("div", class_="css-fmb6qw")
+        company_name = company_name_div.find("span")
 
         if title_element:
             self.parsed_data["title"] = title_element.text
@@ -35,6 +39,10 @@ class JJITProcess(Process):
             self.parsed_data["skills"] = skills
         if localization_element:
             self.parsed_data["localization"] = localization_element.text
+        if company_logo:
+            self.parsed_data["company_logo"] = company_logo["src"]
+        if company_name:
+            self.parsed_data["company_name"] = company_name.text
 
     @staticmethod
     def process_salary(salary: str) -> Tuple[Optional[int], Optional[int]]:
@@ -81,6 +89,8 @@ class JJITProcess(Process):
         salary = self.parsed_data.get("salary")
         skills = self.parsed_data.get("skills")
         localization = self.parsed_data.get("localization")
+        company_logo = self.parsed_data.get("company_logo")
+        company_name = self.parsed_data.get("company_name")
 
         salary_from, salary_to = self.process_salary(salary)
         is_remote = self.is_remote(skills, title)
@@ -105,6 +115,8 @@ class JJITProcess(Process):
             title=title,
             url=f"https://justjoin.it{url}",
             skills=processed_skills,
+            company_logo=company_logo,
+            company_name=company_name,
             is_remote=is_remote,
             is_hybrid=is_hybrid,
             experience_level=experiences_obj,
