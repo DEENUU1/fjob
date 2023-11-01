@@ -2,7 +2,8 @@ from ..strategy_abstract.get_content import GetContentStrategy
 import logging
 import httpx
 from bs4 import BeautifulSoup
-
+from selenium import webdriver
+from selenium.webdriver.common.by import By
 
 logging.basicConfig(
     filename="../logs.log",
@@ -35,9 +36,19 @@ class GetPracujPLContent(GetContentStrategy):
     def fetch_content(self) -> None:
         for _ in range(self.current_page, self.max_page):
             try:
-                response = httpx.get(f"{self.base_url}{self.current_page}")
-                self.data.append(response.text)
+                driver = webdriver.Chrome()
+                url = f"{self.base_url}?pn={self.current_page}"
+                print(url)
+                driver.get(url)
+
+                element = driver.find_element(
+                    By.XPATH, "//div[@data-test='section-offers']"
+                )
+                print(element)
+                self.data.append(element.get_attribute("outerHTML"))
+
                 self.current_page += 1
+                driver.quit()
                 logging.info(
                     f"Fetched content from {self.website} - page: {self.current_page}"
                 )
