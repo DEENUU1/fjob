@@ -1,4 +1,7 @@
-from .scrapers.theprotocol import get_content as get_content_theprotocol
+from .scrapers.theprotocol import (
+    get_content as get_content_theprotocol,
+    process as process_the_protocol,
+)
 from .scrapers.justjoinit import (
     get_content as get_content_justjoinit,
     process as process_justjoinit,
@@ -22,12 +25,22 @@ logging.basicConfig(
 
 def run_the_protocol():
     try:
-        scraper = get_content_theprotocol.GetTheProtocolContent()
-        scraper.fetch_content()
-        logging.info(
-            f"Successfully fetched content for {scraper.website} get {scraper.__len__()} elements"
-        )
-        scraper.save_to_db()
+        # scraper = get_content_theprotocol.GetTheProtocolContent()
+        # scraper.fetch_content()
+        # logging.info(
+        #     f"Successfully fetched content for {scraper.website} get {scraper.__len__()} elements"
+        # )
+        # scraper.save_to_db()
+
+        page_content = PageContent.objects.filter(
+            website="TheProtocol", is_parsed=False
+        ).all()
+        for content in page_content:
+            process = process_the_protocol.TheProtocolProcess()
+            process.parse_html(content.content)
+            processed_data = process.process()
+            for data in processed_data:
+                process.save_to_db(data)
 
     except Exception as e:
         logging.error(f"Failed to run the protocol scraper: {e}")
@@ -78,13 +91,13 @@ def run_nfj():
 
 def run_pracapl():
     try:
-        # max_page = get_content_pracapl.get_max_page()
-        # scraper = get_content_pracapl.GetPracaPLContent(max_page)
-        # scraper.fetch_content()
-        # logging.info(
-        #     f"Successfully fetched content for {scraper.website} get {scraper.__len__()} elements"
-        # )
-        # scraper.save_to_db()
+        max_page = get_content_pracapl.get_max_page()
+        scraper = get_content_pracapl.GetPracaPLContent(max_page)
+        scraper.fetch_content()
+        logging.info(
+            f"Successfully fetched content for {scraper.website} get {scraper.__len__()} elements"
+        )
+        scraper.save_to_db()
 
         page_content = PageContent.objects.filter(
             website="PracaPL", is_parsed=False

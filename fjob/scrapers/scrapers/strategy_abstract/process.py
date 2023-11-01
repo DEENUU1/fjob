@@ -112,8 +112,12 @@ class Process(ABC):
 
     @staticmethod
     def get_experience_level(text: str) -> List[Optional[str]]:
-        text = text.lower()
         result = []
+        if not text:
+            return result
+
+        text = text.lower()
+
         data = {
             "Intern": [
                 "intern",
