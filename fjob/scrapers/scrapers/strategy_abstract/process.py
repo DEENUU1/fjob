@@ -70,6 +70,7 @@ class Process(ABC):
         localizations = []
         if parsed_offer.localizations:
             for loc in parsed_offer.localizations:
+                print(loc)
                 localization = Localization(
                     country=loc.country,
                     city=loc.city,
@@ -114,13 +115,23 @@ class Process(ABC):
         text = text.lower()
         result = []
         data = {
-            "Intern": ["intern", "stażysta", "staż"],
-            "Junior": ["młodszy", "junior"],
+            "Intern": [
+                "intern",
+                "stażysta",
+                "staż",
+                "praktykant",
+                "stażysta",
+                "praktykant/stażysta",
+            ],
+            "Junior": ["młodszy", "junior", "młodszy specjalista"],
+            "Expert": ["ekspert", "expert"],
+            "Assistant": ["asystent", "asystentka"],
             "Mid": ["mid", "regular"],
             "Senior": ["senior", "starszy"],
-            "Lead": ["lead", "kierownik"],
-            "Director": ["dyrektor"],
-            "Manager": ["manager"],
+            "Lead": ["lead", "kierownik", "kierownik/koordynator", "koordynator"],
+            "Director": ["dyrektor", "director"],
+            "Manager": ["manager", "menadżer"],
+            "Worker": ["pracownik fizyczny", "worker"],
         }
 
         for p, f in data.items():

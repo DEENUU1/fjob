@@ -3,7 +3,10 @@ from .scrapers.justjoinit import (
     get_content as get_content_justjoinit,
     process as process_justjoinit,
 )
-from .scrapers.pracapl import get_content as get_content_pracapl
+from .scrapers.pracapl import (
+    get_content as get_content_pracapl,
+    process as process_pracapl,
+)
 from .scrapers.pracujpl import get_content as get_content_pracujpl
 from .scrapers.nfj import get_content as get_content_nfj, process as process_nfj
 import logging
@@ -75,13 +78,23 @@ def run_nfj():
 
 def run_pracapl():
     try:
-        max_page = get_content_pracapl.get_max_page()
-        scraper = get_content_pracapl.GetPracaPLContent(max_page)
-        scraper.fetch_content()
-        logging.info(
-            f"Successfully fetched content for {scraper.website} get {scraper.__len__()} elements"
-        )
-        scraper.save_to_db()
+        # max_page = get_content_pracapl.get_max_page()
+        # scraper = get_content_pracapl.GetPracaPLContent(max_page)
+        # scraper.fetch_content()
+        # logging.info(
+        #     f"Successfully fetched content for {scraper.website} get {scraper.__len__()} elements"
+        # )
+        # scraper.save_to_db()
+
+        page_content = PageContent.objects.filter(
+            website="PracaPL", is_parsed=False
+        ).all()
+        for content in page_content:
+            process = process_pracapl.PracaPLProcess()
+            process.parse_html(content.content)
+            processed_data = process.process()
+            for data in processed_data:
+                process.save_to_db(data)
 
     except Exception as e:
         logging.error(f"Failed to run pracapl scraper: {e}")
