@@ -1,16 +1,24 @@
 from ..strategy_abstract.process import Process
-from typing import List, Optional, Dict, Any
+from typing import List, Optional, Dict, Any, Tuple
 from bs4 import BeautifulSoup
-from ...scraper import ParsedOffer
+from ...scraper import (
+    ParsedOffer,
+    ParsedSalary,
+    ParsedWebsite,
+    ParsedLocalization,
+    ParsedContractType,
+    ParsedWorkSchedule,
+    ParsedExperienceLevel,
+)
 
 
 class JJITProcess(Process):
     def __init__(self):
         super().__init__()
+        self.parsed_data = {}
 
-    def parse_html(self, html: Optional[str]) -> Dict[str, Any]:
+    def parse_html(self, html: Optional[str]) -> None:
         soup = BeautifulSoup(html, "html.parser")
-        parsed_data = {}
 
         title_element = soup.find("h2", class_="css-16gpjqw")
         url_element = soup.find("a", class_="css-4lqp8g")
@@ -20,20 +28,90 @@ class JJITProcess(Process):
         localization_element = soup.find("div", class_="css-h3r3z8")
 
         if title_element:
-            parsed_data["title"] = title_element.text
+            self.parsed_data["title"] = title_element.text
         if url_element:
-            parsed_data["url"] = url_element["href"]
+            self.parsed_data["url"] = url_element["href"]
         if salary_element:
-            parsed_data["salary"] = salary_element.text
+            self.parsed_data["salary"] = salary_element.text
         if skills:
-            parsed_data["skills"] = skills
+            self.parsed_data["skills"] = skills
         if localization_element:
-            parsed_data["localization"] = localization_element.text
+            self.parsed_data["localization"] = localization_element.text
 
-        return parsed_data
+    @staticmethod
+    def process_salary(salary: str) -> Tuple[Optional[int], Optional[int]]:
+        if "Undisclosed" in salary:
+            return None, None
+        salary = salary.replace("PLN", "")
 
-    def clean_data(self) -> None:
-        pass
+        if "-" in salary:
+            text = salary.split("-")
+            num1, num2 = text
+            return int(num1.replace(" ", "")), int(num2.replace(" ", ""))
+        else:
+            return int(salary.replace(" ", "")), None
 
-    def normalize(self) -> None:
-        pass
+    @staticmethod
+    def process_skills(skills: List[str]) -> List[str]:
+        to_delete = ["New", "Fully remote"]
+        return [element for element in skills if element not in to_delete]
+
+    @staticmethod
+    def is_remote(skills: List[str], title: str) -> bool:
+        if "remote" in skills or "remote" in title.lower():
+            return True
+        return False
+
+    @staticmethod
+    def is_hybrid(title: str) -> bool:
+        if "hybrid" in title.lower():
+            return True
+        return False
+
+    @staticmethod
+    def process_localization(localization: Optional[str]) -> Optional[str]:
+        if not localization:
+            return None
+        if ", " in localization:
+            return localization.split(", ")[0]
+        else:
+            return localization
+
+    def process(self) -> ParsedOffer:
+        title = self.parsed_data.get("title")
+        url = self.parsed_data.get("url")
+        salary = self.parsed_data.get("salary")
+        skills = self.parsed_data.get("skills")
+        localization = self.parsed_data.get("localization")
+
+        salary_from, salary_to = self.process_salary(salary)
+        is_remote = self.is_remote(skills, title)
+        is_hybrid = self.is_hybrid(title)
+        processed_skills = self.process_skills(skills)
+        processed_localization = self.process_localization(localization)
+        currency = self.get_currency(salary)
+        experiences = self.get_experience_level(title)
+        website = ParsedWebsite(name="JustJoinIT", url="https://justjoin.it/")
+        localization = ParsedLocalization(city=processed_localization)
+        experiences_obj = []
+        for exp in experiences:
+            experiences_obj.append(ParsedExperienceLevel(name=exp))
+        salary = ParsedSalary(
+            salary_from=salary_from,
+            salary_to=salary_to,
+            currency=currency,
+            salary_schedule=1,
+            type=2,
+        )
+        offer = ParsedOffer(
+            title=title,
+            url=f"https://justjoin.it{url}",
+            skills=processed_skills,
+            is_remote=is_remote,
+            is_hybrid=is_hybrid,
+            experience_level=experiences_obj,
+            salary=[salary],
+            website=website,
+            localizations=[localization],
+        )
+        return offer

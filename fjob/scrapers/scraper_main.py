@@ -32,20 +32,21 @@ def run_the_protocol():
 
 def run_justjoinit():
     try:
-        # scraper = get_content_justjoinit.GetJustJoinITContent()
-        # scraper.fetch_content()
-        # logging.info(
-        #     f"Successfully fetched content for {scraper.website} get {scraper.__len__()} elements"
-        # )
-        # scraper.save_to_db()
+        scraper = get_content_justjoinit.GetJustJoinITContent()
+        scraper.fetch_content()
+        logging.info(
+            f"Successfully fetched content for {scraper.website} get {scraper.__len__()} elements"
+        )
+        scraper.save_to_db()
 
-        process = process_justjoinit.JJITProcess()
         page_content = PageContent.objects.filter(
             website="JustJoinIT", is_parsed=False
         ).all()
         for content in page_content:
-            parse = process.parse_html(content.content)
-            print(parse)
+            process = process_justjoinit.JJITProcess()
+            process.parse_html(content.content)
+            processed_data = process.process()
+            process.save_to_db(processed_data)
 
     except Exception as e:
         logging.error(f"Failed to run justjoinit  scraper: {e}")
