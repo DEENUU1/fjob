@@ -22,7 +22,7 @@ class Process(ABC):
         pass
 
     @abstractmethod
-    def process(self) -> ParsedOffer:
+    def process(self) -> ParsedOffer | List[Optional[ParsedOffer]]:
         pass
 
     @staticmethod

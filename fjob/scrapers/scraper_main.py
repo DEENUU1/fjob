@@ -5,7 +5,7 @@ from .scrapers.justjoinit import (
 )
 from .scrapers.pracapl import get_content as get_content_pracapl
 from .scrapers.pracujpl import get_content as get_content_pracujpl
-from .scrapers.nfj import get_content as get_content_nfj
+from .scrapers.nfj import get_content as get_content_nfj, process as process_nfj
 import logging
 from .models import PageContent
 
@@ -52,6 +52,27 @@ def run_justjoinit():
         logging.error(f"Failed to run justjoinit  scraper: {e}")
 
 
+def run_nfj():
+    try:
+        scraper = get_content_nfj.GetNFJContent()
+        scraper.fetch_content()
+        logging.info(
+            f"Successfully fetched content for {scraper.website} get {scraper.__len__()} elements"
+        )
+        scraper.save_to_db()
+
+        page_content = PageContent.objects.filter(website="NFJ", is_parsed=False).all()
+        for content in page_content:
+            process = process_nfj.NFJProcess()
+            process.parse_html(content.content)
+            processed_data = process.process()
+            for pd in processed_data:
+                process.save_to_db(pd)
+
+    except Exception as e:
+        logging.error(f"Failed to run nfj scraper: {e}")
+
+
 def run_pracapl():
     try:
         max_page = get_content_pracapl.get_max_page()
@@ -78,16 +99,3 @@ def run_pracujpl():
 
     except Exception as e:
         logging.error(f"Failed to run pracujpl scraper: {e}")
-
-
-def run_nfj():
-    try:
-        scraper = get_content_nfj.GetNFJContent()
-        scraper.fetch_content()
-        logging.info(
-            f"Successfully fetched content for {scraper.website} get {scraper.__len__()} elements"
-        )
-        scraper.save_to_db()
-
-    except Exception as e:
-        logging.error(f"Failed to run nfj scraper: {e}")
