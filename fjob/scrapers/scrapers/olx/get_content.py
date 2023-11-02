@@ -3,7 +3,7 @@ import logging
 import requests
 from typing import Optional
 import json
-
+from ...models import PageContent
 
 logging.basicConfig(
     filename="../logs.log",
@@ -29,7 +29,7 @@ class GetOLXContent(GetContentStrategy):
                         if not json_data:
                             break
 
-                        self.data.append(json_data)
+                        PageContent.objects.create(website="OLX", content=json_data)
 
                         self.base_url = self.get_next_page_url(json_data)
                 except Exception as e:

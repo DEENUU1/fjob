@@ -18,7 +18,9 @@ class Process(ABC):
         self.processed_data: List[ParsedOffer] = []
 
     @abstractmethod
-    def parse_html(self, html: List[Optional[str]] | Optional[str]) -> Dict[str, Any]:
+    def parse_html(
+        self, html: List[Optional[str]] | Optional[str] | Dict[str, Any]
+    ) -> Dict[str, Any]:
         pass
 
     @abstractmethod
