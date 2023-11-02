@@ -1,13 +1,5 @@
-import json
-import logging
-from typing import Dict, List, Optional, Any
-from .localization import Localization
-from .params_data import ParamsData
-import requests
-from ...utils.delete_html_tags import delete_html_tags
-from ...normalize import Normalize
+from ..strategy_abstract.process import Process
 from ...scraper import (
-    Scraper,
     ParsedOffer,
     ParsedSalary,
     ParsedWebsite,
@@ -16,6 +8,12 @@ from ...scraper import (
     ParsedContractType,
     ParsedWorkSchedule,
 )
+from typing import Dict, List, Optional, Any
+from .localization import Localization
+from .params_data import ParamsData
+from ...utils.delete_html_tags import delete_html_tags
+import logging
+
 
 logging.basicConfig(
     filename="../logs.log",
@@ -24,31 +22,16 @@ logging.basicConfig(
 )
 
 
-normalize = Normalize()
+class OLXProcess(Process):
+    def __init__(self):
+        super().__init__()
+        self.json_data = {}
 
-
-class OLX(Scraper):
-    """
-    A scraper for the OLX jobs board.
-    """
-
-    def __init__(
-        self,
-        url: str = "https://www.olx.pl/api/v1/offers?offset=0&limit=40&category_id=4&filter_refiners=spell_checker&sl=18ae25cfa80x3938008f",
-    ):
-        super().__init__(url)
-        self.params = {
-            "offset": "0",
-            "sort_by": "created_at:desc",
-            "limit": "50",
-            "category_id": "4",
-        }
+    def parse_html(self, html) -> None:
+        self.json_data = html
 
     @staticmethod
-    def get_localization_data(localization: Dict[str, Dict[str, str]]) -> Localization:
-        """
-        Extract localization data from json file
-        """
+    def get_localization_data(localization: Dict[str, Dict[str, Any]]) -> Localization:
         region = None
         city = None
 
@@ -122,80 +105,90 @@ class OLX(Scraper):
             salary_schedule=salary_schedule,
         )
 
-    def fetch_data(self) -> List[Dict[str, str]] | None:
-        try:
-            r = requests.get(self.url)
-            r.raise_for_status()
-            return json.loads(r.content)
-        except requests.exceptions.HTTPError as http_err:
-            logging.error(f"HTTP error occurred: {http_err}")
-        except requests.exceptions.JSONDecodeError as json_err:
-            logging.error(f"JSON decoding error occurred: {json_err}")
-        return None
+    @staticmethod
+    def is_remote(text: str) -> bool:
+        if not text:
+            return False
+        return "zdalna" in text
 
     @staticmethod
-    def get_next_page_url(json_data: Dict) -> Optional[str]:
-        """
-        Extract the URL for the next page
-        """
-        links = json_data.get("links")
-        if links:
-            next_page = links.get("next")
-            if next_page:
-                return next_page.get("href")
-        return None
+    def is_hybrid(text: str) -> bool:
+        if not text:
+            return False
+        return "hybrydowa" in text
 
-    def parse_offer(self, json_data: Dict[str, List]) -> List[ParsedOffer] | None:
-        """
-        Parse fetched data and return a list of ParsedOffer objects.
+    @staticmethod
+    def get_work_schedule(text: str) -> List[Optional[str]]:
+        result = []
+        if "fulltime" in text:
+            result.append("Full time")
+        elif "parttime" in text:
+            result.append("Part time")
+        elif "halftime":
+            result.append("Temporary")
 
-        Args:
-            json_data: A list of dictionaries containing the job offer data.
+        return result
 
-        Returns:
-            A list of ParsedOffer objects, or None if an error occurred.
-        """
+    @staticmethod
+    def get_contract_type(text: str) -> List[Optional[str]]:
+        result = []
+        if "zlecenie" in text:
+            result.append("Umowa zlecenie")
+        elif "part" in text:
+            result.append("Umowa o pracę")
+        elif "selfemployment" in text:
+            result.append("B2B")
+        elif "contract" in text:
+            result.append("Umowa o dzieło")
 
-        if not json_data:
-            logging.warning("No data received")
+        return result
+
+    @staticmethod
+    def get_salary_schedule(text: str) -> Optional[str]:
+        if not text:
             return None
 
+        if "hourly" in text:
+            return "Hourly"
+        if "monthly" in text:
+            return "Monthly"
+
+    def process(self) -> List[ParsedOffer]:
         parsed_data = []
         website = ParsedWebsite(name="OLX", url="https://www.olx.pl/")
 
-        for data in json_data["data"]:
+        for data in self.json_data["data"]:
             params_data = self.get_params(data["params"])
             localization_data = self.get_localization_data(data["location"])
-            parsed_experience_data = normalize.get_normalized_experience_level(
-                data["title"]
-            )
+            parsed_experience_data = self.get_experience_level(data["title"])
 
             exp_levels = []
             for exp in parsed_experience_data:
                 exp_levels.append(ParsedExperienceLevel(name=exp))
 
-            is_remote = normalize.is_remote(params_data.workplace)
-            is_hybrid = normalize.is_hybrid(params_data.workplace)
+            is_remote = self.is_remote(params_data.workplace)
+            is_hybrid = self.is_hybrid(params_data.workplace)
 
             work_schedule = []
-            work_schedule_data = normalize.get_normalized_work_schedule(
-                params_data.type
-            )
+            work_schedule_data = self.get_work_schedule(params_data.type)
             if work_schedule_data:
-                work_schedule.append(ParsedWorkSchedule(name=work_schedule_data))
+                for schedule in work_schedule_data:
+                    work_schedule.append(ParsedWorkSchedule(name=schedule))
 
             contract_types = []
             if params_data.agreement:
                 for contract in params_data.agreement:
-                    normalized_contract_name = normalize.get_normalized_contract_type(
-                        contract
-                    )
-                    if normalized_contract_name:
-                        contract_types.append(
-                            ParsedContractType(
-                                name=normalize.get_normalized_contract_type(contract)
-                            )
-                        )
+                    contract_d = self.get_contract_type(contract)
+                    for d in contract_d:
+                        contract_types.append(ParsedContractType(name=d))
+
+            salary_schedule = self.get_salary_schedule(params_data.salary_schedule)
+            salary_schedule_code = None
+            if salary_schedule:
+                if salary_schedule == "Hourly":
+                    salary_schedule_code = 3
+                if salary_schedule == "Monthly":
+                    salary_schedule_code = 1
 
             salary = ParsedSalary(
                 salary_from=params_data.salary_from,
@@ -203,9 +196,7 @@ class OLX(Scraper):
                 currency=params_data.currency,
                 contract_type=contract_types,
                 work_schedule=work_schedule,
-                salary_schedule=normalize.get_normalized_salary_schedule(
-                    params_data.salary_schedule
-                ),
+                salary_schedule=salary_schedule_code,
                 type=1,
             )
 
@@ -230,18 +221,3 @@ class OLX(Scraper):
             )
 
         return parsed_data
-
-    def run(self) -> None:
-        while self.url:
-            json_data = self.fetch_data()
-
-            if not json_data:
-                logging.error("No data received")
-                break
-
-            parsed_data = self.parse_offer(json_data)
-            if not parsed_data:
-                break
-
-            self.save_data(parsed_data)
-            self.url = self.get_next_page_url(json_data)

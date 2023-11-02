@@ -1,0 +1,161 @@
+from ..strategy_abstract.process import Process
+from typing import List, Optional, Any, Dict
+from bs4 import BeautifulSoup
+from ...scraper import (
+    ParsedOffer,
+    ParsedSalary,
+    ParsedWebsite,
+    ParsedLocalization,
+    ParsedExperienceLevel,
+    ParsedContractType,
+    ParsedWorkSchedule,
+)
+
+
+class PracujPLProcess(Process):
+    def __init__(self):
+        super().__init__()
+        self.parsed_data = []
+
+    def parse_html(self, html: Optional[str]) -> None:
+        soup = BeautifulSoup(html, "html.parser")
+        offers = soup.find_all("div", class_="listing-it_cwrnf1a")
+
+        for offer in offers:
+            data = {}
+
+            title = offer.find("h2", {"data-test": "offer-title"})
+            url = offer.find("a", {"data-test": "link-offer"})
+            company_logo = offer.find("img")
+            company_name = offer.find("h4")
+            additional_info_ul = offer.find("ul", class_="listing-it_b1ef77ng")
+            if additional_info_ul:
+                additional_info_li = additional_info_ul.find_all("li")
+            skills = offer.find_all("span", {"data-test": "technologies-item"})
+
+            if title:
+                data["title"] = title.text
+            if url:
+                data["url"] = url["href"]
+            if company_logo:
+                data["company_logo"] = company_logo["src"]
+            if company_name:
+                data["company_name"] = company_name.text
+            if skills:
+                data["skills"] = [skill.text for skill in skills]
+            if additional_info_ul:
+                data["additional_info"] = [info.text for info in additional_info_li]
+
+            self.parsed_data.append(data)
+
+    @staticmethod
+    def is_remote(text: str) -> bool:
+        return "zdalna" in text
+
+    @staticmethod
+    def is_hybrid(text: str) -> bool:
+        return "hybrydowa" in text
+
+    @staticmethod
+    def process_localization(localization: Optional[str]) -> Dict[str, Any]:
+        result = {}
+        localization = localization.split("\n")
+        first_ele = localization[0]
+        if first_ele[0].islower():
+            result["region"] = localization[0]
+        if first_ele[0].isupper():
+            result["city"] = localization[0]
+        return result
+
+    @staticmethod
+    def get_work_schedule(text: str) -> List[Optional[str]]:
+        result = []
+        if "pełny etat" in text:
+            result.append("Full time")
+        elif "część etatu" in text:
+            result.append("Part time")
+        elif "tymczasowa/dodatkowa":
+            result.append("Temporary")
+
+        return result
+
+    @staticmethod
+    def get_contract_type(text: str) -> List[Optional[str]]:
+        result = []
+        if "umowa o prace" in text:
+            result.append("Umowa o pracę")
+        elif "umowa o dzieło" in text:
+            result.append("Umowa o dzieło")
+        elif "umowa zlecenie" in text:
+            result.append("Umowa zlecenie")
+        elif "kontrakt B2B" in text:
+            result.append("B2B")
+        elif "umowa o pracę tymczasową" in text:
+            result.append("Umowa o pracę tymczasową")
+        elif "umowa agencyjna" in text:
+            result.append("Umowa agencyjna")
+        elif "umowa o staż/praktykę" in text:
+            result.append("Umowa o staż / praktykę")
+        elif "umowa o zastępstwo" in text:
+            result.append("Umowa na zastępstwo")
+
+        return result
+
+    def process(self) -> List[ParsedOffer]:
+        offers = []
+        is_remote = False
+        is_hybrid = False
+
+        for data in self.parsed_data:
+            title = data.get("title")
+            url = data.get("url")
+            company_logo = data.get("company_logo")
+            company_name = data.get("company_name")
+            additional_info = data.get("additional_info")
+            additional_info_str_lower = "".join(additional_info).lower()
+            skills = data.get("skills")
+
+            if additional_info:
+                is_remote = self.is_remote(additional_info_str_lower)
+                is_hybrid = self.is_hybrid(additional_info_str_lower)
+
+            experiences = self.get_experience_level(additional_info_str_lower)
+            website = ParsedWebsite(name="PracaPL", url="https://www.praca.pl/")
+
+            experiences_obj = []
+            if experiences:
+                for exp in experiences:
+                    experiences_obj.append(ParsedExperienceLevel(name=exp))
+
+            workschedule = self.get_work_schedule(additional_info_str_lower)
+            workschedule_obj = []
+            if workschedule:
+                for schedule in workschedule:
+                    workschedule_obj.append(ParsedWorkSchedule(name=schedule))
+
+            contract_types = self.get_contract_type(additional_info_str_lower)
+            contracts = []
+            if contract_types:
+                for contract in contract_types:
+                    contracts.append(ParsedContractType(name=contract))
+
+            salary = ParsedSalary(
+                contract_type=contracts,
+                work_schedule=workschedule_obj,
+                currency="PLN",
+            )
+
+            offer = ParsedOffer(
+                title=title,
+                url=url,
+                skills=skills,
+                company_logo=company_logo,
+                company_name=company_name,
+                is_remote=is_remote,
+                is_hybrid=is_hybrid,
+                experience_level=experiences_obj,
+                salary=[salary],
+                website=website,
+            )
+            offers.append(offer)
+        return offers

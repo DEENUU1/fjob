@@ -53,7 +53,10 @@ export const OfferList = ({ offers }) => {
               </div>
 
               <div className="card-description">
-                <p>{offer.description.substring(0, 200) + "..."}</p>
+                {offer.description ? (
+  <p>{offer.description.substring(0, 200) + (offer.description.length > 200 ? '...' : '')}</p>
+                ) : <p></p>}
+
               </div>
 
               <div className="offer-salary-container">
