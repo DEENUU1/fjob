@@ -1,10 +1,12 @@
 import React, { useState } from "react";
 import "../Styles/passwordchangeform.css";
 import { toast } from "react-toastify";
+import {useTranslation} from "react-i18next";
 
 export const ChangePasswordForm = ({ token }) => {
   const [oldPassword, setOldPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
+  const {t, i18n} = useTranslation();
 
   const handleOldPasswordChange = (e) => {
     setOldPassword(e.target.value);
@@ -77,7 +79,7 @@ export const ChangePasswordForm = ({ token }) => {
       <h2>Change password</h2>
       <form onSubmit={handleSubmit}>
         <div>
-          <label htmlFor="oldPassword">Old Password</label>
+          <label htmlFor="oldPassword">{t("profile.oldpassword")}</label>
           <input
             type="password"
             id="oldPassword"
@@ -87,7 +89,7 @@ export const ChangePasswordForm = ({ token }) => {
           />
         </div>
         <div>
-          <label htmlFor="newPassword">New Password</label>
+          <label htmlFor="newPassword">{t("profile.newpassword")}</label>
           <input
             type="password"
             id="newPassword"
@@ -97,7 +99,7 @@ export const ChangePasswordForm = ({ token }) => {
           />
         </div>
         <button className="button-reset" type="submit">
-          Reset Password
+          {t("profile.changepassword")}
         </button>
       </form>
     </div>

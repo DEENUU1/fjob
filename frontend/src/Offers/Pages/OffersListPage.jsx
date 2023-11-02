@@ -3,6 +3,7 @@ import axios from "axios";
 import { OfferList } from "../Components/OfferList.jsx";
 import "../Styles/filtersearch.css";
 import { toast } from "react-toastify";
+import {useTranslation} from "react-i18next";
 
 export const OffersListPage = () => {
   const [offers, setOffers] = useState([]);
@@ -12,6 +13,7 @@ export const OffersListPage = () => {
   const token = localStorage.getItem("access_token");
   const sortUrl = sortOption ? `&ordering=${sortOption}` : "";
   const queryUrl = query ? `&search=${query}` : "";
+  const {t, i18n} = useTranslation();
 
   const loadOffers = () => {
     setIsLoading(true);
@@ -63,9 +65,9 @@ export const OffersListPage = () => {
               id="query"
               type="text"
               name="query"
-              placeholder="Search..."
+              placeholder={t("offer.searchplaceholder")}
             />
-            <button type="submit">Search</button>
+            <button type="submit">{t("offer.searchbutton")}</button>
           </form>
         </div>
         <div className="sort-container">
@@ -73,11 +75,11 @@ export const OffersListPage = () => {
             value={sortOption}
             onChange={(e) => setSortOption(e.target.value)}
           >
-            <option value="">Sort by</option>
-            <option value="-date_scraped">Newest</option>
-            <option value="date_scraped">Oldest</option>
-            <option value="-salary__salary_from">Salary highest</option>
-            <option value="salary__salary_from">Salary lowest</option>
+            <option value="">{t("offer.sortby")}</option>
+            <option value="-date_scraped">{t("offer.newest")}</option>
+            <option value="date_scraped">{t("offer.oldest")}</option>
+            <option value="-salary__salary_from">{t("offer.highest")}</option>
+            <option value="salary__salary_from">{t("offer.lowest")}</option>
           </select>
         </div>
       </div>

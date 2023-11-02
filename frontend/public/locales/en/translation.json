@@ -9,5 +9,67 @@
     "features.subtitle2": "Companies can post job offers here for free!",
     "features.title3": "Notifications",
     "features.subtitle3": "Sign up to get emails about new job offers every day"
+  },
+  "contact": {
+    "header": "Contact Us",
+    "name": "Name",
+    "email": "Email",
+    "message": "Message",
+    "send": "Send Message"
+  },
+  "profile": {
+    "header": "Welcome",
+    "oldpassword": "Old password",
+    "newpassword": "New password",
+    "changepassword": "Change password",
+    "username": "Username",
+    "email": "Email",
+    "password": "Password",
+    "delete": "Delete account"
+  },
+  "footer": {
+    "madeby": "Made by"
+  },
+  "nav": {
+    "languages": "Choose language",
+    "logout": "Logout",
+    "login": "Login",
+    "register": "Register"
+  },
+  "login": {
+    "header": "Sign in",
+    "button": "Sign in",
+    "placeholderpassword": "Enter password",
+    "placeholderusername": "Enter username",
+    "labelusername": "Username",
+    "labelpassword": "Password"
+  },
+  "register": {
+    "header": "Sign up",
+    "placeholderemail": "Enter email",
+    "placeholderpassword": "Enter password",
+    "placeholderusername": "Enter username",
+    "button": "Sign up",
+    "labelpassword": "Password",
+    "labelemail": "Email",
+    "labelusername": "Username"
+  },
+  "report": {
+    "placeholder": "Tell us what is wrong with this offer",
+    "send": "Send"
+  },
+  "offer": {
+    "report": "Report",
+    "searchplaceholder": "Search...",
+    "sortby": "Sort by",
+    "newest": "Newest",
+    "oldest": "Oldest",
+    "highest": "Salary highest",
+    "lowest": "Salary lowest",
+    "searchbutton": "Search"
+  },
+  "remote": {
+    "remote": "Remote",
+    "hybrid": "Hybrid"
   }
 }

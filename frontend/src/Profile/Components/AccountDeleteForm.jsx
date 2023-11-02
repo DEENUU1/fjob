@@ -2,12 +2,14 @@ import React, { useState } from "react";
 import "../Styles/passwordchangeform.css";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
+import {useTranslation} from "react-i18next";
 
 export const AccountDeleteForm = ({ token }) => {
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
+  const {t, i18n} = useTranslation();
 
   const handleUsernameChange = (e) => {
     setUsername(e.target.value);
@@ -87,7 +89,7 @@ export const AccountDeleteForm = ({ token }) => {
       <h2>Delete account</h2>
       <form onSubmit={handleSubmit}>
         <div>
-          <label htmlFor="email">Email</label>
+          <label htmlFor="email">{t("profile.email")}</label>
           <input
             type="email"
             id="email"
@@ -97,7 +99,7 @@ export const AccountDeleteForm = ({ token }) => {
           />
         </div>
         <div>
-          <label htmlFor="username">Username</label>
+          <label htmlFor="username">{t("profile.username")}</label>
           <input
             type="text"
             id="username"
@@ -107,7 +109,7 @@ export const AccountDeleteForm = ({ token }) => {
           />
         </div>
         <div>
-          <label htmlFor="password">Password</label>
+          <label htmlFor="password">{t("profile.password")}</label>
           <input
             type="password"
             id="password"
@@ -117,7 +119,7 @@ export const AccountDeleteForm = ({ token }) => {
           />
         </div>
         <button className="button-delete" type="submit">
-          Delete account
+          {t("profile.delete")}
         </button>
       </form>
     </div>

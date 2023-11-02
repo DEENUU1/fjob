@@ -2,6 +2,7 @@ import axios from "axios";
 import { useState } from "react";
 import "../Styles/login.css";
 import { toast } from "react-toastify";
+import {useTranslation} from "react-i18next";
 
 export const Login = () => {
   const [username, setUsername] = useState("");
@@ -10,6 +11,8 @@ export const Login = () => {
     username: username,
     password: password,
   };
+  const {t, i18n} = useTranslation();
+
   const submit = async (e) => {
     e.preventDefault();
 
@@ -91,12 +94,12 @@ export const Login = () => {
     <div className="Auth-form-container">
       <form className="Auth-form" onSubmit={submit}>
         <div className="Auth-form-content">
-          <h3 className="Auth-form-title">Sign In</h3>
+          <h3 className="Auth-form-title">{t("login.header")}</h3>
           <div className="form-group mt-3">
-            <label>Username</label>
+            <label>{t("login.labelusername")}</label>
             <input
               className="form-control mt-1"
-              placeholder="Enter Username"
+              placeholder={t("login.placeholderusername")}
               name="username"
               type="text"
               value={username}
@@ -105,12 +108,12 @@ export const Login = () => {
             />
           </div>
           <div className="form-group mt-3">
-            <label>Password</label>
+            <label>{t("login.labelpassword")}</label>
             <input
               name="password"
               type="password"
               className="form-control mt-1"
-              placeholder="Enter password"
+              placeholder={t("login.placeholderpassword")}
               value={password}
               required
               onChange={(e) => setPassword(e.target.value)}
@@ -118,7 +121,7 @@ export const Login = () => {
           </div>
           <div className="d-grid gap-2 mt-3">
             <button type="submit" className="btn btn-primary">
-              Submit
+              {t("login.button")}
             </button>
           </div>
         </div>

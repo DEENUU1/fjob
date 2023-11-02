@@ -3,8 +3,10 @@ import "../Styles/reportmodal.css";
 import axios from "axios";
 import { IoClose } from "react-icons/io5";
 import { toast } from "react-toastify";
+import {useTranslation} from "react-i18next";
 
 export const CreateReport = ({ offerId, onClose }) => {
+  const {t, i18n} = useTranslation();
   const [message, setMessage] = useState("");
   const token = localStorage.getItem("access_token");
   const userid = localStorage.getItem("user_id");
@@ -67,7 +69,7 @@ export const CreateReport = ({ offerId, onClose }) => {
           <input
             type="text"
             className="form-control"
-            placeholder="Tell us what is wrong with this offer"
+            placeholder={t("report.placeholder")}
             value={message}
             onChange={(e) => setMessage(e.target.value)}
           />
@@ -78,7 +80,7 @@ export const CreateReport = ({ offerId, onClose }) => {
             className="btn btn-primary"
             onClick={handleSubmit}
           >
-            Send
+            {t("report.send")}
           </button>
         </div>
       </div>

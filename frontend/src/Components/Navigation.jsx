@@ -31,29 +31,32 @@ export function Navigation() {
           <Nav.Link href="/contact">Contact</Nav.Link>
         </Nav>
         <Nav>
-            <Dropdown>
-                <Dropdown.Toggle variant="dark" id="dropdown-lang">
-                    Choose language
-                </Dropdown.Toggle>
-                <Dropdown.Menu>
-                  {Object.keys(locales).map((locale) => (
-                    <Dropdown.Item key={locale} onClick={() => i18n.changeLanguage(locale)}>
-                      {locales[locale].title}
-                    </Dropdown.Item>
-                  ))}
-                </Dropdown.Menu>
-            </Dropdown>
+          <Dropdown>
+            <Dropdown.Toggle variant="dark" id="dropdown-lang">
+              {t("nav.languages")}
+            </Dropdown.Toggle>
+            <Dropdown.Menu>
+              {Object.keys(locales).map((locale) => (
+                <Dropdown.Item
+                  key={locale}
+                  onClick={() => i18n.changeLanguage(locale)}
+                >
+                  {locales[locale].title}
+                </Dropdown.Item>
+              ))}
+            </Dropdown.Menu>
+          </Dropdown>
           {isAuth ? (
             <Nav.Link href="/profile">
               {localStorage.getItem("username")}
             </Nav.Link>
           ) : null}
           {isAuth ? (
-            <Nav.Link href="/logout">Logout</Nav.Link>
+            <Nav.Link href="/logout">{t("nav.logout")}</Nav.Link>
           ) : (
-            <Nav.Link href="/login">Login</Nav.Link>
+            <Nav.Link href="/login">{t("nav.login")}</Nav.Link>
           )}
-          {isAuth ? null : <Nav.Link href="/register">Register</Nav.Link>}
+          {isAuth ? null : <Nav.Link href="/register">{t("nav.register")}</Nav.Link>}
         </Nav>
       </Navbar>
     </div>

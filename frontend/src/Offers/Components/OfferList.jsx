@@ -4,9 +4,11 @@ import { OfferExperience } from "./Experience.jsx";
 import { RemoteHybridOffer } from "./RemoteHybrid.jsx";
 import { Localization } from "./Localization.jsx";
 import { CreateReport } from "./CreateReportModal.jsx";
+import {useTranslation} from "react-i18next";
 
 export const OfferList = ({ offers }) => {
   const [showModal, setShowModal] = useState(false);
+  const {t, i18n} = useTranslation();
 
   const handleShowModal = () => {
     setShowModal(true);
@@ -28,7 +30,7 @@ export const OfferList = ({ offers }) => {
                 </a>
               </h2>
 
-              <button onClick={handleShowModal}>Report</button>
+              <button onClick={handleShowModal}>{t("offer.report")}</button>
               {showModal && (
                 <CreateReport offerId={offer.id} onClose={handleCloseModal} />
               )}
@@ -54,9 +56,13 @@ export const OfferList = ({ offers }) => {
 
               <div className="card-description">
                 {offer.description ? (
-  <p>{offer.description.substring(0, 200) + (offer.description.length > 200 ? '...' : '')}</p>
-                ) : <p></p>}
-
+                  <p>
+                    {offer.description.substring(0, 200) +
+                      (offer.description.length > 200 ? "..." : "")}
+                  </p>
+                ) : (
+                  <p></p>
+                )}
               </div>
 
               <div className="offer-salary-container">
