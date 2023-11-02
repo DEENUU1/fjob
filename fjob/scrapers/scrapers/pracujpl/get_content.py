@@ -38,9 +38,8 @@ class GetPracujPLContent(GetContentStrategy):
             try:
                 driver = webdriver.Chrome()
                 url = f"{self.base_url}?pn={self.current_page}"
-                print(url)
-                driver.get(url)
 
+                driver.get(url)
                 element = driver.find_element(
                     By.XPATH, "//div[@data-test='section-offers']"
                 )

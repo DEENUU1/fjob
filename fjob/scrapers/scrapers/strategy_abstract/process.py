@@ -126,16 +126,20 @@ class Process(ABC):
                 "praktykant",
                 "stażysta",
                 "praktykant/stażysta",
+                "praktykant / stażysta",
             ],
             "Junior": ["młodszy", "junior", "młodszy specjalista"],
             "Expert": ["ekspert", "expert"],
             "Assistant": ["asystent", "asystentka"],
-            "Mid": ["mid", "regular"],
+            "Mid": ["mid", "regular", "specjalista (mid / regular)"],
             "Senior": ["senior", "starszy"],
             "Lead": ["lead", "kierownik", "kierownik/koordynator", "koordynator"],
             "Director": ["dyrektor", "director"],
             "Manager": ["manager", "menadżer"],
             "Worker": ["pracownik fizyczny", "worker"],
+            "CEO": [
+                "prezes",
+            ],
         }
 
         for p, f in data.items():

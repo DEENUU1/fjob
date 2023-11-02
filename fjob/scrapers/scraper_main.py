@@ -132,10 +132,9 @@ def run_pracujpl():
         for content in page_content:
             process = process_pracujpl.PracujPLProcess()
             process.parse_html(content.content)
-            print(process.parsed_data)
-            # processed_data = process.process()
-            # for data in processed_data:
-            #     process.save_to_db(data)
+            processed_data = process.process()
+            for data in processed_data:
+                process.save_to_db(data)
 
     except Exception as e:
         logging.error(f"Failed to run pracujpl scraper: {e}")

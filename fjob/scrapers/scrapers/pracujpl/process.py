@@ -18,7 +18,35 @@ class PracujPLProcess(Process):
         self.parsed_data = []
 
     def parse_html(self, html: Optional[str]) -> None:
-        pass
+        soup = BeautifulSoup(html, "html.parser")
+        offers = soup.find_all("div", class_="listing-it_cwrnf1a")
+
+        for offer in offers:
+            data = {}
+
+            title = offer.find("h2", {"data-test": "offer-title"})
+            url = offer.find("a", {"data-test": "link-offer"})
+            company_logo = offer.find("img")
+            company_name = offer.find("h4")
+            additional_info_ul = offer.find("ul", class_="listing-it_b1ef77ng")
+            if additional_info_ul:
+                additional_info_li = additional_info_ul.find_all("li")
+            skills = offer.find_all("span", {"data-test": "technologies-item"})
+
+            if title:
+                data["title"] = title.text
+            if url:
+                data["url"] = url["href"]
+            if company_logo:
+                data["company_logo"] = company_logo["src"]
+            if company_name:
+                data["company_name"] = company_name.text
+            if skills:
+                data["skills"] = [skill.text for skill in skills]
+            if additional_info_ul:
+                data["additional_info"] = [info.text for info in additional_info_li]
+
+            self.parsed_data.append(data)
 
     @staticmethod
     def is_remote(text: str) -> bool:
@@ -67,9 +95,9 @@ class PracujPLProcess(Process):
         elif "umowa agencyjna" in text:
             result.append("Umowa agencyjna")
         elif "umowa o staż/praktykę" in text:
-            result.append("Umowa o staż/praktykę")
+            result.append("Umowa o staż / praktykę")
         elif "umowa o zastępstwo" in text:
-            result.append("Umowa o zastępstwo")
+            result.append("Umowa na zastępstwo")
 
         return result
 
@@ -81,23 +109,17 @@ class PracujPLProcess(Process):
         for data in self.parsed_data:
             title = data.get("title")
             url = data.get("url")
-            work_mode = data.get("work_model")
-            localization = data.get("localization")
             company_logo = data.get("company_logo")
             company_name = data.get("company_name")
-            info = data.get("info")
+            additional_info = data.get("additional_info")
+            additional_info_str_lower = "".join(additional_info).lower()
+            skills = data.get("skills")
 
-            if work_mode:
-                is_remote = self.is_remote(work_mode)
-                is_hybrid = self.is_hybrid(work_mode)
-            if localization:
-                processed_localization = self.process_localization(localization)
-                localization = ParsedLocalization(
-                    city=processed_localization.get("city"),
-                    region=processed_localization.get("region"),
-                )
-            currency = self.get_currency(info)
-            experiences = self.get_experience_level(info)
+            if additional_info:
+                is_remote = self.is_remote(additional_info_str_lower)
+                is_hybrid = self.is_hybrid(additional_info_str_lower)
+
+            experiences = self.get_experience_level(additional_info_str_lower)
             website = ParsedWebsite(name="PracaPL", url="https://www.praca.pl/")
 
             experiences_obj = []
@@ -105,13 +127,13 @@ class PracujPLProcess(Process):
                 for exp in experiences:
                     experiences_obj.append(ParsedExperienceLevel(name=exp))
 
-            workschedule = self.get_work_schedule(info)
+            workschedule = self.get_work_schedule(additional_info_str_lower)
             workschedule_obj = []
             if workschedule:
                 for schedule in workschedule:
                     workschedule_obj.append(ParsedWorkSchedule(name=schedule))
 
-            contract_types = self.get_contract_type(info)
+            contract_types = self.get_contract_type(additional_info_str_lower)
             contracts = []
             if contract_types:
                 for contract in contract_types:
@@ -120,12 +142,13 @@ class PracujPLProcess(Process):
             salary = ParsedSalary(
                 contract_type=contracts,
                 work_schedule=workschedule_obj,
-                currency=currency,
+                currency="PLN",
             )
 
             offer = ParsedOffer(
                 title=title,
                 url=url,
+                skills=skills,
                 company_logo=company_logo,
                 company_name=company_name,
                 is_remote=is_remote,
@@ -133,7 +156,6 @@ class PracujPLProcess(Process):
                 experience_level=experiences_obj,
                 salary=[salary],
                 website=website,
-                localizations=[localization],
             )
             offers.append(offer)
         return offers
