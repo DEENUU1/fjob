@@ -29,7 +29,7 @@ class GetOLXContent(GetContentStrategy):
                         if not json_data:
                             break
 
-                        PageContent.objects.create(website="OLX", content=json_data)
+                        self.save_to_db_json(json_data)
 
                         self.base_url = self.get_next_page_url(json_data)
                 except Exception as e:

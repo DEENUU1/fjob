@@ -142,24 +142,22 @@ def run_pracujpl():
 
 
 def run_olx():
-    # try:
-    #     scraper = get_content_olx.GetOLXContent()
-    #     scraper.fetch_content()
-    # logging.info(
-    #     f"Successfully fetched content for {scraper.website} get {scraper.__len__()} elements"
-    # )
-    # scraper.save_to_db()
+    try:
+        scraper = get_content_olx.GetOLXContent()
+        scraper.fetch_content()
+        logging.info(
+            f"Successfully fetched content for {scraper.website} get {scraper.__len__()} elements"
+        )
+        scraper.save_to_db()
 
-    page_content = PageContent.objects.filter(website="OLX", is_parsed=False).all()
+        page_content = PageContent.objects.filter(website="OLX", is_parsed=False).all()
 
-    for content in page_content:
-        process = process_olx.OLXProcess()
-        process.parse_html(content.content)
-        print(process.process())
-        # processed_data = process.process()
-        # for data in processed_data:
-        #         process.save_to_db(data)
+        for content in page_content:
+            process = process_olx.OLXProcess()
+            process.parse_html(content.content_json)
+            processed_data = process.process()
+            for data in processed_data:
+                process.save_to_db(data)
 
-
-# except Exception as e:
-#     logging.error(f"Failed to run olx scraper: {e}")
+    except Exception as e:
+        logging.error(f"Failed to run olx scraper: {e}")

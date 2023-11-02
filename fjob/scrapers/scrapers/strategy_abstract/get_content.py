@@ -49,3 +49,18 @@ class GetContentStrategy(ABC):
 
     def __len__(self):
         return len(self.data)
+
+    def save_to_db_json(self, data) -> bool:
+        logging.info(f"Start saving page content for {self.website}")
+        if not data:
+            logging.info(f"Failed to save page content for {self.website}")
+            return False
+        try:
+            PageContent.objects.create(
+                content_json=data,
+                website=self.website,
+            )
+            logging.info(f"Page content saved for {self.website}")
+            return True
+        except Exception as e:
+            logging.error(f"Failed to save page content for {self.website}: {e}")

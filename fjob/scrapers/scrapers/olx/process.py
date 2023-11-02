@@ -13,7 +13,6 @@ from .localization import Localization
 from .params_data import ParamsData
 from ...utils.delete_html_tags import delete_html_tags
 import logging
-import json
 
 
 logging.basicConfig(
@@ -29,7 +28,7 @@ class OLXProcess(Process):
         self.json_data = {}
 
     def parse_html(self, html) -> None:
-        self.json_data = json.loads(html)
+        self.json_data = html
 
     @staticmethod
     def get_localization_data(localization: Dict[str, Dict[str, Any]]) -> Localization:
@@ -108,10 +107,14 @@ class OLXProcess(Process):
 
     @staticmethod
     def is_remote(text: str) -> bool:
+        if not text:
+            return False
         return "zdalna" in text
 
     @staticmethod
     def is_hybrid(text: str) -> bool:
+        if not text:
+            return False
         return "hybrydowa" in text
 
     @staticmethod
@@ -142,6 +145,9 @@ class OLXProcess(Process):
 
     @staticmethod
     def get_salary_schedule(text: str) -> Optional[str]:
+        if not text:
+            return None
+
         if "hourly" in text:
             return "Hourly"
         if "monthly" in text:
