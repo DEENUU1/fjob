@@ -2,9 +2,20 @@ import Nav from "react-bootstrap/Nav";
 import Navbar from "react-bootstrap/Navbar";
 
 import React, { useState, useEffect } from "react";
+import {useTranslation} from "react-i18next";
+import Dropdown from "react-bootstrap/Dropdown";
+
+
+const locales = {
+    en: {title: "English"},
+    pl: {title: "Polish"}
+}
+
 
 export function Navigation() {
   const [isAuth, setIsAuth] = useState(false);
+  const {t, i18n} = useTranslation();
+
   useEffect(() => {
     if (localStorage.getItem("access_token") !== null) {
       setIsAuth(true);
@@ -20,6 +31,18 @@ export function Navigation() {
           <Nav.Link href="/contact">Contact</Nav.Link>
         </Nav>
         <Nav>
+            <Dropdown>
+                <Dropdown.Toggle variant="dark" id="dropdown-lang">
+                    Choose language
+                </Dropdown.Toggle>
+                <Dropdown.Menu>
+                  {Object.keys(locales).map((locale) => (
+                    <Dropdown.Item key={locale} onClick={() => i18n.changeLanguage(locale)}>
+                      {locales[locale].title}
+                    </Dropdown.Item>
+                  ))}
+                </Dropdown.Menu>
+            </Dropdown>
           {isAuth ? (
             <Nav.Link href="/profile">
               {localStorage.getItem("username")}

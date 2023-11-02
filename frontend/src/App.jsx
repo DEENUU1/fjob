@@ -15,9 +15,13 @@ import { UserChangePasswordPage } from "./Profile/Pages/UserChangePasswordPage.j
 import { UserDeleteAccountPage } from "./Profile/Pages/UserDeleteAccountPage.jsx";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.min.css";
+import { Suspense} from "react";
+
 
 function App() {
+
   return (
+    <Suspense fallback="...loading">
     <BrowserRouter>
       <Navigation></Navigation>
       <ToastContainer />
@@ -37,6 +41,7 @@ function App() {
       </Routes>
       <Footer></Footer>
     </BrowserRouter>
+    </Suspense>
   );
 }
 

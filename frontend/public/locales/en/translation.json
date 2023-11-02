@@ -1,0 +1,13 @@
+{
+  "home": {
+    "title": "Find job quicker",
+    "subtitle": "FJob collects data on job offers from many websites to help you find the best offer easily and quickly",
+    "button": "Get Started",
+    "features.title": "Job offer scrapers",
+    "features.subtitle": "Every day many scrapers collects and process data from many websites",
+    "features.title2": "Offers from companies",
+    "features.subtitle2": "Companies can post job offers here for free!",
+    "features.title3": "Notifications",
+    "features.subtitle3": "Sign up to get emails about new job offers every day"
+  }
+}
