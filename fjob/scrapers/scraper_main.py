@@ -15,6 +15,7 @@ from .scrapers.pracujpl import (
     process as process_pracujpl,
 )
 from .scrapers.nfj import get_content as get_content_nfj, process as process_nfj
+from .scrapers.olx import get_content as get_content_olx
 import logging
 from .models import PageContent
 
@@ -138,3 +139,26 @@ def run_pracujpl():
 
     except Exception as e:
         logging.error(f"Failed to run pracujpl scraper: {e}")
+
+
+def run_olx():
+    try:
+        scraper = get_content_olx.GetOLXContent()
+        scraper.fetch_content()
+        logging.info(
+            f"Successfully fetched content for {scraper.website} get {scraper.__len__()} elements"
+        )
+        scraper.save_to_db()
+        #
+        # page_content = PageContent.objects.filter(
+        #     website="PracujPL", is_parsed=False
+        # ).all()
+        # for content in page_content:
+        #     process = process_pracujpl.PracujPLProcess()
+        #     process.parse_html(content.content)
+        #     processed_data = process.process()
+        #     for data in processed_data:
+        #         process.save_to_db(data)
+
+    except Exception as e:
+        logging.error(f"Failed to run olx scraper: {e}")
