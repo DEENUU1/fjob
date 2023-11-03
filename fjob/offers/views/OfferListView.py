@@ -1,3 +1,4 @@
+from django.utils.decorators import method_decorator
 from rest_framework import generics
 from rest_framework.filters import OrderingFilter, SearchFilter
 from rest_framework.permissions import IsAuthenticated
@@ -6,6 +7,7 @@ from ..models import Offers
 from ..serializers.OfferSerializer import OffersSerializer
 from ..forms import OffersFilter
 from django_filters import rest_framework as filters
+from django.views.decorators.cache import cache_page
 
 
 class OfferListView(generics.ListAPIView):
@@ -24,3 +26,7 @@ class OfferListView(generics.ListAPIView):
         "-salary__salary_from",
     ]
     search_fields = ["title", "description", "skills"]
+
+    @method_decorator(cache_page(60 * 15))
+    def get(self, *args, **kwargs):
+        return super().get(*args, **kwargs)
