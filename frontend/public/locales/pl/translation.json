@@ -1,0 +1,77 @@
+{
+  "home": {
+    "title": "Znajdź pracę szybciej",
+    "subtitle": "FJob zbiera dane dotyczące ofert pracy z wielu stron internetowych, aby pomóc Ci łatwo i szybko znaleźć najlepszą ofertę",
+    "button": "Rozpocznij",
+    "features.title": "Skrapery ofert pracy",
+    "features.subtitle": "Codziennie wiele skraperów zbiera i przetwarza dane z wielu stron internetowych",
+    "features.title2": "Oferty od firm",
+    "features.subtitle2": "Firmy mogą bezpłatnie publikować oferty pracy tutaj!",
+    "features.title3": "Powiadomienia",
+    "features.subtitle3": "Zarejestruj się, aby otrzymywać codzienne e-maile z nowymi ofertami pracy"
+  },
+  "contact": {
+    "header": "Skontaktuj się z nami",
+    "name": "Imię",
+    "email": "E-mail",
+    "message": "Wiadomość",
+    "send": "Wyślij wiadomość"
+  },
+  "profile": {
+    "header": "Witaj",
+    "oldpassword": "Stare hasło",
+    "newpassword": "Nowe hasło",
+    "changepassword": "Zmień hasło",
+    "username": "Nazwa użytkownika",
+    "email": "E-mail",
+    "password": "Hasło",
+    "delete": "Usuń konto"
+  },
+  "footer": {
+    "madeby": "Wykonane przez"
+  },
+  "nav": {
+    "languages": "Wybierz język",
+    "logout": "Wyloguj się",
+    "login": "Zaloguj się",
+    "register": "Zarejestruj się",
+    "home": "Strona główna",
+    "contact": "Kontakt"
+  },
+  "login": {
+    "header": "Zaloguj się",
+    "button": "Zaloguj się",
+    "placeholderpassword": "Wprowadź hasło",
+    "placeholderusername": "Wprowadź nazwę użytkownika",
+    "labelusername": "Nazwa użytkownika",
+    "labelpassword": "Hasło"
+  },
+  "register": {
+    "header": "Zarejestruj się",
+    "placeholderemail": "Wprowadź e-mail",
+    "placeholderpassword": "Wprowadź hasło",
+    "placeholderusername": "Wprowadź nazwę użytkownika",
+    "button": "Zarejestruj się",
+    "labelpassword": "Hasło",
+    "labelemail": "E-mail",
+    "labelusername": "Nazwa użytkownika"
+  },
+  "report": {
+    "placeholder": "Powiedz nam, co jest nie tak z tą ofertą",
+    "send": "Wyślij"
+  },
+  "offer": {
+    "report": "Zgłoś",
+    "searchplaceholder": "Szukaj...",
+    "sortby": "Sortuj według",
+    "newest": "Najnowsze",
+    "oldest": "Najstarsze",
+    "highest": "Najwyższa pensja",
+    "lowest": "Najniższa pensja",
+    "searchbutton": "Szukaj"
+  },
+  "remote": {
+    "remote": "Zdalna",
+    "hybrid": "Hybrydowa"
+  }
+}

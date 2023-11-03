@@ -34,7 +34,9 @@
     "languages": "Choose language",
     "logout": "Logout",
     "login": "Login",
-    "register": "Register"
+    "register": "Register",
+    "home": "Home",
+    "contact": "Contact"
   },
   "login": {
     "header": "Sign in",

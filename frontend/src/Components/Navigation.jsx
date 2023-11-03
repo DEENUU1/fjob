@@ -27,8 +27,8 @@ export function Navigation() {
       <Navbar bg="light" variant="light">
         <Navbar.Brand href="/">FJob</Navbar.Brand>
         <Nav className="me-auto">
-          <Nav.Link href="/">Home</Nav.Link>
-          <Nav.Link href="/contact">Contact</Nav.Link>
+          <Nav.Link href="/">{t("nav.home")}</Nav.Link>
+          <Nav.Link href="/contact">{t("nav.contact")}</Nav.Link>
         </Nav>
         <Nav>
           <Dropdown>
@@ -56,7 +56,9 @@ export function Navigation() {
           ) : (
             <Nav.Link href="/login">{t("nav.login")}</Nav.Link>
           )}
-          {isAuth ? null : <Nav.Link href="/register">{t("nav.register")}</Nav.Link>}
+          {isAuth ? null : (
+            <Nav.Link href="/register">{t("nav.register")}</Nav.Link>
+          )}
         </Nav>
       </Navbar>
     </div>
