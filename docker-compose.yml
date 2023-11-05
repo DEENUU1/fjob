@@ -20,7 +20,7 @@ services:
             context: .
             dockerfile: ./config/django/Dockerfile
         container_name: fjob-web-dev
-        command: python manage.py runserver 0.0.0.0:8000
+        command: gunicorn fjob.wsgi --bind 0.0.0.0:8000
         volumes:
             - ./fjob:/app
         ports:
@@ -31,6 +31,17 @@ services:
             - celery
         env_file:
             - .env
+
+    nginx:
+        build:
+            context: .
+            dockerfile: ./config/nginx/Dockerfile
+        ports:
+            - 80:80
+        depends_on:
+            - web
+        volumes:
+            - ./fjob:/app/
 
     redis:
         image: redis:latest

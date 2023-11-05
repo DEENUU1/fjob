@@ -12,15 +12,13 @@ SECRET_KEY = "django-insecure-btn_88i#@f7xef_^9iqth6h!y&c_c21hs4=ta(dg1h+d7cdfot
 
 if os.getenv("DEV") == "true":
     DEBUG = True
+    ALLOWED_HOSTS = []
+# Set up for production
 else:
     DEBUG = False
+    ALLOWED_HOSTS = ["localhost", "127.0.0.1"]
 
 DATA_UPLOAD_MAX_NUMBER_FIELDS = 9999999
-
-if os.getenv("DEV") != "true":
-    ALLOWED_HOSTS = ["localhost", "127.0.0.1"]
-else:
-    ALLOWED_HOSTS = []
 
 
 CORS_ALLOWED_ORIGINS = [
@@ -78,12 +76,13 @@ REST_FRAMEWORK = {
 }
 
 SIMPLE_JWT = {
-    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=10),
+    "ACCESS_TOKEN_LIFETIME": timedelta(days=7),
     "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
     "ROTATE_REFRESH_TOKENS": True,
     "BLACKLIST_AFTER_ROTATION": True,
 }
 
+# For production where redis is used
 if os.getenv("DEV") == "false":
     CACHES = {
         "default": {
@@ -135,15 +134,16 @@ if os.getenv("DEV") == "true":
             "NAME": BASE_DIR / "db.sqlite3",
         }
     }
+# Production database
 else:
     DATABASES = {
         "default": {
             "ENGINE": "django.db.backends.postgresql",
-            "NAME": "fjob",
-            "USER": "fjob",
-            "PASSWORD": "fjob123",
-            "HOST": "db",
-            "PORT": "5432",
+            "NAME": os.getenv("PG_NAME"),
+            "USER": os.getenv("PG_USER"),
+            "PASSWORD": os.getenv("PG_PASSWORD"),
+            "HOST": os.getenv("PG_HOST"),
+            "PORT": os.getenv("PG_PORT"),
         }
     }
 
