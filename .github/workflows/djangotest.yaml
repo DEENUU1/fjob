@@ -23,7 +23,7 @@ jobs:
         working-directory: ./fjob/
         env:
           DEV: "true"
-          SECRET_KEY: "test123123123"
+          SECRET_KEY: ${{ secrets.SECRET_KEY }}
         run: |
           python manage.py makemigrations
           python manage.py migrate
