@@ -22,7 +22,8 @@ jobs:
       - name: Set up SQLite database
         working-directory: ./fjob/
         env:
-          USE_SQLITE: "true"
+          DEV: "true"
+          SECRET_KEY: ${SECRET_KEY}
         run: |
           python manage.py makemigrations
           python manage.py migrate
