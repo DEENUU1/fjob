@@ -4,33 +4,50 @@ services:
     db:
         hostname: db
         image: postgres:15
-        container_name: fjob-db-dev
+        container_name: fjob-db-prod
         volumes:
             - ./data/db:/var/lib/postgresql/data
         environment:
-            - POSTGRES_DB=fjob
-            - POSTGRES_USER=fjob
-            - POSTGRES_PASSWORD=fjob123
+            - POSTGRES_DB=${PG_NAME}
+            - POSTGRES_USER=${PG_USER}
+            - POSTGRES_PASSWORD=${PG_PASSWORD}
         ports:
             - "5432:5432"
-
+        env_file:
+            -  .env
     web:
         hostname: web
         build:
             context: .
             dockerfile: ./config/django/Dockerfile
-        container_name: fjob-web-dev
-        command: python manage.py runserver 0.0.0.0:8000
+        container_name: fjob-web-prod
+        command: gunicorn fjob.wsgi --bind 0.0.0.0:8001
         volumes:
             - ./fjob:/app
         ports:
-            - "8000:8000"
+            - "8001:8001"
         depends_on:
             - db
             - redis
             - celery
+        environment:
+            - SECRET_KEY=${SECRET_KEY}
         env_file:
             - .env
+
+    nginx:
+        build:
+            context: .
+            dockerfile: ./config/nginx/Dockerfile
+        ports:
+            - "80:80"
+        container_name: fjob-nginx-prod
+        depends_on:
+            - web
+            - react
+        volumes:
+            - ./fjob:/app/
+            - ./config/nginx/nginx.conf:/etc/nginx/conf.d/default.conf
 
     redis:
         image: redis:latest
@@ -42,35 +59,40 @@ services:
         build:
             context: .
             dockerfile: ./config/django/Dockerfile
-        container_name: fjob-celery-dev
+        container_name: fjob-celery-prod
         command: celery -A fjob.celery worker -l info
         volumes:
             - ./fjob:/app/
         depends_on:
             - db
             - redis
-
-    react:
-        build:
-            context: .
-            dockerfile: ./config/react/Dockerfile
-        container_name: fjob-react-dev
-        volumes:
-            - ./frontend:/app
-        ports:
-            - "3000:3000"
-        depends_on:
-            - web
-
+        environment:
+            - SECRET_KEY=${SECRET_KEY}
+        env_file:
+            - .env
 
     celery_beat:
         build:
             context: .
             dockerfile: ./config/django/Dockerfile
-        container_name: myfridge-celery-beat-dev
+        container_name: fjob-celery-beat-prod
         command: celery -A fjob.celery beat -l info
         volumes:
             - ./fjob:/app/
         depends_on:
             - db
             - redis
+        environment:
+            - SECRET_KEY=${SECRET_KEY}
+        env_file:
+            - .env
+
+    react:
+        build:
+            context: .
+            dockerfile: ./config/react/Dockerfile
+        ports:
+            - "4173:4173"
+        container_name: fjob-react-prod
+        depends_on:
+            - web

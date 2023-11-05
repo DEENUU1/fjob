@@ -1,44 +1,23 @@
 from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib import admin
-from django.urls import path, include, re_path
-from drf_yasg import openapi
-from drf_yasg.views import get_schema_view
-from rest_framework import permissions
+from django.urls import path, include
 from rest_framework_simplejwt import views as jwt_views
 from users.views.CustomTokenObtainPairView import CustomTokenObtainPairView
 
 
-schema_view = get_schema_view(
-    openapi.Info(
-        title="FJob",
-        default_version="v1",
-        # description="Opis Twojego API",
-        # terms_of_service="https://www.twojaserwis.com/terms/",
-        # contact=openapi.Contact(email="contact@twojemail.com"),
-        # license=openapi.License(name="Licencja Twojego API"),
-    ),
-    public=True,
-    permission_classes=(permissions.AllowAny,),
-)
-
 urlpatterns = [
     path("admin/", admin.site.urls),
-    path("offers/", include("offers.urls")),
-    path("users/", include("users.urls")),
-    path("messages/", include("contact.urls")),
-    path("reports/", include("report.urls")),
-    path("token/", CustomTokenObtainPairView.as_view(), name="token_obtain_pair"),
-    path("token/refresh/", jwt_views.TokenRefreshView.as_view(), name="token_refresh"),
-    re_path(
-        r"^swagger(?P<format>\.json|\.yaml)$",
-        schema_view.without_ui(cache_timeout=0),
-        name="schema-json",
+    path("api/v1/offers/", include("offers.urls")),
+    path("api/v1/users/", include("users.urls")),
+    path("api/v1/messages/", include("contact.urls")),
+    path("api/v1/reports/", include("report.urls")),
+    path(
+        "api/v1/token/", CustomTokenObtainPairView.as_view(), name="token_obtain_pair"
     ),
     path(
-        "swagger/",
-        schema_view.with_ui("swagger", cache_timeout=0),
-        name="schema-swagger-ui",
+        "api/v1/token/refresh/",
+        jwt_views.TokenRefreshView.as_view(),
+        name="token_refresh",
     ),
-    path("redoc/", schema_view.with_ui("redoc", cache_timeout=0), name="schema-redoc"),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

@@ -46,22 +46,20 @@ class LocalizationAdmin(admin.ModelAdmin):
 class OffersAdmin(admin.ModelAdmin):
     list_display = [
         "title",
-        "company_name",
+        "website",
         "is_active",
         "is_promoted",
-        "is_remote",
-        "is_hybrid",
         "date_scraped",
+        "is_new",
     ]
-    list_filter = ["is_active", "is_promoted", "is_hybrid", "is_remote"]
-    search_fields = ["title", "company_name"]
-    ordering = ["-date_scraped"]
-    filter_horizontal = ["experience_level", "localizations", "salary"]
+    list_filter = ["is_active", "is_promoted", "date_scraped", "experience_level"]
+    search_fields = ["title", "company_name", "description", "skills"]
+    list_editable = ["is_active"]
 
 
+admin.site.register(Offers, OffersAdmin)
 admin.site.register(Website, WebsiteAdmin)
 admin.site.register(Salaries, SalariesAdmin)
 admin.site.register(Localization, LocalizationAdmin)
-admin.site.register(Offers, OffersAdmin)
 admin.site.register(ContractType, ContractTypeAdmin)
 admin.site.register(WorkSchedule, WorkScheduleAdmin)
