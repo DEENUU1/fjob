@@ -4,7 +4,7 @@ services:
     db:
         hostname: db
         image: postgres:15
-        container_name: fjob-db-dev
+        container_name: fjob-db-prod
         volumes:
             - ./data/db:/var/lib/postgresql/data
         environment:
@@ -20,7 +20,7 @@ services:
         build:
             context: .
             dockerfile: ./config/django/Dockerfile
-        container_name: fjob-web-dev
+        container_name: fjob-web-prod
         command: gunicorn fjob.wsgi --bind 0.0.0.0:8001
         volumes:
             - ./fjob:/app
@@ -41,6 +41,7 @@ services:
             dockerfile: ./config/nginx/Dockerfile
         ports:
             - "80:80"
+        container_name: fjob-nginx-prod
         depends_on:
             - web
             - react
@@ -58,7 +59,7 @@ services:
         build:
             context: .
             dockerfile: ./config/django/Dockerfile
-        container_name: fjob-celery-dev
+        container_name: fjob-celery-prod
         command: celery -A fjob.celery worker -l info
         volumes:
             - ./fjob:/app/
@@ -74,7 +75,7 @@ services:
         build:
             context: .
             dockerfile: ./config/django/Dockerfile
-        container_name: fjob-celery-beat-dev
+        container_name: fjob-celery-beat-prod
         command: celery -A fjob.celery beat -l info
         volumes:
             - ./fjob:/app/
