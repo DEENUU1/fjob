@@ -43,8 +43,10 @@ services:
             - "80:80"
         depends_on:
             - web
+            - react
         volumes:
             - ./fjob:/app/
+            - ./config/nginx/nginx.conf:/etc/nginx/conf.d/default.conf
 
     redis:
         image: redis:latest
@@ -83,3 +85,13 @@ services:
             - SECRET_KEY=${SECRET_KEY}
         env_file:
             - .env
+
+    react:
+        build:
+            context: .
+            dockerfile: ./config/react/Dockerfile
+        ports:
+            - "4173:4173"
+        container_name: fjob-react-prod
+        depends_on:
+            - web
