@@ -8,15 +8,14 @@ load_dotenv()
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-SECRET_KEY = "django-insecure-btn_88i#@f7xef_^9iqth6h!y&c_c21hs4=ta(dg1h+d7cdfot"
-
+SECRET_KEY = os.getenv("SECRET_KEY")
 if os.getenv("DEV") == "true":
     DEBUG = True
     ALLOWED_HOSTS = []
 # Set up for production
 else:
     DEBUG = False
-    ALLOWED_HOSTS = ["localhost", "127.0.0.1"]
+    ALLOWED_HOSTS = ["*"]
 
 DATA_UPLOAD_MAX_NUMBER_FIELDS = 9999999
 

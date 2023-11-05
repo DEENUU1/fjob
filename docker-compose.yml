@@ -8,27 +8,30 @@ services:
         volumes:
             - ./data/db:/var/lib/postgresql/data
         environment:
-            - POSTGRES_DB=fjob
-            - POSTGRES_USER=fjob
-            - POSTGRES_PASSWORD=fjob123
+            - POSTGRES_DB=${PG_NAME}
+            - POSTGRES_USER=${PG_USER}
+            - POSTGRES_PASSWORD=${PG_PASSWORD}
         ports:
             - "5432:5432"
-
+        env_file:
+            -  .env
     web:
         hostname: web
         build:
             context: .
             dockerfile: ./config/django/Dockerfile
         container_name: fjob-web-dev
-        command: gunicorn fjob.wsgi --bind 0.0.0.0:8000
+        command: gunicorn fjob.wsgi --bind 0.0.0.0:8001
         volumes:
             - ./fjob:/app
         ports:
-            - "8000:8000"
+            - "8001:8001"
         depends_on:
             - db
             - redis
             - celery
+        environment:
+            - SECRET_KEY=${SECRET_KEY}
         env_file:
             - .env
 
@@ -37,7 +40,7 @@ services:
             context: .
             dockerfile: ./config/nginx/Dockerfile
         ports:
-            - 80:80
+            - "80:80"
         depends_on:
             - web
         volumes:
@@ -60,6 +63,10 @@ services:
         depends_on:
             - db
             - redis
+        environment:
+            - SECRET_KEY=${SECRET_KEY}
+        env_file:
+            - .env
 
     celery_beat:
         build:
@@ -72,17 +79,7 @@ services:
         depends_on:
             - db
             - redis
-
-    react:
-        build:
-            context: .
-            dockerfile: ./config/react/Dockerfile
-        container_name: fjob-react-dev
-        volumes:
-            - "./frontend:/app"
-            - "/app/node_modules"
-
-        ports:
-            - "5173:5173"
-        depends_on:
-            - web
+        environment:
+            - SECRET_KEY=${SECRET_KEY}
+        env_file:
+            - .env
