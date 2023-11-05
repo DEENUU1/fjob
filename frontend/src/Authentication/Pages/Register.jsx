@@ -23,7 +23,7 @@ export const Register = () => {
 
     try {
       const { data } = await axios.post(
-        "http://localhost:8000/users/register/",
+        "http://localhost:8000/api/v1/users/register/",
         user,
         {
           headers: {

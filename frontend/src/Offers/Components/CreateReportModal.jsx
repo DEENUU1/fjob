@@ -23,7 +23,7 @@ export const CreateReport = ({ offerId, onClose }) => {
   const handleSubmit = async () => {
     try {
       const response = await axios.post(
-        "http://localhost:8000/reports/",
+        "http://localhost:8000/api/v1/reports/",
         data,
         {
           headers: {

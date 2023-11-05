@@ -19,7 +19,7 @@ export const OffersListPage = () => {
     setIsLoading(true);
 
     axios
-      .get(`http://localhost:8000/offers/?${sortUrl}${queryUrl}`, {
+      .get(`http://localhost:8000/api/v1/offers/?${sortUrl}${queryUrl}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },

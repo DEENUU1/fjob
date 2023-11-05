@@ -18,7 +18,7 @@ export const Login = () => {
 
     try {
       const { data } = await axios.post(
-        "http://localhost:8000/token/",
+        "http://localhost:8000/api/v1/token/",
         user,
         {
           headers: {
