@@ -16,6 +16,8 @@ import { UserDeleteAccountPage } from "./Profile/Pages/UserDeleteAccountPage.jsx
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.min.css";
 import { Suspense} from "react";
+import {PrivatePolicyPage} from "./Components/TermsPage.jsx";
+import {CookiesPolicyPage} from "./Components/CookiesPolicy.jsx";
 
 
 function App() {
@@ -34,6 +36,8 @@ function App() {
         <Route path="/contact" element={<ContactFormPage />} />
         <Route path="/profile" element={<UserProfilePage />} />
         <Route path="/profile/delete" element={<UserDeleteAccountPage />} />
+        <Route path="/documents/policy" element={<PrivatePolicyPage />} />
+        <Route path="/documents/cookies" element={<CookiesPolicyPage />} />
         <Route
           path="/profile/password_change"
           element={<UserChangePasswordPage />}
