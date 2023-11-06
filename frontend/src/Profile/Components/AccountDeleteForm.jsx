@@ -26,7 +26,7 @@ export const AccountDeleteForm = ({ token }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const endpoint = "http://localhost:8000/users/account-delete/";
+    const endpoint = "http://localhost:8000/api/v1/users/account-delete/";
     const headers = {
       "Content-Type": "application/json",
       Authorization: `Bearer ${token}`,

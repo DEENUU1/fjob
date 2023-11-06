@@ -54,7 +54,8 @@
     "button": "Zarejestruj się",
     "labelpassword": "Hasło",
     "labelemail": "E-mail",
-    "labelusername": "Nazwa użytkownika"
+    "labelusername": "Nazwa użytkownika",
+    "labelterms": "Akceptuje regulamin"
   },
   "report": {
     "placeholder": "Powiedz nam, co jest nie tak z tą ofertą",

@@ -17,7 +17,7 @@ export const ContactFormPage = () => {
 
     try {
       const response = await axios.post(
-        "http://localhost:8000/messages/send/",
+        "http://localhost:8000/api/v1/messages/send/",
         {
           name,
           email,
