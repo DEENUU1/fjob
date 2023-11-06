@@ -11,12 +11,40 @@ logging.basicConfig(
     format="%(asctime)s - %(levelname)s - %(message)s",
 )
 
+CATEGORIES = [
+    "javascript",
+    "html",
+    "php",
+    "ruby",
+    "java",
+    "net",
+    "scala",
+    "c",
+    "mobile",
+    "testing",
+    "devops",
+    "admin",
+    "ux",
+    "pm",
+    "game",
+    "analytics",
+    "security",
+    "data",
+    "go",
+    "support",
+    "erp",
+    "architecture",
+    "other",
+]
+
 
 class GetJustJoinITContent(GetContentStrategy):
-    def __init__(self):
+    def __init__(self, category: str):
         super().__init__(
-            website="JustJoinIT", base_url="https://justjoin.it/all-locations/ux"
-        )  # TODO add all categories
+            website="JustJoinIT",
+            base_url=f"https://justjoin.it/all-locations/{category}",
+        )
+        self.category = category
         self.pixels_to_scroll = "500"
         self.driver = webdriver.Chrome()
         self.driver.get(self.base_url)
