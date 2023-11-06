@@ -1,5 +1,5 @@
 from django.core.management.base import BaseCommand
-from ...scraper_main import run_pracapl
+from ...tasks import run_pracapl
 
 
 class Command(BaseCommand):

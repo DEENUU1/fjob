@@ -1,5 +1,5 @@
 from django.core.management.base import BaseCommand
-from ...scraper_main import run_olx
+from ...tasks import run_olx
 
 
 class Command(BaseCommand):

@@ -1,5 +1,5 @@
 from django.core.management.base import BaseCommand
-from ...scraper_main import run_justjoinit
+from ...tasks import run_justjoinit
 
 
 class Command(BaseCommand):
