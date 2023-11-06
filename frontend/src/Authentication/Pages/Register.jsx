@@ -1,7 +1,7 @@
 import axios from "axios";
 import { useState } from "react";
 import "../Styles/login.css";
-import { useNavigate } from "react-router-dom";
+import {Link, useNavigate} from "react-router-dom";
 import { toast } from "react-toastify";
 import {useTranslation} from "react-i18next";
 
@@ -152,7 +152,7 @@ export const Register = () => {
               onChange={() => setTermsAccepted(!termsAccepted)}
               required
             />
-            <label>{t('register.labelterms')}</label>
+            <label><a href="/documents/policy">{t('register.labelterms')} </a> </label>
 
           </div>
 
