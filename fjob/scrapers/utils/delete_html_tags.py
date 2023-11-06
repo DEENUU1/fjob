@@ -17,4 +17,5 @@ def delete_html_tags(description: str) -> Optional[str]:
         .replace("</li>", " ")
         .replace("<ul>", " ")
         .replace("</ul>", " ")
+        .replace("<br />", " ")
     )
