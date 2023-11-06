@@ -6,6 +6,7 @@ from .scrapers.justjoinit import (
     get_content as get_content_justjoinit,
     process as process_justjoinit,
 )
+from .scrapers.justjoinit.get_content import CATEGORIES
 from .scrapers.pracapl import (
     get_content as get_content_pracapl,
     process as process_pracapl,
@@ -54,12 +55,13 @@ def run_the_protocol():
 @shared_task
 def run_justjoinit():
     try:
-        scraper = get_content_justjoinit.GetJustJoinITContent()
-        scraper.fetch_content()
-        logging.info(
-            f"Successfully fetched content for {scraper.website} get {scraper.__len__()} elements"
-        )
-        scraper.save_to_db()
+        for cat in CATEGORIES:
+            scraper = get_content_justjoinit.GetJustJoinITContent(cat)
+            scraper.fetch_content()
+            logging.info(
+                f"Successfully fetched content for {scraper.website} get {scraper.__len__()} elements"
+            )
+            scraper.save_to_db()
 
         page_content = PageContent.objects.filter(
             website="JustJoinIT", is_parsed=False
