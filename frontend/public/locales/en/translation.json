@@ -54,7 +54,8 @@
     "button": "Sign up",
     "labelpassword": "Password",
     "labelemail": "Email",
-    "labelusername": "Username"
+    "labelusername": "Username",
+    "labelterms": "Accept terms"
   },
   "report": {
     "placeholder": "Tell us what is wrong with this offer",
