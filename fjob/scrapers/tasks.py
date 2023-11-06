@@ -18,6 +18,7 @@ from .scrapers.nfj import get_content as get_content_nfj, process as process_nfj
 from .scrapers.olx import get_content as get_content_olx, process as process_olx
 import logging
 from .models import PageContent
+from celery import shared_task
 
 
 logging.basicConfig(
@@ -50,6 +51,7 @@ def run_the_protocol():
         logging.error(f"Failed to run the protocol scraper: {e}")
 
 
+@shared_task
 def run_justjoinit():
     try:
         scraper = get_content_justjoinit.GetJustJoinITContent()
@@ -72,6 +74,7 @@ def run_justjoinit():
         logging.error(f"Failed to run justjoinit  scraper: {e}")
 
 
+@shared_task
 def run_nfj():
     try:
         scraper = get_content_nfj.GetNFJContent()
@@ -93,6 +96,7 @@ def run_nfj():
         logging.error(f"Failed to run nfj scraper: {e}")
 
 
+@shared_task
 def run_pracapl():
     try:
         max_page = get_content_pracapl.get_max_page()
@@ -117,6 +121,7 @@ def run_pracapl():
         logging.error(f"Failed to run pracapl scraper: {e}")
 
 
+@shared_task
 def run_pracujpl():
     try:
         max_page = get_content_pracujpl.get_max_page_number()
@@ -141,6 +146,7 @@ def run_pracujpl():
         logging.error(f"Failed to run pracujpl scraper: {e}")
 
 
+@shared_task
 def run_olx():
     try:
         scraper = get_content_olx.GetOLXContent()
