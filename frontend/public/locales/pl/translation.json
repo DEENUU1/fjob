@@ -69,7 +69,9 @@
     "oldest": "Najstarsze",
     "highest": "Najwyższa pensja",
     "lowest": "Najniższa pensja",
-    "searchbutton": "Szukaj"
+    "searchbutton": "Szukaj",
+    "contracttype": "Typ umowy:",
+    "workschedule": "Wymiar pracy:"
   },
   "remote": {
     "remote": "Zdalna",

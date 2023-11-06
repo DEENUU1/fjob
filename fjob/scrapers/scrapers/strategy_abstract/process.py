@@ -91,7 +91,7 @@ class Process(ABC):
             company_logo=parsed_offer.company_logo,
             is_remote=parsed_offer.is_remote,
             is_hybrid=parsed_offer.is_hybrid,
-            is_active=False,
+            is_active=True,  # TODO Change that to False
             date_created=datetime.strptime(parsed_offer.date_created, "%Y-%m-%d")
             if parsed_offer.date_created
             else None,

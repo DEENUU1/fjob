@@ -69,7 +69,9 @@
     "oldest": "Oldest",
     "highest": "Salary highest",
     "lowest": "Salary lowest",
-    "searchbutton": "Search"
+    "searchbutton": "Search",
+    "contracttype": "Contract type:",
+    "workschedule": "Work schedule:"
   },
   "remote": {
     "remote": "Remote",

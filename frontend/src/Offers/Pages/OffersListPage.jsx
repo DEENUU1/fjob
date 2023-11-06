@@ -4,6 +4,8 @@ import { OfferList } from "../Components/OfferList.jsx";
 import "../Styles/filtersearch.css";
 import { toast } from "react-toastify";
 import {useTranslation} from "react-i18next";
+import Container from "react-bootstrap/Container";
+
 
 export const OffersListPage = () => {
   const [offers, setOffers] = useState([]);
@@ -83,7 +85,9 @@ export const OffersListPage = () => {
           </select>
         </div>
       </div>
-      <OfferList offers={offers} />
+      <Container>
+        <OfferList offers={offers} />
+      </Container>
     </div>
   );
 };

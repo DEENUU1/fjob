@@ -1,10 +1,12 @@
-import React, { useState } from "react";
+import React, {useEffect, useState} from "react";
 import "../Styles/offerlist.css";
-import { OfferExperience } from "./Experience.jsx";
 import { RemoteHybridOffer } from "./RemoteHybrid.jsx";
 import { Localization } from "./Localization.jsx";
 import { CreateReport } from "./CreateReportModal.jsx";
 import {useTranslation} from "react-i18next";
+import {SalaryDetails} from "./SalaryDetails.jsx";
+import Button from "react-bootstrap/Button";
+import {Converter} from "./DateConverter.jsx";
 
 export const OfferList = ({ offers }) => {
   const [showModal, setShowModal] = useState(false);
@@ -18,40 +20,46 @@ export const OfferList = ({ offers }) => {
     setShowModal(false);
   };
 
+
   return (
     <ul>
       {offers.map((offer) => (
         <div className="offer">
           <div className="card-container">
             <div className="card-header">
-              <h2>
+              <h5>
                 <a className="offer-url" href={offer.url}>
                   {offer.title}
                 </a>
-              </h2>
+              </h5>
 
-              <button onClick={handleShowModal}>{t("offer.report")}</button>
+              <Button variant="danger" className="report-button" size="sm" onClick={handleShowModal}>{t("offer.report")}</Button>
               {showModal && (
                 <CreateReport offerId={offer.id} onClose={handleCloseModal} />
               )}
 
-              <OfferExperience offer={offer} />
               <RemoteHybridOffer offer={offer} />
             </div>
 
             <div className="card-additional">
               <div className="offer-skills">
-                {offer.skills ? (
-                  <span>
-                    {offer.skills.split(",").map((skill, index) => (
-                      <span className="skills" key={index}>
-                        {skill}
-                      </span>
-                    ))}
-                  </span>
-                ) : (
-                  <span></span>
-                )}
+                <ul style={{ display: "flex", flexWrap: "wrap" }}>
+                  {offer.experience_level && offer.experience_level.length > 0 ? (
+                    offer.experience_level.map((experienceLevel) => (
+                      <li key={experienceLevel.id} style={{ marginRight: 10 }}>
+                        <span className="skills">{experienceLevel.name}</span>
+                      </li>
+                    ))
+                  ) : null}
+
+                  {offer.skills ? (
+                    offer.skills.split(",").map((skill, index) => (
+                      <li key={index} style={{ marginRight: 10 }}>
+                        <span className="skills">{skill}</span>
+                      </li>
+                    ))
+                  ) : null}
+                </ul>
               </div>
 
               <div className="card-description">
@@ -64,41 +72,20 @@ export const OfferList = ({ offers }) => {
                   <p></p>
                 )}
               </div>
-
-              <div className="offer-salary-container">
-                {offer.salary ? (
-                  <ul>
-                    {offer.salary.map((salaryData) => {
-                      return (
-                        <li className="offer-salary">
-                          {salaryData.salary_from} - {salaryData.salary_to}{" "}
-                          {salaryData.currency} / {salaryData.salary_schedule}
-                          <ul className="offer-work-schedule">
-                            {salaryData.work_schedule.map((workSchedule) => {
-                              return <li>{workSchedule.name}</li>;
-                            })}
-                          </ul>
-                          <ul className="offer-contract-type">
-                            {salaryData.contract_type.map((contractType) => {
-                              return <li>{contractType.name}</li>;
-                            })}
-                          </ul>
-                        </li>
-                      );
-                    })}
-                  </ul>
-                ) : (
-                  <span></span>
-                )}
-              </div>
             </div>
-
+              {offer.salary.map((salary, index) => (
+                <SalaryDetails key={index} salaryData={salary} />
+              ))}
             <div className="card-footer">
               <Localization localizations={offer.localizations} />
               <div className="offer-meta">
-                <span className="date-scraped">{offer.date_scraped} </span>
+                <span className="date-scraped">
+                  <Converter date={offer.date_scraped} />
+                </span>
+
                 <span className="website-source">
-                  <a href={offer.website.url}>{offer.website.name}</a>
+                  {offer.website && <a href={offer.website.url}>{offer.website.name}</a>}
+
                 </span>
               </div>
             </div>

@@ -27,6 +27,6 @@ class OfferListView(generics.ListAPIView):
     ]
     search_fields = ["title", "description", "skills"]
 
-    @method_decorator(cache_page(60 * 15))
+    # @method_decorator(cache_page(60))
     def get(self, *args, **kwargs):
         return super().get(*args, **kwargs)
