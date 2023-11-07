@@ -13,7 +13,7 @@ a.offer-url {
 }
 
 .card-header {
-  background-color: #f3f3f3;
+  background-color: #ffffff;
   padding: 10px;
   position: relative;
 }
@@ -51,6 +51,7 @@ a.offer-url {
   padding: 5px;
   display: inline-block;
   margin-right: 10px;
+  margin-top: 5px;
 }
 
 
@@ -95,9 +96,9 @@ a.offer-url {
     width: 90%;
   }
 
-  .card-header {
-    padding: 5px;
-  }
+  /*.card-header {*/
+  /*  padding: 5px;*/
+  /*}*/
 
   .card-header .report-button {
     position: static;
