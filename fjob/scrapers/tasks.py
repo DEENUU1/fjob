@@ -48,6 +48,8 @@ def run_the_protocol():
             for data in processed_data:
                 process.save_to_db(data)
 
+            content.delete()
+
     except Exception as e:
         logging.error(f"Failed to run the protocol scraper: {e}")
 
@@ -55,13 +57,13 @@ def run_the_protocol():
 @shared_task
 def run_justjoinit():
     try:
-        # for cat in CATEGORIES:
-        #     scraper = get_content_justjoinit.GetJustJoinITContent(cat)
-        #     scraper.fetch_content()
-        #     logging.info(
-        #         f"Successfully fetched content for {scraper.website} get {scraper.__len__()} elements"
-        #     )
-        #     scraper.save_to_db()
+        for cat in CATEGORIES:
+            scraper = get_content_justjoinit.GetJustJoinITContent(cat)
+            scraper.fetch_content()
+            logging.info(
+                f"Successfully fetched content for {scraper.website} get {scraper.__len__()} elements"
+            )
+            scraper.save_to_db()
 
         page_content = PageContent.objects.filter(
             website="JustJoinIT", is_parsed=False
@@ -71,6 +73,8 @@ def run_justjoinit():
             process.parse_html(content.content)
             processed_data = process.process()
             process.save_to_db(processed_data)
+
+            content.delete()
 
     except Exception as e:
         logging.error(f"Failed to run justjoinit  scraper: {e}")
@@ -93,6 +97,8 @@ def run_nfj():
             processed_data = process.process()
             for pd in processed_data:
                 process.save_to_db(pd)
+
+            content.delete()
 
     except Exception as e:
         logging.error(f"Failed to run nfj scraper: {e}")
@@ -119,6 +125,8 @@ def run_pracapl():
             for data in processed_data:
                 process.save_to_db(data)
 
+            content.delete()
+
     except Exception as e:
         logging.error(f"Failed to run pracapl scraper: {e}")
 
@@ -144,6 +152,8 @@ def run_pracujpl():
             for data in processed_data:
                 process.save_to_db(data)
 
+            content.delete()
+
     except Exception as e:
         logging.error(f"Failed to run pracujpl scraper: {e}")
 
@@ -166,6 +176,8 @@ def run_olx():
             processed_data = process.process()
             for data in processed_data:
                 process.save_to_db(data)
+
+            content.delete()
 
     except Exception as e:
         logging.error(f"Failed to run olx scraper: {e}")
